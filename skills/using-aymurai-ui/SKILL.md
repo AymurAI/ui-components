@@ -16,7 +16,7 @@ catalog below genuinely lacks it; then prefer adding it to `@aymurai/ui`.
 Install the pinned release tarball (public repo, no token needed):
 
 ```sh
-pnpm add https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz
+pnpm add https://github.com/AymurAI/ui-components/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz
 ```
 
 Import the stylesheet once at the app root (works in any React app — Vite,

@@ -13,11 +13,11 @@ prefixed `aym-`, so it never clobbers a consumer's own styles.
 ## Install
 
 This package is **not published to a registry** — it is distributed as a
-prebuilt tarball attached to each [GitHub Release](https://github.com/AymurAI/ui/releases).
+prebuilt tarball attached to each [GitHub Release](https://github.com/AymurAI/ui-components/releases).
 Install a pinned version straight from the release asset:
 
 ```sh
-pnpm add https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz
+pnpm add https://github.com/AymurAI/ui-components/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz
 ```
 
 …or pin it in `package.json` and run `pnpm install`:
@@ -25,7 +25,7 @@ pnpm add https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0
 ```jsonc
 {
   "dependencies": {
-    "@aymurai/ui": "https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz"
+    "@aymurai/ui": "https://github.com/AymurAI/ui-components/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz"
   }
 }
 ```
@@ -102,10 +102,19 @@ Agents working in this repo also get the `authoring-aymurai-ui` skill
 
 ### Helping agents in consumer repos use this library
 
-See **[docs/agent-integration/](docs/agent-integration/)** — a drop-in
-`AGENTS.md` guardrail snippet + a `using-aymurai-ui` skill to copy into
-`desktop-app` / `defensoria` so their coding agents import from `@aymurai/ui`
-instead of reinventing components.
+Coding agents in the consumer repos (`desktop-app`, `defensoria`) should import
+from `@aymurai/ui` instead of reinventing components. Install the skill that
+teaches them how, straight from this repo's top-level `skills/` folder:
+
+```sh
+npx skills@latest add AymurAI/ui-components
+```
+
+Plus paste the always-on guardrail from
+[`docs/agent-integration/AGENTS.snippet.md`](docs/agent-integration/AGENTS.snippet.md)
+into the consumer's `AGENTS.md` / `CLAUDE.md`. Full details and the
+AGENTS.md-vs-skill rationale are in
+**[docs/agent-integration/](docs/agent-integration/)**.
 
 ## Releasing
 
