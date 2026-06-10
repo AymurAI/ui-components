@@ -20,7 +20,7 @@ export default defineConfig({
     react(),
     dts({
       entryRoot: "src",
-      include: ["src", "preset.ts"],
+      include: ["src"],
       exclude: ["src/**/*.stories.tsx", "src/styled/**"],
       tsconfigPath: "tsconfig.build.json",
     }),
@@ -29,7 +29,7 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, "src/index.ts"),
-        preset: resolve(__dirname, "preset.ts"),
+        preset: resolve(__dirname, "src/preset.ts"),
       },
       formats: ["es", "cjs"],
     },

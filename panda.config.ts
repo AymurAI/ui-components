@@ -1,5 +1,5 @@
 import { defineConfig } from "@pandacss/dev";
-import { aymuraiPreset } from "./preset";
+import { aymuraiPreset } from "./src/preset";
 
 export default defineConfig({
   // No CSS reset: the library ships a self-contained stylesheet that must NOT

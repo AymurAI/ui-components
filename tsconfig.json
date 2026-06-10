@@ -20,5 +20,5 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "preset.ts", "panda.config.ts", "vite.config.ts", ".storybook"]
+  "include": ["src", "panda.config.ts", "vite.config.ts", ".storybook"]
 }
