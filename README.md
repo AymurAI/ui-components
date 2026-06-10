@@ -12,11 +12,26 @@ prefixed `aym-`, so it never clobbers a consumer's own styles.
 
 ## Install
 
+This package is **not published to a registry** — it is distributed as a
+prebuilt tarball attached to each [GitHub Release](https://github.com/AymurAI/ui/releases).
+Install a pinned version straight from the release asset:
+
 ```sh
-pnpm add @aymurai/ui
+pnpm add https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz
 ```
 
-Peer dependencies (provided by your app): `react`, `react-dom` (v18 or v19).
+…or pin it in `package.json` and run `pnpm install`:
+
+```jsonc
+{
+  "dependencies": {
+    "@aymurai/ui": "https://github.com/AymurAI/ui/releases/download/v0.1.0/aymurai-ui-0.1.0.tgz"
+  }
+}
+```
+
+The repo is public, so no auth token is needed. Peer dependencies (provided by
+your app): `react`, `react-dom` (v18 or v19).
 
 ## Usage
 
@@ -82,12 +97,27 @@ pnpm build            # panda codegen + tsc + vite build + panda cssgen → dist
 
 See **[docs/component-authoring.md](docs/component-authoring.md)** — conventions,
 the token reference, the Figma extraction workflow, and the Figma node-ID map.
+Agents working in this repo also get the `authoring-aymurai-ui` skill
+(`.claude/skills/`).
+
+### Helping agents in consumer repos use this library
+
+See **[docs/agent-integration/](docs/agent-integration/)** — a drop-in
+`AGENTS.md` guardrail snippet + a `using-aymurai-ui` skill to copy into
+`desktop-app` / `defensoria` so their coding agents import from `@aymurai/ui`
+instead of reinventing components.
 
 ## Releasing
 
-Versioning is managed with [changesets](https://github.com/changesets/changesets):
+Releases are GitHub Releases with the prebuilt tarball attached. Bump the
+version, tag it, and push — the `release.yml` workflow builds, packs and
+publishes the Release:
 
 ```sh
-pnpm changeset        # describe the change + bump
-pnpm release          # build + publish (CI runs this on merge)
+npm version 0.2.0 --no-git-tag-version   # bump package.json
+git commit -am "Release v0.2.0"
+git tag v0.2.0
+git push && git push --tags              # → CI builds + attaches aymurai-ui-0.2.0.tgz
 ```
+
+To produce the tarball locally (e.g. to test consumption): `pnpm release`.

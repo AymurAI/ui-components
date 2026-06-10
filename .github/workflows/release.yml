@@ -1,15 +1,15 @@
 name: Release
 
+# Tag a version to publish a GitHub Release with the prebuilt tarball:
+#   npm version 0.2.0 --no-git-tag-version   # bump package.json
+#   git commit -am "Release v0.2.0"
+#   git tag v0.2.0 && git push && git push --tags
 on:
   push:
-    branches: [main]
-
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+    tags: ["v*"]
 
 permissions:
   contents: write
-  pull-requests: write
-  packages: write
 
 jobs:
   release:
@@ -23,18 +23,26 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          registry-url: https://npm.pkg.github.com
 
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm validate
 
-      # Opens/updates a "Version Packages" PR; when that PR merges, publishes.
-      - name: Create Release PR or Publish
-        uses: changesets/action@v1
+      # Build dist/ and pack the publishable tarball (includes dist + types + css).
+      - run: pnpm build
+      - run: pnpm pack --pack-destination .
+
+      - name: Verify tag matches package.json version
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json ($PKG_VERSION)" >&2
+            exit 1
+          fi
+
+      - name: Create GitHub Release with tarball
+        uses: softprops/action-gh-release@v2
         with:
-          version: pnpm changeset version
-          publish: pnpm release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: aymurai-ui-*.tgz
+          generate_release_notes: true
+          fail_on_unmatched_files: true

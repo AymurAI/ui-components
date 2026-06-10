@@ -35,8 +35,7 @@
     "lint:fix": "biome check --write",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "validate": "pnpm lint && pnpm typecheck",
-    "changeset": "changeset",
-    "release": "pnpm build && changeset publish"
+    "release": "pnpm build && pnpm pack --pack-destination ."
   },
   "peerDependencies": {
     "react": "^18 || ^19",
@@ -53,7 +52,6 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@changesets/cli": "^2.27.0",
     "@pandacss/dev": "^1.8.1",
     "@storybook/react": "^8.6.18",
     "@storybook/react-vite": "^8.4.0",
@@ -66,10 +64,6 @@
     "typescript": "^5.9.2",
     "vite": "^6.3.5",
     "vite-plugin-dts": "^4.3.0"
-  },
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
   },
   "repository": {
     "type": "git",
