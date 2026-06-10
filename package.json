@@ -4,6 +4,7 @@
   "description": "AymurAI shared React component library, extracted from the Figma UI Library and authored with Panda CSS.",
   "license": "MIT",
   "type": "module",
+  "packageManager": "pnpm@11.3.0",
   "sideEffects": ["*.css"],
   "files": ["dist"],
   "exports": {
