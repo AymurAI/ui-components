@@ -8,3 +8,4 @@ src/styled
 # Logs / OS
 *.log
 .DS_Store
+*.tgz

@@ -4,12 +4,8 @@
   "description": "AymurAI shared React component library, extracted from the Figma UI Library and authored with Panda CSS.",
   "license": "MIT",
   "type": "module",
-  "sideEffects": [
-    "*.css"
-  ],
-  "files": [
-    "dist"
-  ],
+  "sideEffects": ["*.css"],
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -59,6 +55,7 @@
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.0",
     "@pandacss/dev": "^1.8.1",
+    "@storybook/react": "^8.6.18",
     "@storybook/react-vite": "^8.4.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -71,6 +68,11 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AymurAI/ui.git"
   }
 }
