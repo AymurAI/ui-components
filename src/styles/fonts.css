@@ -1,0 +1,12 @@
+/**
+ * Optional font stylesheet for @aymurai/ui.
+ *
+ * The component library uses "Archivo" for UI text and "Times New Roman" for
+ * document/legal text. Import this file once in your app if you want the
+ * library to load Archivo from Google Fonts:
+ *
+ *   import "@aymurai/ui/fonts.css";
+ *
+ * Alternatively, self-host Archivo and skip this file.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&display=swap");
