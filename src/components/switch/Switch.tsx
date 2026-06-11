@@ -14,7 +14,8 @@ const rootStyle = css({
   cursor: "pointer",
   position: "relative",
   flexShrink: "0",
-  bg: "bg.primary-highlight",
+  // Figma Status=Inactive track is grey (#E0DDE2), not the light-purple highlight.
+  bg: "action.disabled",
 
   transitionProperty: "[background-color]",
   transitionDuration: "slow",
@@ -35,8 +36,7 @@ const thumbStyle = css({
   width: "[20px]",
   height: "[20px]",
   borderRadius: "full",
-  // "white" is not a semantic token — use escape hatch
-  bg: "[white]",
+  bg: "bg.secondary",
   position: "absolute",
   top: "[2px]",
   left: "[2px]",

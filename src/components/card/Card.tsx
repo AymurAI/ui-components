@@ -45,7 +45,7 @@ const styles = cva({
         cursor: "pointer",
         "&:hover": {
           border: "primary-alt",
-          boxShadow: "[0px 0px 15px 0px #3F479D66]",
+          boxShadow: "card-hover",
         },
       },
     },

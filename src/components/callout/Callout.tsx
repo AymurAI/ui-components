@@ -15,11 +15,11 @@ const calloutRecipe = cva({
   base: {
     ...hstack.raw({
       alignItems: "center",
-      gap: "3",
+      gap: "2", // Figma: 8px
     }),
 
     px: "4",
-    py: "3",
+    py: "4", // Figma: 16px uniform padding
 
     rounded: "sm",
     borderWidth: "[1px]",
@@ -27,7 +27,7 @@ const calloutRecipe = cva({
 
     width: "full",
 
-    textStyle: "paragraph.sm.default",
+    textStyle: "label.md.default", // Figma: Archivo 16/120%
   },
   variants: {
     variant: {
@@ -89,8 +89,8 @@ export function Callout({
       {...props}
     >
       <IconComponent
-        size={20}
-        weight="light"
+        size={24}
+        weight="regular"
         aria-hidden="true"
         style={{ flexShrink: 0 }}
       />
@@ -102,7 +102,7 @@ export function Callout({
           onClick={onDismiss}
           cursor="pointer"
         >
-          <X size={18} aria-hidden="true" />
+          <X size={24} aria-hidden="true" />
         </styled.button>
       )}
     </div>

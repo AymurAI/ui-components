@@ -57,6 +57,17 @@ export const aymuraiPreset = definePreset({
           },
           file: { value: '"Times New Roman", Times, serif' },
         },
+        // Shadow scale — values taken pixel-exact from the Figma UI Library.
+        shadows: {
+          focus: { value: "0px 0px 8px rgba(17, 0, 65, 0.2)" },
+          "input-focus": { value: "0px 2px 1px rgba(0, 0, 0, 0.16)" },
+          dropdown: { value: "0px 16px 16px rgba(0, 0, 0, 0.08)" },
+          "card-hover": { value: "0px 0px 7.5px rgba(63, 71, 157, 0.4)" },
+          tooltip: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
+          // Dialog/Popover have no Figma node yet — tokenised at current values.
+          dialog: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
+          popover: { value: "0px 0px 15px 0px #00000026" },
+        },
       },
       textStyles: {
         title: {
@@ -96,6 +107,10 @@ export const aymuraiPreset = definePreset({
             "onbutton-default": color("#110041"),
             "onbutton-alternative": color("#FFFFFF"),
             "onbutton-disabled": color("#2D3748"),
+            // Figma text/text-onbutton-alt — used by ButtonLink (Type=Default).
+            "onbutton-alt": color("#576171"),
+            // Figma text/text-onbutton-disabled — disabled labels (Radio, etc.).
+            disabled: color("#A9A9A9"),
           },
           action: {
             default: color("#C5CAFF"),
@@ -104,7 +119,11 @@ export const aymuraiPreset = definePreset({
             hover: color("#110041"),
             pressed: color("#3F479D"),
             focus: color("#C5CAFF"),
+            // Figma progress-fill tint (ArchiveProgress active bar).
+            progress: color("#CED1F4"),
           },
+          // Dialog/modal scrim.
+          overlay: color("rgba(0, 0, 0, 0.5)"),
           bg: {
             primary: color("#F6F5F7"),
             secondary: color("#FFFFFF"),

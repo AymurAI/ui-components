@@ -16,8 +16,7 @@ const overlayStyles = css({
   position: "fixed",
   inset: "[0]",
   zIndex: 50,
-  // literal rgba — escape hatch required
-  bg: "[rgba(0, 0, 0, 0.5)]",
+  bg: "overlay",
 
   "&[data-state='open']": {
     animation: "fadeIn",
@@ -36,7 +35,7 @@ const contentStyles = css({
   bg: "bg.secondary",
   rounded: "sm",
   p: "6",
-  boxShadow: "[0px 4px 8px rgba(0, 0, 0, 0.1)]",
+  boxShadow: "dialog",
 
   width: "[90vw]",
   minW: "[300px]",

@@ -48,7 +48,7 @@ const button = cva({
           bg: "action.focus",
           outline: "primary-alt",
           outlineWidth: "[2px]",
-          boxShadow: "[0px 0px 10px rgba(17, 0, 65, 0.2)]",
+          boxShadow: "focus",
         },
         "&:disabled": {
           bg: "action.disabled",
@@ -71,7 +71,7 @@ const button = cva({
           borderColor: "action.pressed",
         },
         "&:focus-visible:enabled": {
-          boxShadow: "[0px 0px 10px rgba(17, 0, 65, 0.2)]",
+          boxShadow: "focus",
           outline: "primary-alt",
           outlineWidth: "[2px]",
           bg: "bg.secondary",

@@ -56,6 +56,11 @@ const tagRoot = cva({
       Default: {},
       Hover: {
         bg: "bg.primary-highlight",
+        // Figma Hover: the label badge turns action.alt-default + underline.
+        "& > span:last-child": {
+          color: "action.alt-default",
+          textDecoration: "underline",
+        },
       },
     },
   },

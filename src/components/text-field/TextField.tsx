@@ -24,7 +24,9 @@ const input = sva({
 
       "&:focus-within": {
         outline: "none",
-        boxShadow: "[0px 2px 2px rgba(0, 0, 0, 0.16)]",
+        // Figma Focus: border turns primary-alt (#110041) + 1px-blur shadow.
+        border: "primary-alt",
+        boxShadow: "input-focus",
       },
     },
     input: {
@@ -73,8 +75,7 @@ const input = sva({
       },
       false: {
         inputBox: {
-          // "white" is not a semantic token — use escape hatch
-          bg: "[white]",
+          bg: "bg.secondary",
         },
       },
     },

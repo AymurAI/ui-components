@@ -1,4 +1,5 @@
 import { css, cx } from "@/styled/css";
+import { useId } from "react";
 
 /**
  * Spinner — AymurAI UI Library.
@@ -25,7 +26,7 @@ export type SpinnerProps = {
 export function Spinner({ size = 48, className }: SpinnerProps) {
   // Use unique gradient ID per instance to avoid SVG collision when multiple
   // spinners are on the page simultaneously.
-  const gradId = "spinner-grad";
+  const gradId = useId();
 
   return (
     <svg

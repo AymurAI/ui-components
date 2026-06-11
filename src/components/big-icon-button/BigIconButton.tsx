@@ -44,7 +44,7 @@ const bigIconButton = cva({
       outline: "primary-alt",
       outlineWidth: "[2px]",
       outlineStyle: "solid",
-      boxShadow: "[0px 0px 10px rgba(17, 0, 65, 0.2)]",
+      boxShadow: "focus",
     },
   },
   variants: {

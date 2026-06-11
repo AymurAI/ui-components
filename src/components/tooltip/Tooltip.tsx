@@ -15,8 +15,13 @@ export const TooltipTrigger = TooltipPrimitive.Trigger;
 const contentStyles = css({
   zIndex: 50,
   bg: "bg.primary",
-  rounded: "md",
-  boxShadow: "[0px 0px 15px 0px #00000026]",
+  // Figma: 4px radius, 8px padding, 8px gap, 0px 4px 8px/10% shadow.
+  rounded: "sm",
+  p: "2",
+  display: "flex",
+  alignItems: "center",
+  gap: "2",
+  boxShadow: "tooltip",
 
   "&[data-state='delayed-open']": {
     animation: "fadeIn",

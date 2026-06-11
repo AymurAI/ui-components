@@ -82,12 +82,20 @@ const checkboxRoot = cva({
     "&:hover:not([data-disabled])": {
       bg: "bg.primary-alternative",
     },
+
+    // Figma Hover + Checked: the box darkens to action.hover (#110041).
+    "&:hover:not([data-disabled]) [data-checked='true']": {
+      bg: "action.hover",
+      borderColor: "action.hover",
+    },
   },
   variants: {
     disabled: {
       true: {
         cursor: "not-allowed",
-        opacity: "[0.6]",
+        // Per-slot disabled colours (Figma) rather than a blanket opacity:
+        // the box already maps action.disabled; here we dim the label.
+        color: "text.lighter",
       },
       false: {},
     },
@@ -150,6 +158,7 @@ export function Checkbox({
       {/* Visual box */}
       <span
         aria-hidden="true"
+        data-checked={!!checked || !!defaultChecked}
         className={checkboxBox({
           checked: !!checked || !!defaultChecked,
           disabled,

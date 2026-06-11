@@ -63,6 +63,7 @@ export interface ToolbarProps {
 }
 
 export function Toolbar({
+  context = "anonimizador",
   searchValue,
   onSearchChange,
   rightSlot,
@@ -71,12 +72,14 @@ export function Toolbar({
   className,
   children,
 }: ToolbarProps) {
+  // Figma: Search+Switch is center-aligned; the other contexts are bottom-aligned.
+  const alignItems = context === "search-switch" ? "center" : "flex-end";
   return (
     <div
       className={cx(
         css({
           display: "flex",
-          alignItems: "flex-end",
+          alignItems,
           justifyContent: "space-between",
           bg: "bg.secondary",
           pt: "[42px]",

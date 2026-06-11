@@ -22,7 +22,7 @@ import { ArrowsClockwise, CheckCircle, Stop, X } from "phosphor-react";
  *   onDismiss  — called when X (dismiss) clicked
  *
  * Tokens:
- *   action.default        = #C5CAFF   (active progress fill — approximate, Figma shows #CED1F4)
+ *   action.progress       = #CED1F4   (active progress fill, Figma-exact)
  *   bg.primary            = #F6F5F7   (progress track)
  *   action.disabled       = #E0DDE2   (stopped track + button border)
  *   action.alt-default    = #3F479D   (completed fill)
@@ -76,7 +76,7 @@ function ProgressBar({
         ? "system.error-secondary"
         : status === "stopped"
           ? "action.disabled"
-          : "action.default";
+          : "action.progress";
 
   const pct = Math.min(100, Math.max(0, progress));
 
@@ -139,13 +139,14 @@ function ProgressLabel({
           alignItems: "center",
           gap: "1",
           flexShrink: "0",
+          // Icon + label both inherit currentColor (no raw CSS-var leak).
+          color: "brand.primary",
         })}
       >
-        <CheckCircle size={19} color="var(--colors-brand-primary)" />
+        <CheckCircle size={19} />
         <span
           className={css({
             textStyle: "label.md.default",
-            color: "brand.primary",
             whiteSpace: "nowrap",
           })}
         >
@@ -205,7 +206,8 @@ export function ArchiveProgress({
 
   const showStopButton = status === "default" || status === "stopped";
   const showReplaceButton = status === "replace" || status === "error";
-  const showDismiss = status !== "completed";
+  // Figma shows the dismiss X on every state, including completed.
+  const showDismiss = true;
 
   return (
     <div

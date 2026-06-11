@@ -75,8 +75,7 @@ const select = sva({
       alignItems: "center",
       gap: "2",
       width: "full",
-      // "white" is not a semantic token — use escape hatch
-      bg: "[white]",
+      bg: "bg.secondary",
       border: "primary",
       rounded: "sm",
       cursor: "pointer",
@@ -87,8 +86,7 @@ const select = sva({
 
       "&[data-state='open']": {
         boxShadow: "[0px 2px 2px rgba(0, 0, 0, 0.16)]",
-        // literal hex — escape hatch required
-        borderColor: "[#110041]",
+        borderColor: "text.default",
       },
       "&:focus-visible": {
         outlineColor: "brand.primary",
@@ -121,9 +119,9 @@ const select = sva({
       },
     },
     content: {
-      bg: "[white]",
+      bg: "bg.secondary",
       rounded: "sm",
-      boxShadow: "[0px 8px 16px rgba(0, 0, 0, 0.08)]",
+      boxShadow: "dropdown",
       border: "secondary",
       overflow: "hidden",
       zIndex: "10",
@@ -140,7 +138,7 @@ const select = sva({
       py: "1",
       color: "text.lighter",
       cursor: "default",
-      bg: "[white]",
+      bg: "bg.secondary",
     },
     item: {
       display: "flex",
@@ -178,7 +176,8 @@ const select = sva({
       },
       sm: {
         trigger: { px: "3", py: "1" },
-        item: { px: "3", py: "3" },
+        // Figma S option: 14px text (subtitle.sm), 8px vertical padding (40px row).
+        item: { px: "3", py: "2", textStyle: "subtitle.sm.default" },
       },
     },
   },

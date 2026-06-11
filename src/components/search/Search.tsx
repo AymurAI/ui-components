@@ -43,9 +43,13 @@ const searchInput = sva({
       transitionDuration: "normal",
       transitionTimingFunction: "default",
       "&:focus-within": {
-        borderColor: "action.alt-default",
-        boxShadow: "[0px 2px 1px rgba(0,0,0,0.16)]",
+        // Figma Focus: border primary-alt (#110041), icon darkens to text.default.
+        border: "primary-alt",
+        boxShadow: "input-focus",
         outline: "none",
+      },
+      "&:focus-within > span": {
+        color: "text.default",
       },
     },
     icon: {

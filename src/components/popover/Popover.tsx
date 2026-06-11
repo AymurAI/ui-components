@@ -15,7 +15,7 @@ const contentStyles = css({
   zIndex: 50,
   bg: "bg.primary",
   rounded: "lg",
-  boxShadow: "[0px 0px 15px 0px #00000026]",
+  boxShadow: "popover",
 
   "&[data-state='open']": {
     animation: "fadeIn",
@@ -26,7 +26,9 @@ const contentStyles = css({
 });
 
 const arrowStyles = css({
-  fill: "bg.secondary",
+  // Match the popover surface so the caret reads as one shape (was bg.secondary
+  // = #FFFFFF against a bg.primary #F6F5F7 body → visible seam).
+  fill: "bg.primary",
 });
 
 export interface PopoverContentProps

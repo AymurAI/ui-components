@@ -1,12 +1,13 @@
 import { cx } from "@/styled/css";
+import { useId } from "react";
 
 /**
  * CheckCircle — AymurAI UI Library.
  *
- * Figma family: 1568:25593 (success/complete state icon).
- * 48×48px. Full circle stroke in brand/secondary (#C5CAFF) + gradient overlay
- * from action/alt-default (#3F479D) → transparent.
- * This represents a completed/success state (not an animated spinner).
+ * Figma family: 1568:25593 (success/complete state icon). Geometry matches the
+ * exported Figma vector (src/assets/check-circle.svg): a full ring, NOT a tick.
+ * Base circle stroke #C5CAFF (= action.default) + gradient overlay from
+ * action/alt-default (#3F479D) → transparent. Completed/success state.
  */
 
 export type CheckCircleProps = {
@@ -21,6 +22,9 @@ export function CheckCircle({
   className,
   "aria-label": ariaLabel = "Success",
 }: CheckCircleProps) {
+  // Unique gradient id per instance to avoid <defs> collisions when several
+  // CheckCircle elements are rendered on the same page.
+  const gradId = useId();
   return (
     <svg
       width={size}
@@ -43,14 +47,14 @@ export function CheckCircle({
       {/* Gradient overlay circle — action/alt-default fade */}
       <path
         d="M24 42C33.9411 42 42 33.9411 42 24C42 14.0589 33.9411 6 24 6C14.0589 6 6 14.0589 6 24C6 33.9411 14.0589 42 24 42Z"
-        stroke="url(#check-circle-grad)"
+        stroke={`url(#${gradId})`}
         strokeWidth={3.25}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <defs>
         <linearGradient
-          id="check-circle-grad"
+          id={gradId}
           x1={20}
           y1={6}
           x2={36}

@@ -33,7 +33,6 @@ export function Toast({ t, message, variant = "info", icon }: ToastProps) {
         role={isAssertive ? "alert" : "status"}
         aria-live={isAssertive ? "assertive" : "polite"}
         aria-atomic="true"
-        noBorder
       />
     </div>
   );

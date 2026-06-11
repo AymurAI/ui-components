@@ -33,6 +33,10 @@ export * from "./components/spinner";
 export * from "./components/check-circle";
 export * from "./components/stepper";
 
+// Media & identity
+export * from "./components/avatar";
+export * from "./components/player";
+
 // Surfaces & overlays
 export * from "./components/card";
 export * from "./components/dialog";

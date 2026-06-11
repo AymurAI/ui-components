@@ -40,8 +40,10 @@ const stepIndicator = cva({
   },
   variants: {
     state: {
-      default: {
-        bg: "action.disabled",
+      // Completed step (Figma Editor: filled action.alt-default, white number).
+      complete: {
+        bg: "action.alt-default",
+        color: "text.onbutton-alternative",
         borderWidth: "0",
       },
       focus: {
@@ -53,14 +55,15 @@ const stepIndicator = cva({
       disabled: {
         bg: "action.disabled",
         borderWidth: "0",
-        color: "text.lighter",
+        // Figma: the step number stays text.default in the pending state.
+        color: "text.default",
       },
     },
   },
-  defaultVariants: { state: "default" },
+  defaultVariants: { state: "disabled" },
 });
 
-type StepState = "default" | "focus" | "disabled";
+type StepState = "complete" | "focus" | "disabled";
 
 // ── Single step+text cell ────────────────────────────────────────────────────
 
@@ -97,7 +100,7 @@ function StepCell({ index, label, state }: StepCellProps) {
         <span
           className={css({
             textStyle: "label.md.default",
-            color: state === "disabled" ? "text.lighter" : "text.default",
+            color: "text.default",
             whiteSpace: "nowrap",
           })}
         >
@@ -116,7 +119,7 @@ function StepConnector({ active }: { active: boolean }) {
       className={css({
         flex: "1",
         h: "[2px]",
-        bg: active ? "action.default" : "action.disabled",
+        bg: active ? "action.alt-default" : "action.disabled",
         minW: "[16px]",
         alignSelf: "center",
         transitionProperty: "[background-color]",
@@ -157,7 +160,7 @@ export function Stepper({ steps, current, className, ...props }: StepperProps) {
     >
       {steps.map((step, i) => {
         const state: StepState =
-          i === current ? "focus" : i < current ? "default" : "disabled";
+          i < current ? "complete" : i === current ? "focus" : "disabled";
         return (
           <div
             key={i}

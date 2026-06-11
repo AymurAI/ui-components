@@ -93,7 +93,9 @@ const radioRoot = cva({
     disabled: {
       true: {
         cursor: "not-allowed",
-        opacity: "[0.6]",
+        // Figma disabled label colour (text/text-onbutton-disabled #A9A9A9);
+        // the circle handles its own per-slot disabled colours.
+        color: "text.disabled",
       },
       false: {},
     },

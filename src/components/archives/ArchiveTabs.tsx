@@ -40,7 +40,8 @@ const archiveTab = cva({
         borderStyle: "solid",
         borderColor: "text.default",
         color: "text.default",
-        boxShadow: "[2px_2px_5px_rgba(17,0,65,0.25)]",
+        // Figma uses a drop-shadow filter (not box-shadow) on the selected tab.
+        filter: "[drop-shadow(2px_2px_5px_rgba(17,0,65,0.25))]",
       },
       completed: {
         bg: "action.pressed",

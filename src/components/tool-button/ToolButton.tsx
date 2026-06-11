@@ -1,5 +1,5 @@
 import { cva, cx } from "@/styled/css";
-import { ArrowsClockwise, Tag, Trash, TrashSimple } from "phosphor-react";
+import { Backspace, Repeat, RepeatOnce, TrashSimple } from "phosphor-react";
 import type { ButtonHTMLAttributes } from "react";
 
 /**
@@ -72,21 +72,22 @@ const ACTION_LABELS: Record<ToolButtonAction, string> = {
   "agregar-todas": "Agregar todas",
 };
 
+// Icon per action — exact Figma layer names (node 40000041:10526).
+// "Agregar" uses Backspace rotated 180°. No filled weights in Figma.
 function ActionIcon({ action }: { action: ToolButtonAction }) {
   const size = 24;
+  const flipped = { transform: "rotate(180deg)" };
   switch (action) {
     case "reemplazar":
-      return <ArrowsClockwise size={size} />;
+      return <Repeat size={size} />;
     case "reemplazar-todo":
-      return <ArrowsClockwise size={size} weight="fill" />;
+      return <RepeatOnce size={size} />;
     case "eliminar":
-      return <TrashSimple size={size} />;
     case "eliminar-todo":
-      return <Trash size={size} />;
+      return <TrashSimple size={size} />;
     case "agregar-etiqueta":
-      return <Tag size={size} />;
     case "agregar-todas":
-      return <Tag size={size} weight="fill" />;
+      return <Backspace size={size} style={flipped} />;
     default:
       return null;
   }

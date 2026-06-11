@@ -82,7 +82,7 @@ const frameStyles: Record<ArchiveViewType, string> = {
     borderWidth: "[4px]",
     borderStyle: "solid",
     borderColor: "[#BCBAB8]",
-    boxShadow: "[0px_0px_2px_rgba(0,0,0,0.1)]",
+    filter: "[drop-shadow(0px_0px_2px_rgba(0,0,0,0.1))]",
     bg: "bg.primary",
     flexShrink: "0",
   }),
@@ -97,7 +97,7 @@ const frameStyles: Record<ArchiveViewType, string> = {
     borderWidth: "[4px]",
     borderStyle: "solid",
     borderColor: "system.error",
-    boxShadow: "[0px_0px_2px_rgba(0,0,0,0.1)]",
+    filter: "[drop-shadow(0px_0px_2px_rgba(0,0,0,0.1))]",
     bg: "system.error-secondary",
     flexShrink: "0",
   }),
@@ -196,7 +196,7 @@ export function ArchiveView({
               className={css({
                 w: "[18px]",
                 h: "[18px]",
-                rounded: "xs",
+                rounded: "sm",
                 borderWidth: "[2px]",
                 borderStyle: "solid",
                 borderColor: selected
@@ -246,7 +246,8 @@ export function ArchiveView({
       {isError && (
         <p
           className={css({
-            textStyle: "label.sm.default",
+            // Figma error message is 14px italic (subtitle.sm), not 12px.
+            textStyle: "subtitle.sm.default",
             color: "system.error",
             fontStyle: "italic",
             textAlign: "center",

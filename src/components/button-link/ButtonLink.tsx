@@ -1,4 +1,5 @@
 import { type RecipeVariantProps, cva, cx } from "@/styled/css";
+import { CaretDown } from "phosphor-react";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 
 /**
@@ -8,14 +9,11 @@ import type { AnchorHTMLAttributes, ReactNode } from "react";
  * Variants: Size=M|S × Type=Default|Alternative
  *
  * - Both sizes: text cta.md.strong (Archivo SemiBold 16px), gap 4px, rounded md (8px)
- * - Type=Default:     color #576171 (text/text-onbutton-alt — NOT in token set, escape hatch used)
+ * - Type=Default:     color text.onbutton-alt (#576171)
  * - Type=Alternative: color text.onbutton-alternative (#FFFFFF)
- * - Size=M: icon 16×16, text 16px
- * - Size=S: icon 16×16, text 16px (same text size, different outer spacing)
+ * - Size=M: icon 16×16, text 16px, gap 4px
+ * - Size=S: same, plus a trailing caret-down (angle-down-small) 16×16
  * - No explicit width/height; inline flex element
- *
- * TOKEN GAP: "text/text-onbutton-alt" (#576171) has no semantic token.
- *   Using escape hatch: color: "[#576171]"
  */
 
 const buttonLink = cva({
@@ -52,21 +50,16 @@ const buttonLink = cva({
   variants: {
     type: {
       Default: {
-        // text/text-onbutton-alt — TOKEN GAP: no semantic token for #576171
-        color: "[#576171]",
+        color: "text.onbutton-alt",
       },
       Alternative: {
         color: "text.onbutton-alternative",
       },
     },
     size: {
-      M: {
-        // Size M: no extra padding (inline content sizing)
-      },
-      S: {
-        // Size S: same layout, smaller gap context
-        gap: "[2px]",
-      },
+      // Both sizes share the same inline layout and 4px gap in Figma.
+      M: {},
+      S: {},
     },
   },
   defaultVariants: {
@@ -104,6 +97,12 @@ export function ButtonLink({
       {iconLeft && <span aria-hidden="true">{iconLeft}</span>}
       {children}
       {iconRight && <span aria-hidden="true">{iconRight}</span>}
+      {/* Figma Size=S carries a trailing caret-down (angle-down-small). */}
+      {size === "S" && (
+        <span aria-hidden="true">
+          <CaretDown size={16} />
+        </span>
+      )}
     </a>
   );
 }
