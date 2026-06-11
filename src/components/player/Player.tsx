@@ -247,7 +247,10 @@ export function Player({
 
   const rewind5s = useCallback(() => {
     if (!audioRef.current) return;
-    audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 5);
+    audioRef.current.currentTime = Math.max(
+      0,
+      audioRef.current.currentTime - 5,
+    );
   }, []);
 
   const forward5s = useCallback(() => {
