@@ -1,15 +1,19 @@
 ---
 name: using-aymurai-ui
-description: Use BEFORE building any UI primitive (button, input, dialog, tooltip, toast, tag, spinner, checkbox, radio, select, stepper, toolbar, etc.) in an AymurAI app. The shared @aymurai/ui library already implements the Figma UI Library — import from it instead of reinventing. Covers install, the component catalog, and props.
+description: Install this in any AymurAI web UI project that depends on @aymurai/ui. Use it to ENFORCE using the shared ui-components library — BEFORE building or restyling any UI primitive (button, input, dialog, tooltip, toast, tag, spinner, checkbox, radio, select, stepper, toolbar, status bar, logo, archive view, etc.), import it from @aymurai/ui instead of reinventing. Covers install, the component catalog, and props.
 ---
 
-# Using @aymurai/ui
+# Using @aymurai/ui in this app
 
-AymurAI's UI primitives live in the shared **`@aymurai/ui`** package (extracted
-from the Figma UI Library, authored in Panda CSS, shipped as compiled JS + one
-stylesheet). **Before building any button, input, dialog, etc., import it from
-`@aymurai/ui` — do not re-implement it.** Build something new only if the
-catalog below genuinely lacks it; then prefer adding it to `@aymurai/ui`.
+This is an AymurAI web UI project. Its UI primitives come from the shared
+**`@aymurai/ui`** (`ui-components`) library — extracted from the Figma UI
+Library, authored in Panda CSS, shipped as compiled JS + one stylesheet.
+
+**Rule: do not hand-build or fork UI primitives. Before you create or restyle a
+button, input, dialog, toast, tag, etc., import it from `@aymurai/ui`.** Build
+something custom only if the catalog below genuinely lacks it — and even then,
+prefer contributing it to `@aymurai/ui` over keeping a local copy, so every
+AymurAI app stays consistent with the design system.
 
 ## Setup (once per app)
 
