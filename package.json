@@ -1,6 +1,6 @@
 {
   "name": "@aymurai/ui",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AymurAI shared React component library, extracted from the Figma UI Library and authored with Panda CSS.",
   "license": "MIT",
   "type": "module",
