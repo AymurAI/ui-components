@@ -25,7 +25,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "prepare": "panda codegen",
+    "prepare": "pnpm build",
     "codegen": "panda codegen",
     "cssgen": "panda cssgen --silent --outfile dist/styles.css",
     "build": "pnpm codegen && tsc -p tsconfig.build.json && vite build && pnpm cssgen && cp src/styles/fonts.css dist/fonts.css",
