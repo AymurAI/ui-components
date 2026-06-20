@@ -47,6 +47,7 @@ import { hstack, stack } from "@/styled/patterns";
 - colors: `brand.*`, `text.{default,lighter,onbutton-default,onbutton-alternative,onbutton-disabled}`,
   `action.{default,disabled,alt-default,hover,pressed,focus}`,
   `bg.{primary,secondary,primary-alternative,primary-highlight,secondary-highlight}`,
+  `category.{violet,green,red,yellow,pink,orange,green-light}` (speaker palette),
   `system.{success,error,warning,info}` (+ `-secondary`).
 - radii (px-accurate to Figma): `xs`=2, `sm`=4, `md`=8, `lg`=16, `xl`=24, `full`.
 - textStyles: `title.md`, `subtitle.{md,sm}`, `paragraph.{md,sm,xsm}`,
@@ -94,6 +95,11 @@ a single variant symbol id, not the whole family frame.
 | CheckCircle | `1568:25593` | |
 | Logo | `40000499:40071` | Logo / Logo+Feature / Iso |
 | Tag | `40000041:10589` | Persona/CUIJ/Num_Expediente/Num_Actuacion/Fecha |
+| AvatarPill ✅ | `40002313:53080` | Default/Selected; reuses Avatar + name |
+| Option ✅ | `40001295:56887` | menu/list row: label + X; selected bg |
+| Category Item ✅ | `40001297:49803` | label + Switch row |
+| TranscriptBlock ✅ | `40002318:32859` | Voz a texto turn: Default/Select/Select+Hover/Typed |
+| Side Panel (Voz a texto) ✅ | `40002322:53113` | composite: turno + personas sugeridas + marca de tiempo + acciones |
 
 ## Verify
 

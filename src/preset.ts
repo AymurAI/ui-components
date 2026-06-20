@@ -131,6 +131,17 @@ export const aymuraiPreset = definePreset({
             "primary-highlight": color("#C5CAFF"),
             "secondary-highlight": color("#E0DDE2"),
           },
+          // Speaker/category palette (Figma "bg/category/*") — distinguishes
+          // people in the Voz a texto flows (avatar fills, pills).
+          category: {
+            violet: color("#C5CAFF"), // bg/category/violet-ligth
+            green: color("#94FFC8"), // bg/category/green
+            red: color("#F69FA6"), // bg/category/red
+            yellow: color("#FDE27B"), // bg/category/yellow
+            pink: color("#F8AEEF"), // bg/category/pink
+            orange: color("#FFE2C4"), // bg/category/orange-ligth
+            "green-light": color("#D1F4E2"), // bg/category/green-ligth
+          },
           system: {
             success: color("#1B834E"),
             "success-secondary": color("#E0FAED"),

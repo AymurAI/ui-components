@@ -29,12 +29,31 @@ const avatar = cva({
       secondary: { bg: "bg.secondary-highlight" },
       warning: { bg: "system.warning-secondary" },
       success: { bg: "system.success-secondary" },
+      // Speaker palette (Figma "bg/category/*").
+      violet: { bg: "category.violet" },
+      green: { bg: "category.green" },
+      red: { bg: "category.red" },
+      yellow: { bg: "category.yellow" },
+      pink: { bg: "category.pink" },
+      orange: { bg: "category.orange" },
+      "green-light": { bg: "category.green-light" },
     },
   },
   defaultVariants: { size: "sm", color: "primary" },
 });
 
-export type AvatarColor = "primary" | "secondary" | "warning" | "success";
+export type AvatarColor =
+  | "primary"
+  | "secondary"
+  | "warning"
+  | "success"
+  | "violet"
+  | "green"
+  | "red"
+  | "yellow"
+  | "pink"
+  | "orange"
+  | "green-light";
 
 export type AvatarProps = RecipeVariantProps<typeof avatar> & {
   /** Initials shown inside the circle (e.g. "AD") */

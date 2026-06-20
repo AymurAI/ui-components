@@ -35,6 +35,7 @@ export * from "./components/stepper";
 
 // Media & identity
 export * from "./components/avatar";
+export * from "./components/avatar-pill";
 export * from "./components/player";
 
 // Surfaces & overlays
@@ -50,3 +51,9 @@ export * from "./components/logo";
 
 // Archives
 export * from "./components/archives";
+
+// Voz a texto (speech-to-text)
+export * from "./components/option";
+export * from "./components/category-item";
+export * from "./components/transcript-block";
+export * from "./components/side-panel";
