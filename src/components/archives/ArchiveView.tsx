@@ -242,21 +242,34 @@ export function ArchiveView({
         {fileName}
       </p>
 
-      {/* Error message */}
+      {/* Error message — Figma: 14px italic, two lines, constrained to card width. */}
       {isError && (
         <p
           className={css({
-            // Figma error message is 14px italic (subtitle.sm), not 12px.
             textStyle: "subtitle.sm.default",
             color: "system.error",
             fontStyle: "italic",
             textAlign: "center",
-            minW: "full",
+            w: "[157px]",
           })}
         >
-          {type === "preview-error"
-            ? "Error de carga.\nVolvelo a intentar."
-            : "Error de guardado.\nVolver a cargar archivo."}
+          {type === "preview-error" ? (
+            <>
+              <span className={css({ display: "block" })}>Error de carga.</span>
+              <span className={css({ display: "block" })}>
+                Volvelo a intentar.
+              </span>
+            </>
+          ) : (
+            <>
+              <span className={css({ display: "block" })}>
+                Error de guardado.
+              </span>
+              <span className={css({ display: "block" })}>
+                Volver a cargar archivo.
+              </span>
+            </>
+          )}
         </p>
       )}
     </div>

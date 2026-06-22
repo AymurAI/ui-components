@@ -1,5 +1,5 @@
-import { cva, cx } from "@/styled/css";
-import { Backspace, Repeat, RepeatOnce, TrashSimple } from "phosphor-react";
+import { css, cva, cx } from "@/styled/css";
+import { Backspace, Repeat, TrashSimple } from "phosphor-react";
 import type { ButtonHTMLAttributes } from "react";
 
 /**
@@ -17,6 +17,8 @@ import type { ButtonHTMLAttributes } from "react";
  *   action.hover        = #110041  (Hover bg)
  *   action.pressed      = #3F479D  (Pressed bg) + border/primary-alt
  *   text.onbutton-alternative = #FFFFFF (icon color)
+ *
+ * "Todo/Todas" variants: base icon + "ALL" badge overlay (Figma composite).
  */
 
 const toolButton = cva({
@@ -55,6 +57,32 @@ const toolButton = cva({
   },
 });
 
+/** Wrapper that layers a base icon with an "ALL" badge in the bottom-right. */
+const iconWrapperStyle = css({
+  position: "relative",
+  w: "[24px]",
+  h: "[24px]",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+/** "ALL" badge — positioned bottom-right of the 24×24 icon area. */
+const allBadgeStyle = css({
+  position: "absolute",
+  bottom: "[0px]",
+  right: "[0px]",
+  fontSize: "[6px]",
+  fontWeight: "[700]",
+  lineHeight: "[1]",
+  letterSpacing: "[0.02em]",
+  color: "text.onbutton-alternative",
+  // Tight background patch so the badge is readable over the icon's bottom-right
+  bg: "[transparent]",
+  pointerEvents: "none",
+  userSelect: "none",
+});
+
 export type ToolButtonAction =
   | "reemplazar"
   | "reemplazar-todo"
@@ -72,22 +100,51 @@ const ACTION_LABELS: Record<ToolButtonAction, string> = {
   "agregar-todas": "Agregar todas",
 };
 
-// Icon per action — exact Figma layer names (node 40000041:10526).
-// "Agregar" uses Backspace rotated 180°. No filled weights in Figma.
+/**
+ * Icon per action — matches Figma layer structure (node 40000041:10526).
+ *
+ * "Todo/Todas" variants composite the singular icon with an absolute "ALL"
+ * badge overlaid in the bottom-right quadrant, matching the Figma SVG layout.
+ * "Agregar" uses Backspace rotated 180° (produces the right-pointing tag shape).
+ */
 function ActionIcon({ action }: { action: ToolButtonAction }) {
   const size = 24;
   const flipped = { transform: "rotate(180deg)" };
+
   switch (action) {
     case "reemplazar":
       return <Repeat size={size} />;
+
     case "reemplazar-todo":
-      return <RepeatOnce size={size} />;
+      return (
+        <div className={iconWrapperStyle}>
+          <Repeat size={size} />
+          <span className={allBadgeStyle}>ALL</span>
+        </div>
+      );
+
     case "eliminar":
-    case "eliminar-todo":
       return <TrashSimple size={size} />;
+
+    case "eliminar-todo":
+      return (
+        <div className={iconWrapperStyle}>
+          <TrashSimple size={size} />
+          <span className={allBadgeStyle}>ALL</span>
+        </div>
+      );
+
     case "agregar-etiqueta":
-    case "agregar-todas":
       return <Backspace size={size} style={flipped} />;
+
+    case "agregar-todas":
+      return (
+        <div className={iconWrapperStyle}>
+          <Backspace size={size} style={flipped} />
+          <span className={allBadgeStyle}>ALL</span>
+        </div>
+      );
+
     default:
       return null;
   }

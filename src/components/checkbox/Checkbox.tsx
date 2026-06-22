@@ -7,12 +7,14 @@ import type { InputHTMLAttributes, ReactNode } from "react";
  *
  * Figma family: 25:12490, base: 25:12527
  * Variants: Checked × {Default, Hover, Disable, Focus}
- * - Box: 18×18px, border-radius 4px (token sm)
- * - Padding around box: 3px; outer row padding: 8px; gap: 8px
- * - Unchecked: 2px border action/alt-default (#3F479D)
- * - Checked: filled action/alt-default bg, white check icon
- * - Focus: 3px border border/primary (#BCBAB8)
- * - Disabled: action/disabled bg & border
+ * - Box: 18×18px total, border-radius 4px (token sm)
+ * - Unchecked default: 2px border action/alt-default (#3F479D), transparent bg
+ * - Unchecked hover: 1px border #BCBAB8
+ * - Checked default: filled action/alt-default bg, no border, white check icon 16px
+ * - Checked hover: filled action/hover (#110041) bg
+ * - Focus: 4px border action/hover (#110041) on the box, rounded-[6px]
+ * - Disabled unchecked: bg action/disabled (#E0DDE2) + 2px border #BCBAB8
+ * - Disabled checked: bg action/disabled (#E0DDE2), no border, dimmed tick
  */
 
 const checkboxBox = cva({
@@ -24,7 +26,7 @@ const checkboxBox = cva({
     h: "[18px]",
     rounded: "sm",
     flexShrink: "0",
-    transitionProperty: "[background-color, border-color]",
+    transitionProperty: "[background-color, border-color, border-width]",
     transitionDuration: "fast",
     transitionTimingFunction: "default",
   },
@@ -38,22 +40,35 @@ const checkboxBox = cva({
         color: "[transparent]",
       },
       true: {
-        borderWidth: "[2px]",
-        borderStyle: "solid",
-        borderColor: "action.alt-default",
+        // Figma: checked box is a filled square — no visible border, just bg
+        borderWidth: "0",
         bg: "action.alt-default",
         color: "text.onbutton-alternative",
       },
     },
     disabled: {
+      // Disabled unchecked: bg action/disabled + 2px border #BCBAB8 (border/primary color)
+      // Disabled checked: bg action/disabled only, tick uses onbutton-disabled color
       true: {
-        borderColor: "action.disabled",
+        borderWidth: "[2px]",
+        borderStyle: "solid",
+        borderColor: "[#BCBAB8]",
         bg: "action.disabled",
         color: "text.onbutton-disabled",
       },
       false: {},
     },
   },
+  compoundVariants: [
+    // Disabled + checked: bg only, no border (Figma: bg-[#e0dde2], no border)
+    {
+      checked: true,
+      disabled: true,
+      css: {
+        borderWidth: "0",
+      },
+    },
+  ],
   defaultVariants: {
     checked: false,
     disabled: false,
@@ -65,36 +80,36 @@ const checkboxRoot = cva({
     display: "inline-flex",
     alignItems: "center",
     gap: "2", // 8px
-    p: "2", // 8px
+    p: "2", // 8px outer row padding
     cursor: "pointer",
     userSelect: "none",
     rounded: "xs",
     textStyle: "label.md.default",
     color: "text.default",
 
-    // Focus ring on the wrapper (matches Figma Focus state: 3px border/primary)
-    "&:focus-within": {
-      outline: "primary",
-      outlineWidth: "[3px]",
-      outlineStyle: "solid",
+    // Hover (unchecked): box border changes to 1px #BCBAB8
+    "&:hover:not([data-disabled]) [data-box][data-checked='false']": {
+      borderWidth: "[1px]",
+      borderColor: "[#BCBAB8]",
     },
 
-    "&:hover:not([data-disabled])": {
-      bg: "bg.primary-alternative",
-    },
-
-    // Figma Hover + Checked: the box darkens to action.hover (#110041).
-    "&:hover:not([data-disabled]) [data-checked='true']": {
+    // Hover (checked): box bg darkens to action.hover (#110041)
+    "&:hover:not([data-disabled]) [data-box][data-checked='true']": {
       bg: "action.hover",
+    },
+
+    // Focus: 4px solid action.hover (#110041) border on the box, radius 6px
+    "&:focus-within [data-box]": {
+      borderWidth: "[4px]",
+      borderStyle: "solid",
       borderColor: "action.hover",
+      rounded: "[6px]",
     },
   },
   variants: {
     disabled: {
       true: {
         cursor: "not-allowed",
-        // Per-slot disabled colours (Figma) rather than a blanket opacity:
-        // the box already maps action.disabled; here we dim the label.
         color: "text.lighter",
       },
       false: {},
@@ -158,13 +173,14 @@ export function Checkbox({
       {/* Visual box */}
       <span
         aria-hidden="true"
-        data-checked={!!checked || !!defaultChecked}
+        data-box
+        data-checked={String(!!checked || !!defaultChecked)}
         className={checkboxBox({
           checked: !!checked || !!defaultChecked,
           disabled,
         })}
       >
-        {(checked || defaultChecked) && <Check size={12} weight="bold" />}
+        {(checked || defaultChecked) && <Check size={16} weight="bold" />}
       </span>
       {children}
     </label>

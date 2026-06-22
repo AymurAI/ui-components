@@ -126,6 +126,8 @@ const select = sva({
       overflow: "hidden",
       zIndex: "10",
       minWidth: "[var(--radix-select-trigger-width)]",
+      // Figma dropdown panel: py-[8px] vertical inset around option list.
+      py: "2",
     },
     viewport: {
       maxHeight: "[400px]",
@@ -171,13 +173,15 @@ const select = sva({
   variants: {
     size: {
       md: {
-        trigger: { px: "3", py: "3" },
-        item: { px: "3", py: "3" },
+        // Figma trigger / option row M: px=16px, py=12px → tokens 4/3.
+        trigger: { px: "4", py: "3" },
+        item: { px: "4", py: "3" },
       },
       sm: {
-        trigger: { px: "3", py: "1" },
+        // Figma trigger / option row S: px=16px, py=8px → tokens 4/2.
+        trigger: { px: "4", py: "2" },
         // Figma S option: 14px text (subtitle.sm), 8px vertical padding (40px row).
-        item: { px: "3", py: "2", textStyle: "subtitle.sm.default" },
+        item: { px: "4", py: "2", textStyle: "subtitle.sm.default" },
       },
     },
   },
@@ -247,14 +251,6 @@ export function Select({
           <div className={classes.trigger} role="combobox" tabIndex={0}>
             {prefix && <Affix aria-hidden="true">{prefix} |</Affix>}
 
-            <RadixSelect.Icon asChild>
-              <CaretDown
-                size={16}
-                className={classes.caret}
-                aria-hidden="true"
-              />
-            </RadixSelect.Icon>
-
             <span className={classes.value}>
               {!value && securedSuggestion ? (
                 <button
@@ -271,6 +267,15 @@ export function Select({
             </span>
 
             {suffix && <Affix aria-hidden="true">| {suffix}</Affix>}
+
+            {/* Caret sits at the trailing edge — matches Figma layout */}
+            <RadixSelect.Icon asChild>
+              <CaretDown
+                size={16}
+                className={classes.caret}
+                aria-hidden="true"
+              />
+            </RadixSelect.Icon>
           </div>
         </RadixSelect.Trigger>
 

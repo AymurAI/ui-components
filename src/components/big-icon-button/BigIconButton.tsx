@@ -60,7 +60,9 @@ const bigIconButton = cva({
           bg: "action.pressed",
           color: "text.onbutton-alternative",
         },
-        "&:disabled": { bg: "action.disabled", color: "text.onbutton-default" },
+        // TOKEN GAP: Figma action-disabled for this component = #E2EBF3 (blue-tinted),
+        // not the warm-grey #E0DDE2 stored in action.disabled. Escape until token updated.
+        "&:disabled": { bg: "[#E2EBF3]", color: "text.onbutton-default" },
       },
       secondary: {
         bg: "bg.secondary",
@@ -68,21 +70,24 @@ const bigIconButton = cva({
         borderWidth: "[2px]",
         borderStyle: "solid",
         borderColor: "action.alt-default",
-        "&:hover:enabled": { borderColor: "action.hover" },
+        // TOKEN GAP: Figma secondary-hover border = #728197 (muted blue-grey);
+        // action.hover = #110041 is wrong here. Escape until token promoted.
+        "&:hover:enabled": { borderColor: "[#728197]" },
         "&:active:enabled": {
           bg: "action.pressed",
           color: "text.onbutton-alternative",
           borderColor: "action.pressed",
         },
+        // TOKEN GAP: Figma disabled border uses same #E2EBF3 as primary disabled bg.
         "&:disabled": {
-          borderColor: "action.disabled",
+          borderColor: "[#E2EBF3]",
           color: "text.onbutton-disabled",
         },
       },
       tertiary: {
         bg: "[transparent]",
         color: "text.onbutton-default",
-        "&:hover:enabled": { bg: "bg.primary-alternative" },
+        // Figma tertiary hover: no bg fill — stays transparent.
         "&:active:enabled": {
           bg: "action.pressed",
           color: "text.onbutton-alternative",

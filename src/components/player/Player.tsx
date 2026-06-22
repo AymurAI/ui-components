@@ -42,10 +42,13 @@ const playerBar = css({
   justifyContent: "space-between",
   px: "12",
   py: "6",
-  height: "24",
+  // Figma editor-footer bar: h-99px (24px top pad + 36px content + 24px bottom pad + 15px frame
+  // rounding ≈ 99px). Use escape-hatch to match exactly.
+  minHeight: "[99px]",
   bg: "bg.secondary",
   borderTopWidth: "[1px]",
   borderTopStyle: "solid",
+  // #BCBAB8 is border.primary color but no bare color token exists; escape-hatch required.
   borderTopColor: "[#BCBAB8]",
   boxSizing: "border-box",
 });
@@ -69,9 +72,11 @@ const iconButton = css({
   height: "9",
   rounded: "[6px]",
   borderWidth: "0",
-  background: "transparent",
+  // transparent is not a semantic token — escape-hatch required (strictTokens)
+  bg: "[transparent]",
   cursor: "pointer",
   position: "relative",
+  color: "text.default",
   "&:hover": { bg: "bg.primary-alternative" },
 });
 
@@ -88,6 +93,8 @@ const playButton = css({
   cursor: "pointer",
   position: "relative",
   bg: "action.default",
+  // Figma: play icon is dark (text/default #110041) on lavender (#C5CAFF) background
+  color: "text.default",
   "&:hover": { bg: "action.default", opacity: "0.85" },
 });
 
@@ -112,13 +119,25 @@ const speedText = css({
   userSelect: "none",
 });
 
+// Figma: Controls + progress Container share a row with gap-[24px]; this inner
+// wrapper holds them so rightSlot stays at the far edge via space-between.
+const transportRow = css({
+  display: "flex",
+  flexDir: "row",
+  alignItems: "center",
+  gap: "6",
+  flex: "[1]",
+  minWidth: "0",
+});
+
 const progressSection = css({
   display: "flex",
   flexDir: "row",
   alignItems: "center",
+  // Figma: progress track + timestamp gap is 16px (gap-[16px])
   gap: "4",
   flex: "[1]",
-  mx: "6",
+  minWidth: "0",
 });
 
 const progressBar = css({
@@ -303,54 +322,60 @@ export function Player({
         onPause={() => setIsPlaying(false)}
       />
 
-      <div className={controls}>
-        <button
-          type="button"
-          aria-label={t.rewind5s}
-          onClick={rewind5s}
-          className={iconButton}
-        >
-          <ArrowCounterClockwise size={20} />
-          <span className={skipLabel}>5</span>
-        </button>
+      {/* transportRow mirrors Figma's inner Container (gap-24px: Controls + progress) */}
+      <div className={transportRow}>
+        <div className={controls}>
+          <button
+            type="button"
+            aria-label={t.rewind5s}
+            onClick={rewind5s}
+            className={iconButton}
+          >
+            <ArrowCounterClockwise size={20} />
+            <span className={skipLabel}>5</span>
+          </button>
 
-        <button
-          type="button"
-          aria-label={isPlaying ? t.pause : t.play}
-          onClick={togglePlay}
-          className={playButton}
-        >
-          {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-        </button>
+          <button
+            type="button"
+            aria-label={isPlaying ? t.pause : t.play}
+            onClick={togglePlay}
+            className={playButton}
+          >
+            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+          </button>
 
-        <button
-          type="button"
-          aria-label={t.forward5s}
-          onClick={forward5s}
-          className={iconButton}
-        >
-          <ArrowClockwise size={20} />
-          <span className={skipLabel}>5</span>
-        </button>
+          <button
+            type="button"
+            aria-label={t.forward5s}
+            onClick={forward5s}
+            className={iconButton}
+          >
+            <ArrowClockwise size={20} />
+            <span className={skipLabel}>5</span>
+          </button>
 
-        <button
-          type="button"
-          aria-label={t.speed}
-          onClick={cycleSpeed}
-          className={iconButton}
-        >
-          <span className={speedText}>{playbackRates[rateIndex]}×</span>
-        </button>
-      </div>
-
-      <div className={progressSection}>
-        {/* biome-ignore lint/a11y/useKeyWithClickEvents: seek bar, click-to-seek */}
-        <div ref={barRef} onClick={handleBarClick} className={progressBar}>
-          <div className={progressFill} style={{ width: `${fillPercent}%` }} />
+          <button
+            type="button"
+            aria-label={t.speed}
+            onClick={cycleSpeed}
+            className={iconButton}
+          >
+            <span className={speedText}>{playbackRates[rateIndex]}×</span>
+          </button>
         </div>
-        <span className={timeDisplay}>
-          {formatTime(currentMs)} / {formatTime(durationMs)}
-        </span>
+
+        <div className={progressSection}>
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: seek bar, click-to-seek */}
+          <div ref={barRef} onClick={handleBarClick} className={progressBar}>
+            <div
+              className={progressFill}
+              style={{ width: `${fillPercent}%` }}
+            />
+          </div>
+          <span className={timeDisplay}>
+            {formatTime(currentMs)} / {formatTime(durationMs)}
+          </span>
+        </div>
       </div>
 
       {rightSlot}

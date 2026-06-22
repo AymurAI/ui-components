@@ -30,14 +30,15 @@ import type { ReactNode } from "react";
  * via `toolButtons` prop.
  */
 
-// Vertical divider matching Figma rotated 90-deg line element
+// Vertical divider — Figma: 1px × 48px line, color #BCBAB8 (border/primary stroke).
+// No standalone color token for #BCBAB8 exists; escape hatch used (token gap: border.primary-color).
 function ToolbarDivider() {
   return (
     <div
       className={css({
         w: "[1px]",
         h: "12",
-        bg: "bg.secondary-highlight",
+        bg: "[#BCBAB8]",
         flexShrink: "0",
         alignSelf: "center",
       })}
@@ -72,7 +73,11 @@ export function Toolbar({
   className,
   children,
 }: ToolbarProps) {
-  // Figma: Search+Switch is center-aligned; the other contexts are bottom-aligned.
+  // Figma layout per context:
+  //   anonimizador  — items: end, justify: space-between, pt: 42px, pb: 24px
+  //   set-de-datos  — items: end, justify: start, gap: 24px, py: 24px
+  //   search-switch — items: center, justify: space-between, pt: 42px, pb: 24px
+  const isSetDeDatos = context === "set-de-datos";
   const alignItems = context === "search-switch" ? "center" : "flex-end";
   return (
     <div
@@ -80,13 +85,13 @@ export function Toolbar({
         css({
           display: "flex",
           alignItems,
-          justifyContent: "space-between",
+          justifyContent: isSetDeDatos ? "flex-start" : "space-between",
           bg: "bg.secondary",
-          pt: "[42px]",
+          pt: isSetDeDatos ? "6" : "[42px]",
           pb: "6",
           px: "12",
           w: "full",
-          gap: "6",
+          gap: isSetDeDatos ? "6" : "0",
         }),
         className,
       )}
@@ -116,7 +121,7 @@ export function Toolbar({
             className={css({
               display: "flex",
               alignItems: "center",
-              gap: "1",
+              gap: "4",
               flexShrink: "0",
             })}
           >

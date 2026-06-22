@@ -10,7 +10,8 @@ import type { InputHTMLAttributes, ReactNode } from "react";
  * - On: filled inner dot (action/alt-default)
  * - Off: white bg with border
  * - Padding 3px around circle; outer row 8px, gap 8px
- * - Focus: 3px outline border/primary
+ * - Focus: 3px border border/primary (#BCBAB8), radius 3px
+ * - Hover: circle border + dot darken to action.hover (#110041)
  */
 
 const radioCircle = cva({
@@ -75,26 +76,35 @@ const radioRoot = cva({
     p: "2", // 8px
     cursor: "pointer",
     userSelect: "none",
-    rounded: "xs",
+    // Figma Focus state: 3px border border/primary (#BCBAB8), radius 3px.
+    // Use a transparent border in base so layout is stable; fill it on focus-within.
+    borderWidth: "[3px]",
+    borderStyle: "solid",
+    borderColor: "[transparent]",
+    rounded: "[3px]",
     textStyle: "label.md.default",
     color: "text.default",
 
     "&:focus-within": {
-      outline: "primary",
-      outlineWidth: "[3px]",
-      outlineStyle: "solid",
+      borderColor: "[#BCBAB8]",
     },
 
     "&:hover:not([data-disabled])": {
       bg: "bg.primary-alternative",
+    },
+
+    // Figma Hover: circle border + inner dot darken to action.hover.
+    "&:hover:not([data-disabled]) [data-circle]": {
+      borderColor: "action.hover",
+    },
+    "&:hover:not([data-disabled]) [data-circle='true']::after": {
+      bg: "action.hover",
     },
   },
   variants: {
     disabled: {
       true: {
         cursor: "not-allowed",
-        // Figma disabled label colour (text/text-onbutton-disabled #A9A9A9);
-        // the circle handles its own per-slot disabled colours.
         color: "text.disabled",
       },
       false: {},
@@ -131,6 +141,7 @@ export function Radio({
   ...rest
 }: RadioProps) {
   const isControlled = checked !== undefined;
+  const isChecked = !!checked || !!defaultChecked;
 
   return (
     <label
@@ -161,7 +172,8 @@ export function Radio({
       {/* Visual circle */}
       <span
         aria-hidden="true"
-        className={radioCircle({ checked: !!checked, disabled })}
+        data-circle={isChecked ? "true" : "false"}
+        className={radioCircle({ checked: isChecked, disabled })}
       />
       {children}
     </label>

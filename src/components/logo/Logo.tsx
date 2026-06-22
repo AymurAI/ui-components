@@ -24,8 +24,8 @@ function IsoMark({ className }: { className?: string }) {
   return (
     <svg
       width="40"
-      height="41"
-      viewBox="0 0 40 41"
+      height="40"
+      viewBox="0 0 40 40.048"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -76,9 +76,9 @@ function IsoMark({ className }: { className?: string }) {
 function Wordmark({ className }: { className?: string }) {
   return (
     <svg
-      width="109"
-      height="27"
-      viewBox="48 7 109 20"
+      width="108.27"
+      height="24.19"
+      viewBox="48 7 109 25.2"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
@@ -204,6 +204,7 @@ export function Logo({
           display: "inline-flex",
           alignItems: "center",
           gap: "2", // 8px
+          h: "10", // 40px — matches Figma Version=Logo height
           overflow: "hidden",
         }),
         className,

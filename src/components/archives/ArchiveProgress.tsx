@@ -80,6 +80,17 @@ function ProgressBar({
 
   const pct = Math.min(100, Math.max(0, progress));
 
+  // Figma renders the active/completed fill with a 45° diagonal hatch texture
+  // (a "barber-pole" loading pattern): periwinkle stripes over the light-blue
+  // in-progress fill, white stripes over the navy completed fill. Applied as an
+  // inline backgroundImage (gradients are not tokenizable).
+  const stripe =
+    status === "completed"
+      ? "repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 2px, transparent 2px, transparent 7px)"
+      : status === "default"
+        ? "repeating-linear-gradient(135deg, rgba(63,71,157,0.35) 0px, rgba(63,71,157,0.35) 2px, transparent 2px, transparent 7px)"
+        : undefined;
+
   return (
     <div
       className={css({
@@ -116,7 +127,7 @@ function ProgressBar({
           transitionDuration: "normal",
           transitionTimingFunction: "default",
         })}
-        style={{ width: `${pct}%` }}
+        style={{ width: `${pct}%`, backgroundImage: stripe }}
       />
     </div>
   );
@@ -161,12 +172,30 @@ function ProgressLabel({
       <span
         className={css({
           textStyle: "label.md.default",
+          fontWeight: "[300]",
           color: "system.error",
           fontStyle: "italic",
           whiteSpace: "nowrap",
         })}
       >
         Error de carga de archivo. Volvelo a intentar
+      </span>
+    );
+  }
+
+  // Figma: "Replace archive" shows a light-italic caption (text.lighter), not a %.
+  if (status === "replace") {
+    return (
+      <span
+        className={css({
+          textStyle: "label.md.default",
+          fontWeight: "[300]",
+          color: "text.lighter",
+          fontStyle: "italic",
+          whiteSpace: "nowrap",
+        })}
+      >
+        Detuviste el procesamiento de este archivo
       </span>
     );
   }
@@ -200,7 +229,7 @@ export function ArchiveProgress({
   const nameColor =
     status === "error"
       ? "system.error"
-      : status === "stopped"
+      : status === "stopped" || status === "replace"
         ? "text.onbutton-disabled"
         : "text.default";
 

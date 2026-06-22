@@ -15,6 +15,8 @@ export const TooltipTrigger = TooltipPrimitive.Trigger;
 const contentStyles = css({
   zIndex: 50,
   bg: "bg.primary",
+  color: "text.default",
+  fontFamily: "primary",
   // Figma: 4px radius, 8px padding, 8px gap, 0px 4px 8px/10% shadow.
   rounded: "sm",
   p: "2",
