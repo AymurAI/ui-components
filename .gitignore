@@ -9,3 +9,6 @@ src/styled
 *.log
 .DS_Store
 *.tgz
+
+# Figma fidelity audit scratch (playwright + screenshots)
+.audit/

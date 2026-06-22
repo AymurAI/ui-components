@@ -11,6 +11,12 @@ import type { HTMLAttributes } from "react";
  *
  * Figma: Toast family node 1994:30384 — Error / Warning / Success / Info.
  */
+
+/**
+ * Container recipe — background + border only.
+ * Message text color is always text.default (set in base); accent color is
+ * applied separately to the icon and dismiss button via accentRecipe.
+ */
 const calloutRecipe = cva({
   base: {
     ...hstack.raw({
@@ -27,6 +33,8 @@ const calloutRecipe = cva({
 
     width: "full",
 
+    // Message text is always text.default (#110041) across all variants.
+    color: "text.default",
     textStyle: "label.md.default", // Figma: Archivo 16/120%
   },
   variants: {
@@ -34,22 +42,18 @@ const calloutRecipe = cva({
       error: {
         bg: "system.error-secondary",
         borderColor: "system.error",
-        color: "system.error",
       },
       warning: {
         bg: "system.warning-secondary",
         borderColor: "system.warning",
-        color: "system.warning",
       },
       success: {
         bg: "system.success-secondary",
         borderColor: "system.success",
-        color: "system.success",
       },
       info: {
         bg: "system.info-secondary",
         borderColor: "system.info",
-        color: "text.default",
       },
     },
     noBorder: {
@@ -62,6 +66,24 @@ const calloutRecipe = cva({
     variant: "info",
     noBorder: false,
   },
+});
+
+/**
+ * Accent recipe — maps variant to its accent color.
+ * Applied only to the icon element and the dismiss (X) button so the accent
+ * colour is scoped to those chrome elements, not the message text.
+ */
+const accentRecipe = cva({
+  base: {},
+  variants: {
+    variant: {
+      error: { color: "system.error" },
+      warning: { color: "system.warning" },
+      success: { color: "system.success" },
+      info: { color: "system.info" },
+    },
+  },
+  defaultVariants: { variant: "info" },
 });
 
 export type CalloutVariant = "error" | "warning" | "success" | "info";
@@ -83,17 +105,15 @@ export function Callout({
   className,
   ...props
 }: CalloutProps) {
+  const accent = accentRecipe({ variant });
   return (
     <div
       className={cx(calloutRecipe({ variant, noBorder }), className)}
       {...props}
     >
-      <IconComponent
-        size={24}
-        weight="regular"
-        aria-hidden="true"
-        style={{ flexShrink: 0 }}
-      />
+      <styled.span className={accent} flexShrink="0" lineHeight="[0]">
+        <IconComponent size={24} weight="regular" aria-hidden="true" />
+      </styled.span>
       <styled.span flex="1">{message}</styled.span>
       {onDismiss && (
         <styled.button
@@ -101,6 +121,15 @@ export function Callout({
           aria-label="Dismiss notification"
           onClick={onDismiss}
           cursor="pointer"
+          display="inline-flex"
+          alignItems="center"
+          justifyContent="center"
+          flexShrink="0"
+          p="0"
+          bg="[transparent]"
+          borderWidth="0"
+          lineHeight="[0]"
+          className={accent}
         >
           <X size={24} aria-hidden="true" />
         </styled.button>

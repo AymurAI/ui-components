@@ -11,20 +11,35 @@ import { hstack, stack } from "@/styled/patterns";
  *
  * Figma: TextField family node 1:296 — sizes md/sm;
  * states: Placeholder / Focus / Typed / Disabled / Error / Suggestion.
+ *
+ * Key Figma measurements (from get_design_context):
+ *  - inputBox: h-[48px], p-[12px] all sides, rounded-[4px] (sm), bg white
+ *  - Placeholder border: #BCBAB8 (border/primary)
+ *  - Typed border: #9F99A5 (border/secondary) — darker when value present
+ *  - Focus: border primary-alt (#110041) + drop-shadow(0 2 1 rgba(0,0,0,0.16))
+ *  - Disabled: bg #F6F5F7 (bg.primary), border primary, text lighter
+ *  - Error: border + label + input text all system.error (#DC582E)
+ *  - Suggestion: border secondary + drop-shadow (same as focus shadow)
+ *  - Label: 12px, text.lighter; turns text.default on focus
+ *  - Prefix separator: border-right #C3CCD7 (brand.secondary), pr-[8px]
  */
 const input = sva({
   slots: ["container", "inputBox", "input", "label", "errorMessage", "helper"],
   base: {
     container: stack.raw({ gap: "1", width: "full" }),
     inputBox: {
-      ...hstack.raw({ alignItems: "center", gap: "1" }),
+      ...hstack.raw({ alignItems: "center", gap: "2" }),
 
+      // Figma: p-[12px] on the container box, h-[48px], rounded-[4px]
+      p: "3",
+      h: "12",
       rounded: "sm",
       border: "primary",
+      bg: "bg.secondary",
 
       "&:focus-within": {
         outline: "none",
-        // Figma Focus: border turns primary-alt (#110041) + 1px-blur shadow.
+        // Figma Focus: border turns primary-alt (#110041) + drop-shadow
         border: "primary-alt",
         boxShadow: "input-focus",
       },
@@ -35,7 +50,10 @@ const input = sva({
       borderWidth: "0",
       outline: "none",
       flex: "[1]",
+      minW: "0",
       bg: "[transparent]",
+      // Figma: typed input text is text.default
+      color: "text.default",
 
       "&::placeholder": {
         color: "text.lighter",
@@ -54,41 +72,49 @@ const input = sva({
   },
   variants: {
     size: {
-      md: {
-        input: { p: "3" },
-      },
-      sm: {
-        input: { px: "3", py: "1" },
-      },
+      // Figma M and S: both use h-[48px] + p-[12px] — no visual size difference in the spec
+      md: {},
+      sm: {},
     },
     disabled: {
       true: {
         inputBox: {
           bg: "bg.primary",
           border: "primary",
-          color: "text.lighter",
           cursor: "not-allowed",
         },
         input: {
           cursor: "not-allowed",
+          color: "text.lighter",
         },
       },
-      false: {
-        inputBox: {
-          bg: "bg.secondary",
-        },
-      },
+      false: {},
     },
     error: {
       true: {
-        container: {
-          color: "system.error",
-        },
         inputBox: {
           border: "error",
         },
-        input: {},
+        // Figma Error: input text and label both turn system.error
+        input: { color: "system.error" },
         label: { color: "system.error" },
+      },
+      false: {},
+    },
+    // Typed: Figma uses border/secondary (#9F99A5) when a value is present
+    typed: {
+      true: {
+        inputBox: { border: "secondary" },
+      },
+      false: {},
+    },
+    // Suggestion: Figma shows secondary border + same drop-shadow as focus
+    suggestion: {
+      true: {
+        inputBox: {
+          border: "secondary",
+          boxShadow: "input-focus",
+        },
       },
       false: {},
     },
@@ -97,19 +123,38 @@ const input = sva({
     error: false,
     disabled: false,
     size: "md",
+    typed: false,
+    suggestion: false,
   },
 });
 
+// Prefix/suffix separator styling.
+// Figma: prefix has a border-right divider in brand.secondary (#C3CCD7) with pr-[8px].
+// Suffix mirrors with a border-left divider and pl-[8px].
 const affix = cva({
   base: {
-    ...hstack.raw({ alignItems: "center", gap: "1" }),
+    ...hstack.raw({ alignItems: "center" }),
+    flexShrink: "0",
     userSelect: "none",
     textStyle: "label.md.default",
+    color: "text.lighter",
   },
   variants: {
     position: {
-      prefix: { pl: "3", mr: "-3" },
-      suffix: { pr: "3", ml: "-3" },
+      prefix: {
+        // Figma: right border separator, color brand.secondary (#C3CCD7), pr-[8px]
+        borderRightWidth: "1",
+        borderRightStyle: "solid",
+        borderRightColor: "brand.secondary",
+        pr: "2",
+      },
+      suffix: {
+        // Mirror: left border separator
+        borderLeftWidth: "1",
+        borderLeftStyle: "solid",
+        borderLeftColor: "brand.secondary",
+        pl: "2",
+      },
     },
   },
 });
@@ -164,7 +209,17 @@ export function TextField({
   const inputId = id ?? randomId;
   const errorMessageId = `${inputId}-error`;
 
-  const classes = input({ disabled, error: !!error, size });
+  // Derive typed state: value present + not disabled + not error
+  const isTyped = !!value && !disabled && !error;
+  const hasSuggestion = !!suggestion;
+
+  const classes = input({
+    disabled,
+    error: !!error,
+    size,
+    typed: isTyped,
+    suggestion: hasSuggestion,
+  });
 
   return (
     <div className={classes.container}>
@@ -178,8 +233,6 @@ export function TextField({
         {prefix && (
           <div className={affix({ position: "prefix" })}>
             <span>{prefix}</span>
-            {/* Vertical separator — matches Figma design where this is rendered as text */}
-            <span>|</span>
           </div>
         )}
 
@@ -202,8 +255,6 @@ export function TextField({
 
         {suffix && (
           <div className={affix({ position: "suffix" })}>
-            {/* Vertical separator — matches Figma design */}
-            <span>|</span>
             <span>{suffix}</span>
           </div>
         )}

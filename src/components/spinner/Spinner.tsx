@@ -6,8 +6,10 @@ import { useId } from "react";
  *
  * Figma family: 1994:29039, inner frame: 1568:25587
  * 48×48px animated arc spinner.
- * Track: #E6E8FF (bg/primary-alternative adjacent)
- * Arc: gradient #3F479D → transparent (action/alt-default)
+ * Track: #E6E8FF (no token — distinct from bg.primary-alternative #E5E8FF;
+ *   use escape-hatch [#E6E8FF] if ever needed in a css() call)
+ * Arc: gradient #3F479D → transparent (#3F479D = action.alt-default)
+ *   Gradient coords match Figma asset exactly: x1=42 y1=20.5 x2=22 y2=42
  * Uses the `spin` animation token (1s linear infinite).
  */
 

@@ -96,12 +96,14 @@ export function ButtonLink({
     >
       {iconLeft && <span aria-hidden="true">{iconLeft}</span>}
       {children}
-      {iconRight && <span aria-hidden="true">{iconRight}</span>}
-      {/* Figma Size=S carries a trailing caret-down (angle-down-small). */}
-      {size === "S" && (
+      {/* Figma Size=S always carries a trailing caret-down (angle-down-small)
+          as the exclusive right slot. For Size=M the caller controls iconRight. */}
+      {size === "S" ? (
         <span aria-hidden="true">
           <CaretDown size={16} />
         </span>
+      ) : (
+        iconRight && <span aria-hidden="true">{iconRight}</span>
       )}
     </a>
   );

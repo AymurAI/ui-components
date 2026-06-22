@@ -42,7 +42,7 @@ export const Default: Story = {
       </TooltipTrigger>
       <TooltipContent>
         <span
-          className={css({ px: "3", py: "2", textStyle: "label.sm.default" })}
+          className={css({ px: "3", py: "2", textStyle: "label.md.default" })}
         >
           This is a tooltip
         </span>
@@ -69,7 +69,7 @@ export const WithoutArrow: Story = {
       </TooltipTrigger>
       <TooltipContent showArrow={false}>
         <span
-          className={css({ px: "3", py: "2", textStyle: "label.sm.default" })}
+          className={css({ px: "3", py: "2", textStyle: "label.md.default" })}
         >
           Tooltip without arrow
         </span>
@@ -96,7 +96,7 @@ export const BottomPlacement: Story = {
       </TooltipTrigger>
       <TooltipContent side="bottom">
         <span
-          className={css({ px: "3", py: "2", textStyle: "label.sm.default" })}
+          className={css({ px: "3", py: "2", textStyle: "label.md.default" })}
         >
           Positioned at the bottom
         </span>

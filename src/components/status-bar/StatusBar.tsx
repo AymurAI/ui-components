@@ -60,13 +60,34 @@ function TimeBatteryBar() {
 }
 
 // ── Sub-section: Traffic lights ───────────────────────────────────────────────
+//
+// Each dot uses its own css() call so Panda can statically extract the escape-
+// hatch bg value at build time. Passing a dynamic variable into css({ bg: var })
+// is not statically analysable and produces no CSS output.
+
+const trafficLightRed = css({
+  w: "[12px]",
+  h: "[12px]",
+  rounded: "full",
+  bg: "[#FF5F57]",
+  flexShrink: "0",
+});
+const trafficLightYellow = css({
+  w: "[12px]",
+  h: "[12px]",
+  rounded: "full",
+  bg: "[#FEBC2E]",
+  flexShrink: "0",
+});
+const trafficLightGreen = css({
+  w: "[12px]",
+  h: "[12px]",
+  rounded: "full",
+  bg: "[#28C840]",
+  flexShrink: "0",
+});
 
 function TrafficLights() {
-  const lights = [
-    { bg: "[#FF5F57]" },
-    { bg: "[#FEBC2E]" },
-    { bg: "[#28C840]" },
-  ] as const;
   return (
     <div
       className={css({
@@ -76,17 +97,9 @@ function TrafficLights() {
         flexShrink: "0",
       })}
     >
-      {lights.map((l, i) => (
-        <div
-          key={i}
-          className={css({
-            w: "[12px]",
-            h: "[12px]",
-            rounded: "full",
-            bg: l.bg,
-          })}
-        />
-      ))}
+      <div className={trafficLightRed} />
+      <div className={trafficLightYellow} />
+      <div className={trafficLightGreen} />
     </div>
   );
 }

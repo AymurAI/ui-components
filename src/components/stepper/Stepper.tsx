@@ -48,9 +48,7 @@ const stepIndicator = cva({
       },
       focus: {
         bg: "action.default",
-        borderWidth: "[1px]",
-        borderStyle: "solid",
-        borderColor: "text.default",
+        border: "primary-alt",
       },
       disabled: {
         bg: "action.disabled",

@@ -5,16 +5,16 @@ import * as RadixSwitch from "@radix-ui/react-switch";
  * Switch — Radix UI switch with AymurAI styling.
  * Ported from desktop-app/src/renderer/src/components/ui/switch.tsx
  */
+// Figma: Switch Status=Inactive/Active — track 32×19px, thumb 12×12px, padding 4px
 const rootStyle = css({
-  width: "[44px]",
-  height: "[24px]",
+  width: "[32px]",
+  height: "[19px]",
   borderRadius: "full",
-  // strictTokens: `border: "none"` is invalid — use borderWidth: "0"
   borderWidth: "0",
   cursor: "pointer",
   position: "relative",
   flexShrink: "0",
-  // Figma Status=Inactive track is grey (#E0DDE2), not the light-purple highlight.
+  // Inactive: #E0DDE2 = action.disabled
   bg: "action.disabled",
 
   transitionProperty: "[background-color]",
@@ -22,6 +22,7 @@ const rootStyle = css({
   transitionTimingFunction: "default",
 
   '&[data-state="checked"]': {
+    // Active: #3F479D = brand.primary
     bg: "brand.primary",
   },
 
@@ -33,20 +34,23 @@ const rootStyle = css({
 
 const thumbStyle = css({
   display: "block",
-  width: "[20px]",
-  height: "[20px]",
+  // Figma thumb: 12×12px (track 32 - 2×4px padding = 24 travel space; thumb 12px)
+  width: "[12px]",
+  height: "[12px]",
   borderRadius: "full",
   bg: "bg.secondary",
   position: "absolute",
-  top: "[2px]",
-  left: "[2px]",
+  // Center vertically: (19 - 12) / 2 = 3.5px ≈ 3.5px (matches Figma y=3.5)
+  top: "[3.5px]",
+  left: "[4px]",
 
   transitionProperty: "[transform]",
   transitionDuration: "slow",
   transitionTimingFunction: "default",
 
   '&[data-state="checked"]': {
-    transform: "[translateX(20px)]",
+    // Travel: 32 - 4px left padding - 12px thumb - 4px right padding = 12px
+    transform: "[translateX(12px)]",
   },
 });
 

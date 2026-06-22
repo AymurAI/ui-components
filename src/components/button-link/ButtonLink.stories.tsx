@@ -45,24 +45,24 @@ export const SizeMAlternative: Story = {
 };
 
 // Figma: Size=S, Type=Default (21:5355)
+// Note: Size=S always renders a built-in CaretDown — do not pass iconRight.
 export const SizeSDefault: Story = {
   args: {
     size: "S",
     type: "Default",
     children: "call to action",
     iconLeft: <ArrowLeft size={16} />,
-    iconRight: <CaretDown size={16} />,
   },
 };
 
 // Figma: Size=S, Type=Alternative (21:5359)
+// Note: Size=S always renders a built-in CaretDown — do not pass iconRight.
 export const SizeSAlternative: Story = {
   args: {
     size: "S",
     type: "Alternative",
     children: "call to action",
     iconLeft: <ArrowLeft size={16} />,
-    iconRight: <CaretDown size={16} />,
   },
   parameters: { backgrounds: { default: "dark" } },
 };
@@ -99,12 +99,8 @@ export const Matrix: Story = {
           Size M / Alternative
         </ButtonLink>
       </div>
-      <ButtonLink
-        size="S"
-        type="Default"
-        iconLeft={<ArrowLeft size={16} />}
-        iconRight={<CaretDown size={16} />}
-      >
+      {/* Size=S: built-in CaretDown replaces iconRight */}
+      <ButtonLink size="S" type="Default" iconLeft={<ArrowLeft size={16} />}>
         Size S / Default
       </ButtonLink>
       <div
@@ -114,7 +110,6 @@ export const Matrix: Story = {
           size="S"
           type="Alternative"
           iconLeft={<ArrowLeft size={16} />}
-          iconRight={<CaretDown size={16} />}
         >
           Size S / Alternative
         </ButtonLink>
