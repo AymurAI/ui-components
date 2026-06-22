@@ -5,12 +5,8 @@
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@11.3.0",
-  "sideEffects": [
-    "*.css"
-  ],
-  "files": [
-    "dist"
-  ],
+  "sideEffects": ["*.css"],
+  "files": ["dist"],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
