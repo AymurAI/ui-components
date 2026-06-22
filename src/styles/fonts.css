@@ -8,5 +8,9 @@
  *   import "@aymurai/ui/fonts.css";
  *
  * Alternatively, self-host Archivo and skip this file.
+ *
+ * Weights/styles cover the full Figma usage: 300 (Light, used by the italic
+ * "light italic" captions in ArchiveProgress/ArchiveView/Search), 400, 600,
+ * 700 — each with an italic axis so emphasis is real, not faux-synthesised.
  */
-@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap");
