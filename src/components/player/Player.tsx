@@ -1,4 +1,3 @@
-import { css } from "@/styled/css";
 import {
   ArrowClockwise,
   ArrowCounterClockwise,
@@ -14,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { css } from "@/styled/css";
 
 /**
  * Player — audio player bar. AymurAI UI Library "Player" (node 40001482:38874)
@@ -179,6 +179,7 @@ export interface PlayerLabels {
   play?: string;
   pause?: string;
   speed?: string;
+  seek?: string;
 }
 
 export interface PlayerProps {
@@ -206,6 +207,7 @@ const DEFAULT_LABELS: Required<PlayerLabels> = {
   play: "Reproducir",
   pause: "Pausar",
   speed: "Velocidad de reproducción",
+  seek: "Buscar en el audio",
 };
 
 export function Player({
@@ -366,7 +368,17 @@ export function Player({
 
         <div className={progressSection}>
           {/* biome-ignore lint/a11y/useKeyWithClickEvents: seek bar, click-to-seek */}
-          <div ref={barRef} onClick={handleBarClick} className={progressBar}>
+          <div
+            ref={barRef}
+            onClick={handleBarClick}
+            className={progressBar}
+            role="slider"
+            aria-label={t.seek}
+            aria-valuemin={0}
+            aria-valuemax={Math.round(durationMs / 1000)}
+            aria-valuenow={Math.round(currentMs / 1000)}
+            aria-valuetext={`${formatTime(currentMs)} / ${formatTime(durationMs)}`}
+          >
             <div
               className={progressFill}
               style={{ width: `${fillPercent}%` }}

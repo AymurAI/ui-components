@@ -1,5 +1,5 @@
-import { css, cx } from "@/styled/css";
 import type { HTMLAttributes } from "react";
+import { css, cx } from "@/styled/css";
 
 /**
  * Logo — AymurAI UI Library "logo" family node 40000499:40071.
@@ -148,6 +148,7 @@ export function Logo({
           }),
           className,
         )}
+        role="img"
         aria-label="AymurAI"
       >
         <IsoMark />
@@ -169,6 +170,7 @@ export function Logo({
           }),
           className,
         )}
+        role="img"
         aria-label={`AymurAI ${featureName}`}
       >
         <IsoMark />
@@ -209,6 +211,7 @@ export function Logo({
         }),
         className,
       )}
+      role="img"
       aria-label="AymurAI"
     >
       <IsoMark />
