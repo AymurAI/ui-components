@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -7,32 +7,40 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      "node_modules",
-      "dist",
-      "src/styled",
-      "storybook-static",
-      ".claude"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/src/styled",
+      "!**/storybook-static",
+      "!**/.claude"
     ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
   },
-  "organizeImports": {
-    "enabled": true
-  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noNonNullAssertion": "warn",
-        "useSelfClosingElements": { "fix": "safe", "level": "error" }
+        "useSelfClosingElements": { "fix": "safe", "level": "error" },
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       },
       "suspicious": {
-        "noConsoleLog": "warn",
-        "noArrayIndexKey": "off"
+        "noArrayIndexKey": "off",
+        "noConsole": { "level": "warn", "options": { "allow": ["log"] } }
       },
       "a11y": {
         "noSvgWithoutTitle": "off",
