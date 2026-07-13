@@ -1,1 +1,1 @@
-export { Toast, default, type ToastProps, type ToastVariant } from "./Toast";
+export { default, Toast, type ToastProps, type ToastVariant } from "./Toast";

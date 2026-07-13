@@ -1,6 +1,6 @@
+import { ArrowsClockwise, CheckCircle, Stop, X } from "phosphor-react";
 import { Button } from "@/components/button/Button";
 import { css, cx } from "@/styled/css";
-import { ArrowsClockwise, CheckCircle, Stop, X } from "phosphor-react";
 
 /**
  * ArchiveProgress — AymurAI UI Library "archives in progress" family node 173:24064.

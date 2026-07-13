@@ -1,2 +1,1 @@
-export { CheckCircle, type CheckCircleProps } from "./CheckCircle";
-export { default } from "./CheckCircle";
+export { CheckCircle, type CheckCircleProps, default } from "./CheckCircle";

@@ -1,6 +1,6 @@
-import { css, cx, sva } from "@/styled/css";
 import { CaretDown, CaretUp, MagnifyingGlass, X } from "phosphor-react";
 import type { InputHTMLAttributes } from "react";
+import { css, cx, sva } from "@/styled/css";
 
 /**
  * Search — AymurAI UI Library "search" family node 1992:28026.

@@ -1,5 +1,5 @@
-import { type RecipeVariantProps, cva, cx } from "@/styled/css";
 import type { HTMLAttributes } from "react";
+import { cva, cx, type RecipeVariantProps } from "@/styled/css";
 import { Avatar, type AvatarColor } from "../avatar";
 
 /**

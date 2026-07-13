@@ -1,7 +1,7 @@
-import { css } from "@/styled/css";
-import { stack } from "@/styled/patterns";
 import { Plus, Trash } from "phosphor-react";
 import type { ReactNode } from "react";
+import { css } from "@/styled/css";
+import { stack } from "@/styled/patterns";
 import type { AvatarColor } from "../avatar";
 import { Avatar } from "../avatar";
 import { AvatarPill } from "../avatar-pill";

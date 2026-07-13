@@ -1,5 +1,5 @@
-import { css } from "@/styled/css";
 import type { Meta, StoryObj } from "@storybook/react";
+import { css } from "@/styled/css";
 import {
   Tooltip,
   TooltipContent,

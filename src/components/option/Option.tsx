@@ -1,6 +1,6 @@
-import { type RecipeVariantProps, css, cva, cx } from "@/styled/css";
 import { XCircle } from "phosphor-react";
 import type { HTMLAttributes, MouseEventHandler } from "react";
+import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 
 /**
  * Option — selectable menu/list row used in the Voz a texto flows.

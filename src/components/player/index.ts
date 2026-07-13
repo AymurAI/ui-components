@@ -1,2 +1,2 @@
-export { Player, default } from "./Player";
-export type { PlayerProps, PlayerHandle, PlayerLabels } from "./Player";
+export type { PlayerHandle, PlayerLabels, PlayerProps } from "./Player";
+export { default, Player } from "./Player";

@@ -1,5 +1,5 @@
-import { type RecipeVariantProps, cva, cx } from "@/styled/css";
 import type { HTMLAttributes } from "react";
+import { cva, cx, type RecipeVariantProps } from "@/styled/css";
 
 /**
  * Avatar — initials badge (speaker avatar). AymurAI UI Library node 40001422:54714.

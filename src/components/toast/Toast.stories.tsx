@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CheckCircle, Info, Warning, WarningCircle } from "phosphor-react";
-import { Toaster, toast as hotToast } from "react-hot-toast";
+import { toast as hotToast, Toaster } from "react-hot-toast";
 import { Toast } from "./Toast";
 
 const meta = {

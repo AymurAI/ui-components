@@ -1,9 +1,9 @@
 export {
+  default,
   Popover,
   PopoverAnchor,
   PopoverClose,
   PopoverContent,
-  PopoverTrigger,
-  default,
   type PopoverContentProps,
+  PopoverTrigger,
 } from "./Popover";
