@@ -179,7 +179,6 @@ export interface PlayerLabels {
   play?: string;
   pause?: string;
   speed?: string;
-  seek?: string;
 }
 
 export interface PlayerProps {
@@ -207,7 +206,6 @@ const DEFAULT_LABELS: Required<PlayerLabels> = {
   play: "Reproducir",
   pause: "Pausar",
   speed: "Velocidad de reproducción",
-  seek: "Buscar en el audio",
 };
 
 export function Player({
@@ -367,18 +365,9 @@ export function Player({
         </div>
 
         <div className={progressSection}>
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: seek bar, click-to-seek */}
-          <div
-            ref={barRef}
-            onClick={handleBarClick}
-            className={progressBar}
-            role="slider"
-            aria-label={t.seek}
-            aria-valuemin={0}
-            aria-valuemax={Math.round(durationMs / 1000)}
-            aria-valuenow={Math.round(currentMs / 1000)}
-            aria-valuetext={`${formatTime(currentMs)} / ${formatTime(durationMs)}`}
-          >
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: click-to-seek only, no keyboard support */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: click-to-seek only, no keyboard support */}
+          <div ref={barRef} onClick={handleBarClick} className={progressBar}>
             <div
               className={progressFill}
               style={{ width: `${fillPercent}%` }}
