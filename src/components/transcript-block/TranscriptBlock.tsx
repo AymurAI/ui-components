@@ -1,7 +1,8 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 import { isValidTimestamp } from "@/utils/timestamp";
 import { Avatar, type AvatarColor } from "../avatar";
+import { Suggestion } from "../suggestion";
 
 /**
  * TranscriptBlock — a single speaker turn in the Voz a texto (speech-to-text)
@@ -15,6 +16,10 @@ import { Avatar, type AvatarColor } from "../avatar";
  *  - selected      brand.primary left bar (4px); plain body.
  *  - hover         selected + body bg primary-alternative @80% (rounded md).
  *  - typed         selected + white body with border.primary (editing state).
+ *
+ * `highlight` marks search-query matches inside `text` (case-insensitive)
+ * using {@link Suggestion} — the toolbar search bar has no other way to show
+ * where a match landed in the transcript.
  */
 const transcriptRoot = cva({
   base: { display: "flex", w: "full" },
@@ -102,6 +107,25 @@ const transcriptBody = cva({
   defaultVariants: { variant: "default" },
 });
 
+// Splits `text` on case-insensitive matches of `query`, wrapping each match
+// in Suggestion. Parity of the split result tells matches from plain text
+// apart (a capturing group in the regex keeps matches in the output array).
+function highlightText(text: string, query: string): ReactNode {
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  if (!escaped) return text;
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <Suggestion key={i} rounded>
+        {part}
+      </Suggestion>
+    ) : (
+      part
+    ),
+  );
+}
+
 // Dev-facing "time" format warnings fire once per distinct value, not once
 // per render — TranscriptBlock renders as many instances per transcript.
 const warnedTimestamps = new Set<string>();
@@ -117,6 +141,8 @@ export type TranscriptBlockProps = RecipeVariantProps<typeof transcriptRoot> & {
   text: string;
   /** Avatar circle colour (per-speaker) */
   color?: AvatarColor;
+  /** Search query to highlight inside `text` (case-insensitive) */
+  highlight?: string;
   className?: string;
 } & Omit<HTMLAttributes<HTMLElement>, "color">;
 
@@ -127,6 +153,7 @@ export function TranscriptBlock({
   text,
   variant = "default",
   color = "primary",
+  highlight,
   className,
   ...props
 }: TranscriptBlockProps) {
@@ -147,7 +174,11 @@ export function TranscriptBlock({
       <span className={timestamp}>{time}</span>
     </div>
   );
-  const body = <p className={transcriptBody({ variant })}>{text}</p>;
+  const body = (
+    <p className={transcriptBody({ variant })}>
+      {highlight ? highlightText(text, highlight) : text}
+    </p>
+  );
 
   if (variant === "default") {
     return (
