@@ -24,6 +24,9 @@ import { css, cx } from "@/styled/css";
  *   - The Switch in Search+Switch context is the library's Switch component
  *     but is passed as `rightSlot` for composition.
  *   - bg.secondary = #FFFFFF (white bar background)
+ *   - `searchResultCount`/`onSearchPrev`/`onSearchNext`/`onSearchClear` pass
+ *     straight through to `Search`, which already supports them — Toolbar
+ *     just didn't expose them before.
  *
  * The ToolButton row in the Anonimizador toolbar shown in the Figma is
  * actually the outer toolbar section — within the same bar or below, exposed
@@ -53,6 +56,14 @@ export interface ToolbarProps {
   /** Search input value */
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  /** Result count label, e.g. "1 de 2" — shows the Search nav controls */
+  searchResultCount?: string;
+  /** Called when the user clicks the previous-result arrow */
+  onSearchPrev?: () => void;
+  /** Called when the user clicks the next-result arrow */
+  onSearchNext?: () => void;
+  /** Called when the user clicks the Search clear (X) button */
+  onSearchClear?: () => void;
   /** Right slot — pass any node (Switch+label, button, filter controls, etc.) */
   rightSlot?: ReactNode;
   /** Tool buttons shown in the action zone (Anonimizador context) */
@@ -67,6 +78,10 @@ export function Toolbar({
   context = "anonimizador",
   searchValue,
   onSearchChange,
+  searchResultCount,
+  onSearchPrev,
+  onSearchNext,
+  onSearchClear,
   rightSlot,
   toolButtons,
   onToolButtonClick,
@@ -109,6 +124,10 @@ export function Toolbar({
         <Search
           value={searchValue}
           onChange={(e) => onSearchChange?.(e.target.value)}
+          resultCount={searchResultCount}
+          onPrev={onSearchPrev}
+          onNext={onSearchNext}
+          onClear={onSearchClear}
           className={css({ flex: "1" })}
         />
       </div>

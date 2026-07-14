@@ -27,6 +27,22 @@ export const SetDeDatos: Story = {
   },
 };
 
+/**
+ * Search+Switch with an active query — shows the result counter + prev/next
+ * + clear controls, which `Search` already supported but `Toolbar` didn't
+ * pass through.
+ */
+export const SearchSwitchWithResults: Story = {
+  args: {
+    context: "search-switch",
+    searchValue: "ano",
+    searchResultCount: "1 de 2",
+    onSearchPrev: () => {},
+    onSearchNext: () => {},
+    onSearchClear: () => {},
+  },
+};
+
 /** Figma: Property1=Search+Switch — search + switch label on right */
 export const SearchSwitch: Story = {
   args: {
