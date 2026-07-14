@@ -27,9 +27,13 @@ const pillRoot = cva({
     state: {
       default: {
         bg: "bg.secondary", // #FFFFFF
+        border: "[1px solid transparent]",
         "&:hover": { bg: "bg.primary-alternative" },
       },
-      selected: { bg: "bg.primary-alternative" }, // #E5E8FF
+      selected: {
+        bg: "bg.primary-alternative", // #E5E8FF
+        border: "[1px solid transparent]",
+      },
       typing: {
         bg: "bg.secondary",
         border: "primary-alt",
@@ -56,7 +60,7 @@ const pillName = cva({
 });
 
 const renameButton = css({
-  display: "none",
+  display: "flex",
   alignItems: "center",
   justifyContent: "center",
   flexShrink: "0",
@@ -65,7 +69,22 @@ const renameButton = css({
   color: "text.default",
   cursor: "pointer",
   p: "0",
-  ".aym-pill-root:hover &": { display: "flex" },
+  // Visually hidden until hover/focus, but never display:none — that would
+  // drop it from the tab order and accessibility tree (keyboard/screen
+  // reader users could never reach the rename affordance).
+  opacity: "0",
+  pointerEvents: "none",
+  transitionProperty: "[opacity]",
+  transitionDuration: "fast",
+  transitionTimingFunction: "default",
+  "[data-pill-root]:hover &": { opacity: "1", pointerEvents: "auto" },
+  "[data-pill-root]:focus-within &": { opacity: "1", pointerEvents: "auto" },
+  "&:focus-visible": {
+    opacity: "1",
+    pointerEvents: "auto",
+    outline: "primary-alt",
+    outlineWidth: "[2px]",
+  },
 });
 
 export type AvatarPillState = "default" | "selected" | "typing";
@@ -109,11 +128,8 @@ export function AvatarPill({
 
   return (
     <span
-      className={cx(
-        "aym-pill-root",
-        pillRoot({ state: resolvedState }),
-        className,
-      )}
+      data-pill-root
+      className={cx(pillRoot({ state: resolvedState }), className)}
       {...props}
     >
       <Avatar initials={initials} size="sm" color={color} />
@@ -121,7 +137,10 @@ export function AvatarPill({
       {onRename && resolvedState !== "typing" && (
         <button
           type="button"
-          onClick={onRename}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRename();
+          }}
           aria-label={renameLabel}
           className={renameButton}
         >
