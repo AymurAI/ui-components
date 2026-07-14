@@ -53,6 +53,12 @@ export interface ArchiveProgressProps {
   className?: string;
 }
 
+// Same stripe geometry for every variant (2px stripe / 7px repeat, 45deg) —
+// only the colour changes between "in progress" and "completed".
+function diagonalStripe(color: string): string {
+  return `repeating-linear-gradient(45deg, ${color} 0px, ${color} 2px, transparent 2px, transparent 7px)`;
+}
+
 // ── Progress bar sub-component ───────────────────────────────────────────────
 
 function ProgressBar({
@@ -84,11 +90,17 @@ function ProgressBar({
   // (a "barber-pole" loading pattern): periwinkle stripes over the light-blue
   // in-progress fill, white stripes over the navy completed fill. Applied as an
   // inline backgroundImage (gradients are not tokenizable).
+  //
+  // The angle and stripe geometry (2px stripe / 7px repeat) are shared between
+  // both variants on purpose — Figma renders them identically, only the
+  // stripe colour changes. Confirmed pixel-by-pixel against the Figma
+  // reference (node 173:24064): the previous 135deg produced the mirrored
+  // "/" diagonal instead of Figma's "\".
   const stripe =
     status === "completed"
-      ? "repeating-linear-gradient(135deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 2px, transparent 2px, transparent 7px)"
+      ? diagonalStripe("rgba(255,255,255,0.5)")
       : status === "default"
-        ? "repeating-linear-gradient(135deg, rgba(63,71,157,0.35) 0px, rgba(63,71,157,0.35) 2px, transparent 2px, transparent 7px)"
+        ? diagonalStripe("rgba(63,71,157,0.35)")
         : undefined;
 
   return (
