@@ -129,7 +129,7 @@ export function TranscriptBlock({
   if (!isValidTimestamp(time)) {
     // biome-ignore lint/suspicious/noConsole: intentional dev-facing data warning, not debug logging
     console.warn(
-      `TranscriptBlock: "time" ("${time}") doesn't match the [HH]:MM:SS format.`,
+      `TranscriptBlock: "time" ("${time}") doesn't match the [HH:]MM:SS format.`,
     );
   }
 
