@@ -1,30 +1,49 @@
 import { Plus, Trash } from "phosphor-react";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
+import { useState } from "react";
 import { css } from "@/styled/css";
 import { stack } from "@/styled/patterns";
+import { isValidTimestamp } from "@/utils/timestamp";
 import type { AvatarColor } from "../avatar";
 import { Avatar } from "../avatar";
 import { AvatarPill } from "../avatar-pill";
 import { Button } from "../button";
+import { Popover, PopoverAnchor, PopoverContent } from "../popover";
 import { TextField } from "../text-field";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
 import { ArrowsMerge } from "./ArrowsMergeIcon";
 
 /**
  * SidePanel — "Side Panel Voz a texto" (speech-to-text turn editor).
  * AymurAI UI Library node 40002322:53113.
  *
- * Composite assembled from {@link AvatarPill}, {@link TextField} and
- * {@link Button}. Sections: selected turn card, suggested people, timestamp,
- * and turn actions (merge previous/next, add below, delete).
+ * Composite assembled from {@link AvatarPill}, {@link TextField},
+ * {@link Button}, {@link Popover} and {@link Tooltip}. Sections: selected
+ * turn card, suggested people, timestamp, and turn actions (merge
+ * previous/next, add below, delete).
  *
  * Merge actions use the Phosphor "ArrowsMerge" glyph (vendored in
  * ./ArrowsMergeIcon as phosphor-react@1.4.1 predates it): base points down
  * ("siguiente"), rotated 180° points up ("anterior").
+ *
+ * Consumers need a `TooltipProvider` somewhere up the tree for the Acciones
+ * tooltips (see Tooltip.tsx / this component's story).
+ *
+ * Merging two turns whose speakers differ shows a confirm popover (Figma
+ * "Conflicto Nombre etiqueta", node 40002384:38487) before firing
+ * `onMergePrevious`/`onMergeNext` — pass `previousTurnName`/`nextTurnName` to
+ * enable it; without them, merge fires immediately (previous behaviour).
  */
 export type SidePanelPerson = {
   initials: string;
   name: string;
   color?: AvatarColor;
+};
+
+type ConfirmState = {
+  title: string;
+  description: string;
+  onConfirm: () => void;
 };
 
 export type SidePanelProps = {
@@ -36,11 +55,15 @@ export type SidePanelProps = {
   selectedIndex?: number;
   onSelectPerson?: (index: number) => void;
   onNewPerson?: () => void;
-  /** Timestamp field value (e.g. "01:15") */
+  /** Timestamp field value (e.g. "01:15") — format `[HH]:MM:SS` */
   timestamp: string;
   onTimestampChange?: (value: string) => void;
   onMergePrevious?: () => void;
   onMergeNext?: () => void;
+  /** Speaker name of the previous turn — enables the merge confirm popover */
+  previousTurnName?: string;
+  /** Speaker name of the next turn — enables the merge confirm popover */
+  nextTurnName?: string;
   onAddBelow?: () => void;
   onDelete?: () => void;
   className?: string;
@@ -101,6 +124,27 @@ const divider = css({
   bg: "[#BCBAB8]", // Figma divider line (border/primary colour)
 });
 
+// Confirm popover (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
+// title + description + Combinar/Cancelar. Anchored to the Acciones section.
+const confirmBox = css({
+  ...stack.raw({ gap: "3" }), // 12px
+  p: "6", // 24px
+  maxW: "[341px]",
+});
+const confirmTitle = css({
+  textStyle: "subtitle.sm.strong",
+  color: "text.default",
+});
+const confirmDescription = css({
+  textStyle: "label.sm.default",
+  color: "text.lighter",
+});
+const confirmButtons = css({
+  display: "flex",
+  alignItems: "center",
+  gap: "4", // 16px
+});
+
 function Section({
   heading,
   children,
@@ -116,6 +160,27 @@ function Section({
   );
 }
 
+function ActionButton({
+  tooltip,
+  ...props
+}: {
+  tooltip: string;
+} & ComponentProps<typeof Button>) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="secondary"
+          size="sm"
+          className={fullWidthButton}
+          {...props}
+        />
+      </TooltipTrigger>
+      <TooltipContent side="left">{tooltip}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function SidePanel({
   turn,
   people,
@@ -126,10 +191,50 @@ export function SidePanel({
   onTimestampChange,
   onMergePrevious,
   onMergeNext,
+  previousTurnName,
+  nextTurnName,
   onAddBelow,
   onDelete,
   className,
 }: SidePanelProps) {
+  const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+
+  const timestampError = isValidTimestamp(timestamp)
+    ? null
+    : "Formato inválido (HH:MM:SS)";
+
+  function handleMergePrevious() {
+    if (previousTurnName && previousTurnName !== turn.name) {
+      setConfirm({
+        title: `Vas a unir este turno con el de "${previousTurnName}".`,
+        description:
+          "Los turnos se combinan en uno solo, con la persona del turno anterior.",
+        onConfirm: () => {
+          onMergePrevious?.();
+          setConfirm(null);
+        },
+      });
+    } else {
+      onMergePrevious?.();
+    }
+  }
+
+  function handleMergeNext() {
+    if (nextTurnName && nextTurnName !== turn.name) {
+      setConfirm({
+        title: `Vas a unir este turno con el de "${nextTurnName}".`,
+        description:
+          "Los turnos se combinan en uno solo, con la persona del turno siguiente.",
+        onConfirm: () => {
+          onMergeNext?.();
+          setConfirm(null);
+        },
+      });
+    } else {
+      onMergeNext?.();
+    }
+  }
+
   return (
     <div className={className ? `${root} ${className}` : root}>
       {/* Selected turn */}
@@ -169,50 +274,73 @@ export function SidePanel({
           value={timestamp}
           onChange={(e) => onTimestampChange?.(e.target.value)}
           aria-label="Marca de tiempo"
+          error={timestampError}
         />
       </Section>
       <div className={divider} />
 
       {/* Actions */}
       <Section heading="Acciones">
-        <div className={actions}>
-          <Button
-            variant="secondary"
-            size="sm"
-            className={fullWidthButton}
-            onClick={onMergePrevious}
-          >
-            <ArrowsMerge size={16} style={{ transform: "rotate(180deg)" }} />
-            Unir con el anterior
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className={fullWidthButton}
-            onClick={onMergeNext}
-          >
-            <ArrowsMerge size={16} />
-            Unir con el siguiente
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className={fullWidthButton}
-            onClick={onAddBelow}
-          >
-            <Plus size={16} />
-            Agregar debajo
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className={fullWidthButton}
-            onClick={onDelete}
-          >
-            <Trash size={16} />
-            Eliminar
-          </Button>
-        </div>
+        <Popover
+          open={confirm !== null}
+          onOpenChange={(open) => {
+            if (!open) setConfirm(null);
+          }}
+        >
+          <PopoverAnchor asChild>
+            <div className={actions}>
+              <ActionButton
+                tooltip="Combina este turno con el anterior"
+                onClick={handleMergePrevious}
+              >
+                <ArrowsMerge
+                  size={16}
+                  style={{ transform: "rotate(180deg)" }}
+                />
+                Unir con el anterior
+              </ActionButton>
+              <ActionButton
+                tooltip="Combina este turno con el siguiente"
+                onClick={handleMergeNext}
+              >
+                <ArrowsMerge size={16} />
+                Unir con el siguiente
+              </ActionButton>
+              <ActionButton
+                tooltip="Agrega un turno nuevo debajo de este"
+                onClick={onAddBelow}
+              >
+                <Plus size={16} />
+                Agregar debajo
+              </ActionButton>
+              <ActionButton tooltip="Elimina este turno" onClick={onDelete}>
+                <Trash size={16} />
+                Eliminar
+              </ActionButton>
+            </div>
+          </PopoverAnchor>
+          {confirm && (
+            <PopoverContent
+              className={confirmBox}
+              onOpenAutoFocus={(e) => e.preventDefault()}
+            >
+              <p className={confirmTitle}>{confirm.title}</p>
+              <p className={confirmDescription}>{confirm.description}</p>
+              <div className={confirmButtons}>
+                <Button variant="primary" size="sm" onClick={confirm.onConfirm}>
+                  Combinar
+                </Button>
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  onClick={() => setConfirm(null)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </PopoverContent>
+          )}
+        </Popover>
       </Section>
     </div>
   );
