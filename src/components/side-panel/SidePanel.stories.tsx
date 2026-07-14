@@ -80,9 +80,9 @@ export const MergeConfirmation: Story = {
           onSelectPerson={setSelected}
           timestamp="01:15"
           previousTurnName="Fiscal"
-          nextTurnName="Persona1"
+          nextTurnName="Defensor"
           onMergePrevious={() => window.alert("Unido con Fiscal")}
-          onMergeNext={() => window.alert("Unido con el siguiente")}
+          onMergeNext={() => window.alert("Unido con Defensor")}
         />
       </div>
     );

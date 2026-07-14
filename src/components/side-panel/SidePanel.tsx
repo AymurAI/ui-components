@@ -201,7 +201,7 @@ export function SidePanel({
 
   const timestampError = isValidTimestamp(timestamp)
     ? null
-    : "Formato inválido (HH:MM:SS)";
+    : "Formato inválido (MM:SS o HH:MM:SS)";
 
   function handleMergePrevious() {
     if (previousTurnName && previousTurnName !== turn.name) {
@@ -320,10 +320,7 @@ export function SidePanel({
             </div>
           </PopoverAnchor>
           {confirm && (
-            <PopoverContent
-              className={confirmBox}
-              onOpenAutoFocus={(e) => e.preventDefault()}
-            >
+            <PopoverContent className={confirmBox}>
               <p className={confirmTitle}>{confirm.title}</p>
               <p className={confirmDescription}>{confirm.description}</p>
               <div className={confirmButtons}>
