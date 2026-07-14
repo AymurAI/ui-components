@@ -10,6 +10,7 @@
  * so there are no default-export collisions.)
  */
 
+export * from "./components/app-header";
 // Archives
 export * from "./components/archives";
 // Media & identity
