@@ -29,14 +29,21 @@ const avatar = cva({
       secondary: { bg: "bg.secondary-highlight" },
       warning: { bg: "system.warning-secondary" },
       success: { bg: "system.success-secondary" },
-      // Speaker palette (Figma "bg/category/*").
+      // Speaker palette (Figma "bg/category/*") — 7 colours × base/-light.
       violet: { bg: "category.violet" },
+      "violet-light": { bg: "category.violet-light" },
       green: { bg: "category.green" },
-      red: { bg: "category.red" },
-      yellow: { bg: "category.yellow" },
-      pink: { bg: "category.pink" },
-      orange: { bg: "category.orange" },
       "green-light": { bg: "category.green-light" },
+      red: { bg: "category.red" },
+      "red-light": { bg: "category.red-light" },
+      yellow: { bg: "category.yellow" },
+      "yellow-light": { bg: "category.yellow-light" },
+      pink: { bg: "category.pink" },
+      "pink-light": { bg: "category.pink-light" },
+      orange: { bg: "category.orange" },
+      "orange-light": { bg: "category.orange-light" },
+      blue: { bg: "category.blue" },
+      "blue-light": { bg: "category.blue-light" },
     },
   },
   defaultVariants: { size: "sm", color: "primary" },
@@ -48,12 +55,19 @@ export type AvatarColor =
   | "warning"
   | "success"
   | "violet"
+  | "violet-light"
   | "green"
+  | "green-light"
   | "red"
+  | "red-light"
   | "yellow"
+  | "yellow-light"
   | "pink"
+  | "pink-light"
   | "orange"
-  | "green-light";
+  | "orange-light"
+  | "blue"
+  | "blue-light";
 
 export type AvatarProps = RecipeVariantProps<typeof avatar> & {
   /** Initials shown inside the circle (e.g. "AD") */

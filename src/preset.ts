@@ -132,15 +132,26 @@ export const aymuraiPreset = definePreset({
             "secondary-highlight": color("#E0DDE2"),
           },
           // Speaker/category palette (Figma "bg/category/*") — distinguishes
-          // people in the Voz a texto flows (avatar fills, pills).
+          // people in the Voz a texto flows (avatar fills, pills). 7 colours,
+          // each with a base + "-light" pair (Figma exact, via get_variable_defs
+          // on node 40001422:54687). `violet` and `orange` were previously
+          // mapped to their "-light" hex under the base name — corrected here;
+          // see docs/figma-alignment-audit.md follow-up.
           category: {
-            violet: color("#C5CAFF"), // bg/category/violet-ligth
+            violet: color("#3F479D"), // bg/category/violet
+            "violet-light": color("#C5CAFF"), // bg/category/violet-ligth
             green: color("#94FFC8"), // bg/category/green
-            red: color("#F69FA6"), // bg/category/red
-            yellow: color("#FDE27B"), // bg/category/yellow
-            pink: color("#F8AEEF"), // bg/category/pink
-            orange: color("#FFE2C4"), // bg/category/orange-ligth
             "green-light": color("#D1F4E2"), // bg/category/green-ligth
+            red: color("#F69FA6"), // bg/category/red
+            "red-light": color("#FFE2D9"), // bg/category/red-ligth
+            yellow: color("#FDE27B"), // bg/category/yellow
+            "yellow-light": color("#FFF2C6"), // bg/category/yellow-ligth
+            pink: color("#F8AEEF"), // bg/category/pink
+            "pink-light": color("#FFD6FA"), // bg/category/pink-ligth
+            orange: color("#F7C693"), // bg/category/orange
+            "orange-light": color("#FFE2C4"), // bg/category/orange-ligth
+            blue: color("#A2E2F9"), // bg/category/blue
+            "blue-light": color("#CBF1FF"), // bg/category/blue-ligth
           },
           system: {
             success: color("#1B834E"),

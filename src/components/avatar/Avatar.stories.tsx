@@ -20,12 +20,19 @@ const meta = {
         "warning",
         "success",
         "violet",
+        "violet-light",
         "green",
-        "red",
-        "yellow",
-        "pink",
-        "orange",
         "green-light",
+        "red",
+        "red-light",
+        "yellow",
+        "yellow-light",
+        "pink",
+        "pink-light",
+        "orange",
+        "orange-light",
+        "blue",
+        "blue-light",
       ],
     },
   },
@@ -38,7 +45,10 @@ export const Default: Story = {
   args: { initials: "AD", size: "sm", color: "violet" },
 };
 
-/** Figma bg/category/* speaker-palette — one avatar per colour, both sizes. */
+/**
+ * Figma bg/category/* speaker-palette — 7 colours × base/-light, both sizes,
+ * plus the semantic set (primary/secondary/warning/success).
+ */
 export const Matrix: Story = {
   render: () => (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -49,7 +59,16 @@ export const Matrix: Story = {
         <Avatar initials="GH" color="yellow" size="sm" />
         <Avatar initials="IJ" color="pink" size="sm" />
         <Avatar initials="KL" color="orange" size="sm" />
-        <Avatar initials="MN" color="green-light" size="sm" />
+        <Avatar initials="MN" color="blue" size="sm" />
+      </div>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <Avatar initials="AB" color="violet-light" size="sm" />
+        <Avatar initials="CD" color="green-light" size="sm" />
+        <Avatar initials="EF" color="red-light" size="sm" />
+        <Avatar initials="GH" color="yellow-light" size="sm" />
+        <Avatar initials="IJ" color="pink-light" size="sm" />
+        <Avatar initials="KL" color="orange-light" size="sm" />
+        <Avatar initials="MN" color="blue-light" size="sm" />
       </div>
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <Avatar initials="AB" color="violet" size="md" />
@@ -58,7 +77,7 @@ export const Matrix: Story = {
         <Avatar initials="GH" color="yellow" size="md" />
         <Avatar initials="IJ" color="pink" size="md" />
         <Avatar initials="KL" color="orange" size="md" />
-        <Avatar initials="MN" color="green-light" size="md" />
+        <Avatar initials="MN" color="blue" size="md" />
       </div>
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <Avatar initials="AD" color="primary" size="sm" />
