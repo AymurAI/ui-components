@@ -139,9 +139,17 @@ export interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   steps: StepDef[];
   /** 0-based index of the currently active step */
   current: number;
+  /** Whether to render connector lines between steps */
+  showConnectors?: boolean;
 }
 
-export function Stepper({ steps, current, className, ...props }: StepperProps) {
+export function Stepper({
+  steps,
+  current,
+  showConnectors = true,
+  className,
+  ...props
+}: StepperProps) {
   return (
     <div
       {...props}
@@ -165,13 +173,15 @@ export function Stepper({ steps, current, className, ...props }: StepperProps) {
             className={css({
               display: "flex",
               alignItems: "center",
-              flex: i < steps.length - 1 ? "1" : undefined,
+              flex: showConnectors && i < steps.length - 1 ? "1" : undefined,
             })}
             role="listitem"
             aria-current={i === current ? "step" : undefined}
           >
             <StepCell index={i} label={step.label} state={state} />
-            {i < steps.length - 1 && <StepConnector active={i < current} />}
+            {showConnectors && i < steps.length - 1 && (
+              <StepConnector active={i < current} />
+            )}
           </div>
         );
       })}

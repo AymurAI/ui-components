@@ -19,7 +19,7 @@ const meta = {
   },
   args: {
     steps: STEPS,
-    current: 1,
+    current: 0,
   },
 } satisfies Meta<typeof AppHeader>;
 

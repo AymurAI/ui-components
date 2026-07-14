@@ -17,9 +17,9 @@ import { Stepper } from "../stepper";
  * feature name instead. `featureName` covers both: omit it for the bare
  * iso mark, pass it for "iso mark + divider + name".
  *
- * No Figma node documents the container's own spacing (only the 96px-tall
- * bar itself) — padding/height here follow Toolbar's conventions as a
- * best-effort match pending a dedicated node.
+ * The top-bar variant is 1440×96px with 48px horizontal padding. Its three
+ * layout regions are 203px (logo), 332px (stepper), and 203px (actions), so
+ * the stepper remains centered even when the logo content changes width.
  */
 const root = css({
   display: "flex",
@@ -34,18 +34,31 @@ const root = css({
   borderBottomColor: "[#BCBAB8]", // border.primary colour, no bare token
 });
 
+const logoWrap = css({
+  display: "flex",
+  alignItems: "center",
+  w: "[203px]",
+  flexShrink: "0",
+});
+
 const stepperWrap = css({
   display: "flex",
-  flex: "1",
-  justifyContent: "center",
+  alignItems: "center",
+  w: "[332px]",
+  h: "[52px]",
+  flexShrink: "0",
 });
 
 const actionsWrap = css({
   display: "flex",
   alignItems: "center",
+  justifyContent: "flex-end",
   gap: "4", // 16px
+  w: "[203px]",
   flexShrink: "0",
 });
+
+const helpIcon = css({ color: "text.lighter" });
 
 export interface AppHeaderProps {
   /** Feature name shown next to the logo (e.g. "Voz a Texto"). Omit for the bare iso mark. */
@@ -77,32 +90,40 @@ export function AppHeader({
 
   return (
     <div className={cx(root, className)}>
-      {featureName ? (
-        <Logo variant="logo-feature" featureName={featureName} />
-      ) : (
-        <Logo variant="iso" />
-      )}
+      <div className={logoWrap}>
+        {featureName ? (
+          <Logo variant="logo-feature" featureName={featureName} />
+        ) : (
+          <Logo variant="iso" />
+        )}
+      </div>
 
       <div className={stepperWrap}>
-        <Stepper steps={stepperSteps} current={current} />
+        <Stepper
+          steps={stepperSteps}
+          current={current}
+          showConnectors={false}
+        />
       </div>
 
       <div className={actionsWrap}>
         <Button
           variant="tertiary"
-          size="icon-md"
+          size="icon-sm"
           aria-label={helpLabel}
           onClick={onHelp}
+          style={{ padding: 2, borderRadius: 4 }}
         >
-          <Question size={20} />
+          <Question size={32} className={helpIcon} />
         </Button>
         <BigIconButton
           variant="primary"
           size="small"
           aria-label={appsLabel}
           onClick={onOpenApps}
+          style={{ padding: 2, borderRadius: 4 }}
         >
-          <DotsNine size={20} />
+          <DotsNine size={32} />
         </BigIconButton>
       </div>
     </div>
