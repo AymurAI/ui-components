@@ -7,10 +7,8 @@ import { css, cva, cx } from "@/styled/css";
  * Figma variants:
  *   Step states: default (disabled/bg action.disabled), focus (active/bg action.default + border).
  *
- * Layout: horizontal row of step+text cells. A thin connecting bar between
- * steps is rendered as a flex spacer line (not in Figma as a distinct element
- * but implied by the horizontal layout; omitted as assumption — steps are
- * inline with padding).
+ * Layout: horizontal row of step+text cells, with no connector lines between
+ * them, matching the Figma component.
  *
  * Tokens:
  *   action.default  = #C5CAFF  (Focus/active indicator)
@@ -109,25 +107,6 @@ function StepCell({ index, label, state }: StepCellProps) {
   );
 }
 
-// ── Connector bar between steps ──────────────────────────────────────────────
-
-function StepConnector({ active }: { active: boolean }) {
-  return (
-    <div
-      className={css({
-        flex: "1",
-        h: "[2px]",
-        bg: active ? "action.alt-default" : "action.disabled",
-        minW: "[16px]",
-        alignSelf: "center",
-        transitionProperty: "[background-color]",
-        transitionDuration: "normal",
-        transitionTimingFunction: "default",
-      })}
-    />
-  );
-}
-
 // ── Public API ───────────────────────────────────────────────────────────────
 
 export interface StepDef {
@@ -139,17 +118,9 @@ export interface StepperProps extends HTMLAttributes<HTMLDivElement> {
   steps: StepDef[];
   /** 0-based index of the currently active step */
   current: number;
-  /** Whether to render connector lines between steps */
-  showConnectors?: boolean;
 }
 
-export function Stepper({
-  steps,
-  current,
-  showConnectors = true,
-  className,
-  ...props
-}: StepperProps) {
+export function Stepper({ steps, current, className, ...props }: StepperProps) {
   return (
     <div
       {...props}
@@ -173,15 +144,11 @@ export function Stepper({
             className={css({
               display: "flex",
               alignItems: "center",
-              flex: showConnectors && i < steps.length - 1 ? "1" : undefined,
             })}
             role="listitem"
             aria-current={i === current ? "step" : undefined}
           >
             <StepCell index={i} label={step.label} state={state} />
-            {showConnectors && i < steps.length - 1 && (
-              <StepConnector active={i < current} />
-            )}
           </div>
         );
       })}

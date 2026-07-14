@@ -99,11 +99,7 @@ export function AppHeader({
       </div>
 
       <div className={stepperWrap}>
-        <Stepper
-          steps={stepperSteps}
-          current={current}
-          showConnectors={false}
-        />
+        <Stepper steps={stepperSteps} current={current} />
       </div>
 
       <div className={actionsWrap}>
