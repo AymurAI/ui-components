@@ -3,6 +3,7 @@ import { ArrowsClockwise, Plus, Trash } from "phosphor-react";
 import { useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import {
+  AppHeader,
   ArchiveProgress,
   ArchiveTabs,
   ArchiveView,
@@ -381,6 +382,11 @@ function ShowcasePage() {
 
         <Section title="Chrome">
           <div style={{ width: "100%", display: "grid", gap: 16 }}>
+            <AppHeader
+              featureName="Voz a Texto"
+              steps={["Selección", "Transcripción", "Validación", "Fin"]}
+              current={1}
+            />
             <Toolbar context="anonimizador" />
             <StatusBar variant="tabs" tabTitle="AymurAI" />
           </div>

@@ -1,2 +1,2 @@
-export type { AvatarPillProps } from "./AvatarPill";
+export type { AvatarPillProps, AvatarPillState } from "./AvatarPill";
 export { AvatarPill, default } from "./AvatarPill";
