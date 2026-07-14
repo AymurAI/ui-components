@@ -55,7 +55,7 @@ export type SidePanelProps = {
   selectedIndex?: number;
   onSelectPerson?: (index: number) => void;
   onNewPerson?: () => void;
-  /** Timestamp field value (e.g. "01:15") — format `[HH]:MM:SS` */
+  /** Timestamp field value (e.g. "01:15") — format `[HH:]MM:SS` */
   timestamp: string;
   onTimestampChange?: (value: string) => void;
   onMergePrevious?: () => void;

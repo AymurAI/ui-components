@@ -89,7 +89,7 @@ export const MergeConfirmation: Story = {
   },
 };
 
-/** "Marca de tiempo" rejects anything that isn't [HH]:MM:SS. */
+/** "Marca de tiempo" rejects anything that isn't [HH:]MM:SS. */
 export const InvalidTimestamp: Story = {
   render: () => {
     const [time, setTime] = useState("1:5");
