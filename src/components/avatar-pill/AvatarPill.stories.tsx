@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { useState } from "react";
 import { AvatarPill } from "./AvatarPill";
 
 const meta = {
@@ -48,7 +49,45 @@ export const Hover: Story = {
 
 /** Typing = edit focus, triggered manually by selecting the person from the pill. */
 export const Typing: Story = {
-  args: { initials: "AB", name: "Name Surname", state: "typing" },
+  args: {
+    initials: "AB",
+    name: "Name Surname",
+    state: "typing",
+    editValue: "Name Surname",
+  },
+};
+
+/** Enter commits the controlled value; Escape restores the previous name. */
+export const Editing: Story = {
+  render: () => {
+    const [name, setName] = useState("Name Surname");
+    const [draft, setDraft] = useState(name);
+    const [editing, setEditing] = useState(false);
+
+    return (
+      <AvatarPill
+        initials="AB"
+        name={name}
+        state={editing ? "typing" : "default"}
+        onRename={() => {
+          setDraft(name);
+          setEditing(true);
+        }}
+        editValue={draft}
+        onEditValueChange={setDraft}
+        onEditCommit={(value) => {
+          const nextName = value.trim();
+          if (nextName) setName(nextName);
+          setEditing(false);
+        }}
+        onEditCancel={() => {
+          setDraft(name);
+          setEditing(false);
+        }}
+        renameInputLabel="Editar nombre de la persona"
+      />
+    );
+  },
 };
 
 export const Matrix: Story = {
