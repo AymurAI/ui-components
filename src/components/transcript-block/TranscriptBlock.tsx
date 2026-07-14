@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
+import { isValidTimestamp } from "@/utils/timestamp";
 import { Avatar, type AvatarColor } from "../avatar";
 
 /**
@@ -101,6 +102,10 @@ const transcriptBody = cva({
   defaultVariants: { variant: "default" },
 });
 
+// Dev-facing "time" format warnings fire once per distinct value, not once
+// per render — TranscriptBlock renders as many instances per transcript.
+const warnedTimestamps = new Set<string>();
+
 export type TranscriptBlockProps = RecipeVariantProps<typeof transcriptRoot> & {
   /** Speaker initials shown in the avatar */
   initials: string;
@@ -125,6 +130,14 @@ export function TranscriptBlock({
   className,
   ...props
 }: TranscriptBlockProps) {
+  if (!isValidTimestamp(time) && !warnedTimestamps.has(time)) {
+    warnedTimestamps.add(time);
+    // biome-ignore lint/suspicious/noConsole: intentional dev-facing data warning, not debug logging
+    console.warn(
+      `TranscriptBlock: "time" ("${time}") doesn't match the [HH:]MM:SS format.`,
+    );
+  }
+
   const head = (
     <div className={header}>
       <div className={avatarName}>
