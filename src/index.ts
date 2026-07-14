@@ -51,3 +51,5 @@ export * from "./components/tool-button";
 export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/transcript-block";
+// Utils
+export * from "./utils/timestamp";
