@@ -67,3 +67,8 @@ export const Conversation: Story = {
     </div>
   ),
 };
+
+/** `highlight` marks every case-insensitive match of a search query. */
+export const Highlighted: Story = {
+  args: { highlight: "caso" },
+};
