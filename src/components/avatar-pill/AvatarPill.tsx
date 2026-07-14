@@ -1,5 +1,6 @@
+import { PencilSimple } from "phosphor-react";
 import type { HTMLAttributes } from "react";
-import { cva, cx, type RecipeVariantProps } from "@/styled/css";
+import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 import { Avatar, type AvatarColor } from "../avatar";
 
 /**
@@ -7,8 +8,10 @@ import { Avatar, type AvatarColor } from "../avatar";
  * AymurAI UI Library node 40002313:53080.
  *
  * Reuses {@link Avatar} (24px circle) plus a name label inside a rounded pill.
- * Two states: Default (white bg, lighter name) and Selected (primary-alternative
- * bg, default name). The avatar circle colour is per-speaker (passthrough).
+ *
+ * Figma states: Default | Selected | Hover (reveals a rename pencil) | Typing
+ * (edit focus — confirmed with design: triggered manually by selecting the
+ * person from the pill, not tied to audio playback).
  */
 const pillRoot = cva({
   base: {
@@ -21,12 +24,19 @@ const pillRoot = cva({
     userSelect: "none",
   },
   variants: {
-    selected: {
-      true: { bg: "bg.primary-alternative" }, // #E5E8FF
-      false: { bg: "bg.secondary" }, // #FFFFFF
+    state: {
+      default: {
+        bg: "bg.secondary", // #FFFFFF
+        "&:hover": { bg: "bg.primary-alternative" },
+      },
+      selected: { bg: "bg.primary-alternative" }, // #E5E8FF
+      typing: {
+        bg: "bg.secondary",
+        border: "primary-alt",
+      },
     },
   },
-  defaultVariants: { selected: false },
+  defaultVariants: { state: "default" },
 });
 
 const pillName = cva({
@@ -36,36 +46,88 @@ const pillName = cva({
     flexShrink: "0",
   },
   variants: {
-    selected: {
-      true: { color: "text.default" }, // #110041
-      false: { color: "text.lighter" }, // #625C68
+    state: {
+      default: { color: "text.lighter" }, // #625C68
+      selected: { color: "text.default" }, // #110041
+      typing: { color: "text.default" },
     },
   },
-  defaultVariants: { selected: false },
+  defaultVariants: { state: "default" },
 });
 
-export type AvatarPillProps = RecipeVariantProps<typeof pillRoot> & {
+const renameButton = css({
+  display: "none",
+  alignItems: "center",
+  justifyContent: "center",
+  flexShrink: "0",
+  borderWidth: "0",
+  bg: "[transparent]",
+  color: "text.default",
+  cursor: "pointer",
+  p: "0",
+  ".aym-pill-root:hover &": { display: "flex" },
+});
+
+export type AvatarPillState = "default" | "selected" | "typing";
+
+export type AvatarPillProps = Omit<
+  RecipeVariantProps<typeof pillRoot>,
+  "state"
+> & {
   /** Initials shown inside the avatar circle (e.g. "AB") */
   initials: string;
   /** Speaker name shown next to the avatar */
   name: string;
   /** Avatar circle colour (per-speaker) */
   color?: AvatarColor;
+  /** Figma "Property 1": default | selected | typing (edit focus) */
+  state?: AvatarPillState;
+  /**
+   * @deprecated use `state="selected"` instead — kept for backwards
+   * compatibility, ignored when `state` is passed explicitly.
+   */
+  selected?: boolean;
+  /** Shown as a pencil icon on hover; omit to hide the rename affordance */
+  onRename?: () => void;
+  renameLabel?: string;
   className?: string;
 } & Omit<HTMLAttributes<HTMLSpanElement>, "color">;
 
 export function AvatarPill({
   initials,
   name,
+  state,
   selected,
   color = "primary",
+  onRename,
+  renameLabel = "Renombrar",
   className,
   ...props
 }: AvatarPillProps) {
+  const resolvedState: AvatarPillState =
+    state ?? (selected ? "selected" : "default");
+
   return (
-    <span className={cx(pillRoot({ selected }), className)} {...props}>
+    <span
+      className={cx(
+        "aym-pill-root",
+        pillRoot({ state: resolvedState }),
+        className,
+      )}
+      {...props}
+    >
       <Avatar initials={initials} size="sm" color={color} />
-      <span className={pillName({ selected })}>{name}</span>
+      <span className={pillName({ state: resolvedState })}>{name}</span>
+      {onRename && resolvedState !== "typing" && (
+        <button
+          type="button"
+          onClick={onRename}
+          aria-label={renameLabel}
+          className={renameButton}
+        >
+          <PencilSimple size={14} />
+        </button>
+      )}
     </span>
   );
 }
