@@ -13,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { BigIconButton } from "@/components/big-icon-button/BigIconButton";
 import { css } from "@/styled/css";
 
 /**
@@ -22,6 +23,12 @@ import { css } from "@/styled/css";
  * Transport controls (rewind 5s / play-pause / forward 5s / speed cycle),
  * a click-to-seek progress bar, a mm:ss / mm:ss time display, and an optional
  * `rightSlot` (used in the editor to inject the "Finalizar" button).
+ *
+ * The 4 transport controls are `BigIconButton` instances (Figma uses
+ * "🟢big icon button🟢" for all four) — play/pause is `primary`, the rest
+ * are `tertiary`. Speed stays a cycling button (confirmed with product: not
+ * a 5-option picker — Figma's row of speeds documents each symbol
+ * individually, it isn't a literal "all options visible" spec).
  *
  * Ported from desktop-app's voice-to-text/audio-player (i18n removed; aria
  * labels are props with Spanish defaults).
@@ -60,42 +67,6 @@ const controls = css({
   gap: "1",
   width: "[156px]",
   flexShrink: "0",
-});
-
-const iconButton = css({
-  display: "flex",
-  flexDir: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  p: "2",
-  width: "9",
-  height: "9",
-  rounded: "[6px]",
-  borderWidth: "0",
-  // transparent is not a semantic token — escape-hatch required (strictTokens)
-  bg: "[transparent]",
-  cursor: "pointer",
-  position: "relative",
-  color: "text.default",
-  "&:hover": { bg: "bg.primary-alternative" },
-});
-
-const playButton = css({
-  display: "flex",
-  flexDir: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  p: "2",
-  width: "9",
-  height: "9",
-  rounded: "[6px]",
-  borderWidth: "0",
-  cursor: "pointer",
-  position: "relative",
-  bg: "action.default",
-  // Figma: play icon is dark (text/default #110041) on lavender (#C5CAFF) background
-  color: "text.default",
-  "&:hover": { bg: "action.default", opacity: "0.85" },
 });
 
 const skipLabel = css({
@@ -325,43 +296,43 @@ export function Player({
       {/* transportRow mirrors Figma's inner Container (gap-24px: Controls + progress) */}
       <div className={transportRow}>
         <div className={controls}>
-          <button
-            type="button"
+          <BigIconButton
+            variant="tertiary"
+            size="small"
             aria-label={t.rewind5s}
             onClick={rewind5s}
-            className={iconButton}
           >
             <ArrowCounterClockwise size={20} />
             <span className={skipLabel}>5</span>
-          </button>
+          </BigIconButton>
 
-          <button
-            type="button"
+          <BigIconButton
+            variant="primary"
+            size="small"
             aria-label={isPlaying ? t.pause : t.play}
             onClick={togglePlay}
-            className={playButton}
           >
             {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-          </button>
+          </BigIconButton>
 
-          <button
-            type="button"
+          <BigIconButton
+            variant="tertiary"
+            size="small"
             aria-label={t.forward5s}
             onClick={forward5s}
-            className={iconButton}
           >
             <ArrowClockwise size={20} />
             <span className={skipLabel}>5</span>
-          </button>
+          </BigIconButton>
 
-          <button
-            type="button"
+          <BigIconButton
+            variant="tertiary"
+            size="small"
             aria-label={t.speed}
             onClick={cycleSpeed}
-            className={iconButton}
           >
             <span className={speedText}>{playbackRates[rateIndex]}×</span>
-          </button>
+          </BigIconButton>
         </div>
 
         <div className={progressSection}>
