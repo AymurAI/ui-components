@@ -28,7 +28,6 @@ const pillRoot = cva({
       default: {
         bg: "bg.secondary", // #FFFFFF
         border: "[1px solid transparent]",
-        "&:hover": { bg: "bg.primary-alternative" },
       },
       selected: {
         bg: "bg.primary-alternative", // #E5E8FF
@@ -57,6 +56,14 @@ const pillName = cva({
     },
   },
   defaultVariants: { state: "default" },
+});
+
+// Hover feedback only makes sense where hovering actually reveals something
+// to do (the rename pencil) — applied conditionally, not baked into the
+// `default` variant, so plain non-renamable pills don't look "selected" on
+// hover with no affordance to explain it.
+const renameableHover = css({
+  "&:hover": { bg: "bg.primary-alternative" },
 });
 
 const renameButton = css({
@@ -129,7 +136,11 @@ export function AvatarPill({
   return (
     <span
       data-pill-root
-      className={cx(pillRoot({ state: resolvedState }), className)}
+      className={cx(
+        pillRoot({ state: resolvedState }),
+        onRename && resolvedState === "default" && renameableHover,
+        className,
+      )}
       {...props}
     >
       <Avatar initials={initials} size="sm" color={color} />
