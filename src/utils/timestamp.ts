@@ -10,5 +10,6 @@
 const TIMESTAMP_RE = /^(?:([0-9]{1,2}):)?([0-5][0-9]):([0-5][0-9])$/;
 
 export function isValidTimestamp(value: string): boolean {
-  return TIMESTAMP_RE.test(value.trim());
+  if (typeof value !== "string") return false;
+  return TIMESTAMP_RE.test(value);
 }
