@@ -1,6 +1,6 @@
-import { css, cx } from "@/styled/css";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import type { ComponentPropsWithoutRef, HTMLAttributes } from "react";
+import { css, cx } from "@/styled/css";
 
 /**
  * Dialog — Radix UI dialog with AymurAI styling.

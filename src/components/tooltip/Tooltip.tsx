@@ -1,6 +1,6 @@
-import { css, cx } from "@/styled/css";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import type { ComponentPropsWithoutRef } from "react";
+import { css, cx } from "@/styled/css";
 
 /**
  * Tooltip — Radix UI tooltip with AymurAI styling.

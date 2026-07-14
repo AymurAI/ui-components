@@ -1,4 +1,3 @@
-import { css } from "@/styled/css";
 import {
   ArrowClockwise,
   ArrowCounterClockwise,
@@ -14,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { css } from "@/styled/css";
 
 /**
  * Player — audio player bar. AymurAI UI Library "Player" (node 40001482:38874)
@@ -365,7 +365,8 @@ export function Player({
         </div>
 
         <div className={progressSection}>
-          {/* biome-ignore lint/a11y/useKeyWithClickEvents: seek bar, click-to-seek */}
+          {/* biome-ignore lint/a11y/useKeyWithClickEvents: click-to-seek only, no keyboard support */}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: click-to-seek only, no keyboard support */}
           <div ref={barRef} onClick={handleBarClick} className={progressBar}>
             <div
               className={progressFill}

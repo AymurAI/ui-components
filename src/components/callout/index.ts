@@ -1,6 +1,6 @@
 export {
   Callout,
-  default,
   type CalloutProps,
   type CalloutVariant,
+  default,
 } from "./Callout";

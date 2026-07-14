@@ -1,2 +1,2 @@
-export { SidePanel, default } from "./SidePanel";
-export type { SidePanelProps, SidePanelPerson } from "./SidePanel";
+export type { SidePanelPerson, SidePanelProps } from "./SidePanel";
+export { default, SidePanel } from "./SidePanel";

@@ -5,8 +5,12 @@
   "license": "MIT",
   "type": "module",
   "packageManager": "pnpm@11.3.0",
-  "sideEffects": ["*.css"],
-  "files": ["dist"],
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -25,7 +29,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "prepare": "pnpm build",
+    "prepare": "husky && pnpm build",
     "codegen": "panda codegen",
     "cssgen": "panda cssgen --silent --outfile dist/styles.css",
     "build": "pnpm codegen && tsc -p tsconfig.build.json && vite build && pnpm cssgen && cp src/styles/fonts.css dist/fonts.css",
@@ -52,13 +56,15 @@
     "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.5.3",
     "@pandacss/dev": "^1.8.1",
     "@storybook/react": "^8.6.18",
     "@storybook/react-vite": "^8.4.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^4.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "react": "^19",
     "react-dom": "^19",
     "storybook": "^8.4.0",
@@ -69,5 +75,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AymurAI/ui-components.git"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,jsx,tsx,json,jsonc,css}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   }
 }

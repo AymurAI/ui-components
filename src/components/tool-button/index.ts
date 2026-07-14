@@ -1,6 +1,6 @@
 export {
+  default,
   ToolButton,
-  type ToolButtonProps,
   type ToolButtonAction,
+  type ToolButtonProps,
 } from "./ToolButton";
-export { default } from "./ToolButton";

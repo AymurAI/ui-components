@@ -10,50 +10,43 @@
  * so there are no default-export collisions.)
  */
 
-// Buttons & actions
-export * from "./components/button";
-export * from "./components/button-link";
-export * from "./components/big-icon-button";
-export * from "./components/tool-button";
-
-// Inputs & form controls
-export * from "./components/text-field";
-export * from "./components/search";
-export * from "./components/select";
-export * from "./components/checkbox";
-export * from "./components/radio";
-export * from "./components/switch";
-export * from "./components/suggestion";
-
-// Feedback & status
-export * from "./components/callout";
-export * from "./components/toast";
-export * from "./components/tooltip";
-export * from "./components/spinner";
-export * from "./components/check-circle";
-export * from "./components/stepper";
-
+// Archives
+export * from "./components/archives";
 // Media & identity
 export * from "./components/avatar";
 export * from "./components/avatar-pill";
-export * from "./components/player";
-
+export * from "./components/big-icon-button";
+// Buttons & actions
+export * from "./components/button";
+export * from "./components/button-link";
+// Feedback & status
+export * from "./components/callout";
 // Surfaces & overlays
 export * from "./components/card";
+export * from "./components/category-item";
+export * from "./components/check-circle";
+export * from "./components/checkbox";
 export * from "./components/dialog";
-export * from "./components/popover";
-
-// Navigation & chrome
-export * from "./components/toolbar";
-export * from "./components/status-bar";
-export * from "./components/tag";
 export * from "./components/logo";
-
-// Archives
-export * from "./components/archives";
-
 // Voz a texto (speech-to-text)
 export * from "./components/option";
-export * from "./components/category-item";
-export * from "./components/transcript-block";
+export * from "./components/player";
+export * from "./components/popover";
+export * from "./components/radio";
+export * from "./components/search";
+export * from "./components/select";
 export * from "./components/side-panel";
+export * from "./components/spinner";
+export * from "./components/status-bar";
+export * from "./components/stepper";
+export * from "./components/suggestion";
+export * from "./components/switch";
+export * from "./components/tag";
+// Inputs & form controls
+export * from "./components/text-field";
+export * from "./components/toast";
+export * from "./components/tool-button";
+// Navigation & chrome
+export * from "./components/toolbar";
+export * from "./components/tooltip";
+export * from "./components/transcript-block";

@@ -1,9 +1,9 @@
-import { cva, cx } from "@/styled/css";
-import { styled } from "@/styled/jsx";
-import { hstack } from "@/styled/patterns";
 import type { Icon } from "phosphor-react";
 import { Bell, X } from "phosphor-react";
 import type { HTMLAttributes } from "react";
+import { cva, cx } from "@/styled/css";
+import { styled } from "@/styled/jsx";
+import { hstack } from "@/styled/patterns";
 
 /**
  * Callout — inline notification banner.

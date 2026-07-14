@@ -1,5 +1,5 @@
-import { cva, cx } from "@/styled/css";
 import { CheckCircle } from "phosphor-react";
+import { cva, cx } from "@/styled/css";
 
 /**
  * ArchiveTabs — AymurAI UI Library "archive-tabs" family node 186:18202.

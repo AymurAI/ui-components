@@ -1,6 +1,6 @@
-import { type RecipeVariantProps, css, cva, cx } from "@/styled/css";
 import { Check } from "phosphor-react";
 import type { InputHTMLAttributes, ReactNode } from "react";
+import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 
 /**
  * Checkbox — AymurAI UI Library "🟢checkbox🟢".

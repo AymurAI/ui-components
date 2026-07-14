@@ -1,8 +1,8 @@
 export {
+  default,
   Tooltip,
   TooltipContent,
+  type TooltipContentProps,
   TooltipProvider,
   TooltipTrigger,
-  default,
-  type TooltipContentProps,
 } from "./Tooltip";

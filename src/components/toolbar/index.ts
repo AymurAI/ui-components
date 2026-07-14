@@ -1,6 +1,6 @@
 export {
+  default,
   Toolbar,
-  type ToolbarProps,
   type ToolbarContext,
+  type ToolbarProps,
 } from "./Toolbar";
-export { default } from "./Toolbar";

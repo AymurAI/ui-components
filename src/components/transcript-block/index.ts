@@ -1,2 +1,2 @@
-export { TranscriptBlock, default } from "./TranscriptBlock";
 export type { TranscriptBlockProps } from "./TranscriptBlock";
+export { default, TranscriptBlock } from "./TranscriptBlock";

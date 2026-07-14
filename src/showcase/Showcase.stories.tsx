@@ -11,8 +11,8 @@ import {
   ButtonLink,
   Callout,
   Card,
-  CheckCircle,
   Checkbox,
+  CheckCircle,
   Dialog,
   DialogClose,
   DialogContent,
@@ -100,7 +100,10 @@ function Section({
 function Tile({
   label,
   children,
-}: { label: string; children: React.ReactNode }) {
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <span style={{ fontFamily: "Archivo", fontSize: 11, color: "#625C68" }}>

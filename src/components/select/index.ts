@@ -1,6 +1,6 @@
 export {
-  Select,
   default,
+  Select,
   type SelectOption,
   type SelectProps,
   type SelectSuggestion,

@@ -247,7 +247,7 @@ export function Select({
         disabled={disabled}
       >
         <RadixSelect.Trigger id={triggerId} asChild>
-          {/* biome-ignore lint/a11y/useSemanticElements lint/a11y/useAriaPropsForRole: Radix merges role, aria-expanded, aria-controls, and tabIndex onto this div at runtime via asChild */}
+          {/* biome-ignore lint/a11y/useAriaPropsForRole: Radix merges aria-expanded and aria-controls onto this div at runtime via asChild */}
           <div className={classes.trigger} role="combobox" tabIndex={0}>
             {prefix && <Affix aria-hidden="true">{prefix} |</Affix>}
 

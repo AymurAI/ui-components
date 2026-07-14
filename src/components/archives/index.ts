@@ -1,18 +1,17 @@
+// Default export = primary component (ArchiveProgress)
 export {
   ArchiveProgress,
   type ArchiveProgressProps,
   type ArchiveProgressStatus,
+  default,
 } from "./ArchiveProgress";
 export {
+  type ArchiveTabStatus,
   ArchiveTabs,
   type ArchiveTabsProps,
-  type ArchiveTabStatus,
 } from "./ArchiveTabs";
 export {
   ArchiveView,
   type ArchiveViewProps,
   type ArchiveViewType,
 } from "./ArchiveView";
-
-// Default export = primary component (ArchiveProgress)
-export { default } from "./ArchiveProgress";
