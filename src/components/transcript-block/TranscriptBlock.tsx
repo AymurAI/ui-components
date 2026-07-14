@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
+import { isValidTimestamp } from "@/utils/timestamp";
 import { Avatar, type AvatarColor } from "../avatar";
 
 /**
@@ -125,6 +126,13 @@ export function TranscriptBlock({
   className,
   ...props
 }: TranscriptBlockProps) {
+  if (!isValidTimestamp(time)) {
+    // biome-ignore lint/suspicious/noConsole: intentional dev-facing data warning, not debug logging
+    console.warn(
+      `TranscriptBlock: "time" ("${time}") doesn't match the [HH]:MM:SS format.`,
+    );
+  }
+
   const head = (
     <div className={header}>
       <div className={avatarName}>
