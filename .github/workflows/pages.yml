@@ -27,6 +27,16 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      # Mirrors release.yml's check so Pages never publishes docs for a tag
+      # that release.yml would reject (workflow_dispatch has no tag, so skip there).
+      - name: Verify tag matches package.json version
+        if: github.ref_type == 'tag'
+        run: |
+          PKG_VERSION="v$(node -p "require('./package.json').version")"
+          if [ "$PKG_VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match package.json ($PKG_VERSION)" >&2
+            exit 1
+          fi
       - run: pnpm install --frozen-lockfile
       # Generate the Panda styled-system the stories import from.
       - run: pnpm codegen
