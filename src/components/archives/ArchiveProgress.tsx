@@ -320,13 +320,14 @@ export function ArchiveProgress({
               size="sm"
               disabled={status === "stopped"}
               onClick={onStop}
-              className={css({
-                h: "[41px]",
-                px: "4",
-                py: "2",
-                gap: "1",
-                w: "[141px]",
-              })}
+              // Figma: 141×41px. `size="sm"` (32px tall) is the closest real
+              // variant for padding/radius, but its own `h` recipe class
+              // collides with — and, being an atomic class, unpredictably
+              // wins or loses against — any `h` override passed via
+              // className. `style` always wins over class-based CSS, so the
+              // one-off 41px height/141px width live there instead.
+              className={css({ px: "4", py: "2", gap: "1" })}
+              style={{ height: 41, width: 141 }}
             >
               <Stop size={16} />
               Detener
@@ -337,12 +338,8 @@ export function ArchiveProgress({
               variant="secondary"
               size="sm"
               onClick={onReplace}
-              className={css({
-                h: "[41px]",
-                px: "4",
-                py: "2",
-                gap: "1",
-              })}
+              className={css({ px: "4", py: "2", gap: "1" })}
+              style={{ height: 41 }}
             >
               <ArrowsClockwise size={16} />
               Reemplazar
