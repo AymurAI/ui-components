@@ -80,6 +80,15 @@ export const Matrix: Story = {
         <Avatar initials="MN" color="blue" size="md" />
       </div>
       <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <Avatar initials="AB" color="violet-light" size="md" />
+        <Avatar initials="CD" color="green-light" size="md" />
+        <Avatar initials="EF" color="red-light" size="md" />
+        <Avatar initials="GH" color="yellow-light" size="md" />
+        <Avatar initials="IJ" color="pink-light" size="md" />
+        <Avatar initials="KL" color="orange-light" size="md" />
+        <Avatar initials="MN" color="blue-light" size="md" />
+      </div>
+      <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
         <Avatar initials="AD" color="primary" size="sm" />
         <Avatar initials="AB" color="secondary" size="sm" />
         <Avatar initials="MC" color="warning" size="sm" />

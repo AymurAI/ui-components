@@ -30,7 +30,10 @@ const avatar = cva({
       warning: { bg: "system.warning-secondary" },
       success: { bg: "system.success-secondary" },
       // Speaker palette (Figma "bg/category/*") — 7 colours × base/-light.
-      violet: { bg: "category.violet" },
+      violet: {
+        bg: "category.violet",
+        color: "text.onbutton-alternative",
+      },
       "violet-light": { bg: "category.violet-light" },
       green: { bg: "category.green" },
       "green-light": { bg: "category.green-light" },
