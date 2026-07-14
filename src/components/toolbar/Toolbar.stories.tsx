@@ -36,10 +36,17 @@ export const SearchSwitchWithResults: Story = {
   args: {
     context: "search-switch",
     searchValue: "ano",
+    searchPlaceholder: "Buscar en la transcripción",
+    searchAriaLabel: "Buscar en la transcripción",
     searchResultCount: "1 de 2",
     onSearchPrev: () => {},
     onSearchNext: () => {},
     onSearchClear: () => {},
+    searchLabels: {
+      clear: "Borrar consulta",
+      previous: "Coincidencia anterior",
+      next: "Coincidencia siguiente",
+    },
   },
 };
 

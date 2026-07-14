@@ -1,1 +1,6 @@
-export { default, Search, type SearchProps } from "./Search";
+export {
+  default,
+  Search,
+  type SearchLabels,
+  type SearchProps,
+} from "./Search";

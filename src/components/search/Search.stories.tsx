@@ -31,6 +31,12 @@ export const Field: Story = {
     onClear: () => {},
     onPrev: () => {},
     onNext: () => {},
+    "aria-label": "Buscar en la transcripción",
+    labels: {
+      clear: "Borrar consulta",
+      previous: "Coincidencia anterior",
+      next: "Coincidencia siguiente",
+    },
   },
 };
 
