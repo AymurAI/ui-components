@@ -256,6 +256,13 @@ export function SidePanel({
     );
 
     if (targetIndex >= 0) {
+      // Drop out of typing/input mode — the confirm popover is the only
+      // active affordance now. Leaving the input mounted here would sit
+      // inside PopoverAnchor (outside PopoverContent), so a click into it
+      // to keep editing registers as a Radix pointer-down-outside and
+      // cancels the whole edit instead.
+      setEditingIndex(null);
+      setEditValue("");
       setRenameConflict({
         sourceIndex: index,
         targetIndex,

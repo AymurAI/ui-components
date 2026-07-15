@@ -197,7 +197,7 @@ export function AvatarPill({
               e.preventDefault();
               skipBlurCommitRef.current = true;
               onEditCommit?.(editValue ?? name);
-            } else if (e.key === "Escape") {
+            } else if (e.key === "Escape" && !e.nativeEvent.isComposing) {
               e.preventDefault();
               skipBlurCommitRef.current = true;
               onEditCancel?.();

@@ -68,9 +68,9 @@ const helpIcon = css({ color: "text.lighter" });
 export interface AppHeaderSlots {
   /** Wrap or replace the default Logo while preserving the header layout. */
   logo?: (defaultElement: ReactElement) => ReactNode;
-  /** Wrap or replace the default help Button (for example with DialogTrigger). */
+  /** Wrap or replace the default help Button (for example with PopoverTrigger). */
   help?: (defaultElement: ReactElement) => ReactNode;
-  /** Wrap or replace the default apps button (for example with PopoverTrigger). */
+  /** Wrap or replace the default apps button (for example with DialogTrigger). */
   apps?: (defaultElement: ReactElement) => ReactNode;
 }
 
