@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Search } from "@/components/search/Search";
+import { Search, type SearchLabels } from "@/components/search/Search";
 import {
   ToolButton,
   type ToolButtonAction,
@@ -56,6 +56,12 @@ export interface ToolbarProps {
   /** Search input value */
   searchValue?: string;
   onSearchChange?: (value: string) => void;
+  /** Placeholder forwarded to the internal Search input. */
+  searchPlaceholder?: string;
+  /** Accessible label forwarded to the internal Search input. */
+  searchAriaLabel?: string;
+  /** Accessible labels for Search's clear/previous/next controls. */
+  searchLabels?: SearchLabels;
   /** Result count label, e.g. "1 de 2" — shows the Search nav controls */
   searchResultCount?: string;
   /** Called when the user clicks the previous-result arrow */
@@ -78,6 +84,9 @@ export function Toolbar({
   context = "anonimizador",
   searchValue,
   onSearchChange,
+  searchPlaceholder,
+  searchAriaLabel,
+  searchLabels,
   searchResultCount,
   onSearchPrev,
   onSearchNext,
@@ -124,6 +133,9 @@ export function Toolbar({
         <Search
           value={searchValue}
           onChange={(e) => onSearchChange?.(e.target.value)}
+          placeholder={searchPlaceholder}
+          aria-label={searchAriaLabel}
+          labels={searchLabels}
           resultCount={searchResultCount}
           onPrev={onSearchPrev}
           onNext={onSearchNext}

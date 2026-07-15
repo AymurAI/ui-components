@@ -101,7 +101,21 @@ export interface SearchProps
   onNext?: () => void;
   /** Called when the user clicks the Clear (X) button */
   onClear?: () => void;
+  /** Accessible labels for the built-in clear and result-navigation buttons. */
+  labels?: SearchLabels;
 }
+
+export interface SearchLabels {
+  clear?: string;
+  previous?: string;
+  next?: string;
+}
+
+const DEFAULT_LABELS: Required<SearchLabels> = {
+  clear: "Limpiar búsqueda",
+  previous: "Resultado anterior",
+  next: "Resultado siguiente",
+};
 
 export function Search({
   suggestion,
@@ -112,9 +126,11 @@ export function Search({
   onPrev,
   onNext,
   onClear,
+  labels,
   ...props
 }: SearchProps) {
   const classes = searchInput();
+  const accessibleLabels = { ...DEFAULT_LABELS, ...labels };
 
   // Field state: value is present (no suggestion). Border changes to #9F99A5,
   // gap shrinks to 6px, icon darkens to text.default.
@@ -226,7 +242,7 @@ export function Search({
               <button
                 type="button"
                 onClick={onClear}
-                aria-label="Limpiar búsqueda"
+                aria-label={accessibleLabels.clear}
                 className={css({
                   display: "flex",
                   alignItems: "center",
@@ -267,7 +283,8 @@ export function Search({
                 <button
                   type="button"
                   onClick={onPrev}
-                  aria-label="Resultado anterior"
+                  aria-label={accessibleLabels.previous}
+                  disabled={!onPrev}
                   className={css({
                     display: "flex",
                     alignItems: "center",
@@ -281,6 +298,7 @@ export function Search({
                     flexShrink: "0",
                     p: "0",
                     "&:hover": { color: "text.default" },
+                    "&:disabled": { cursor: "not-allowed", opacity: "0.5" },
                   })}
                 >
                   <CaretUp size={24} />
@@ -288,7 +306,8 @@ export function Search({
                 <button
                   type="button"
                   onClick={onNext}
-                  aria-label="Resultado siguiente"
+                  aria-label={accessibleLabels.next}
+                  disabled={!onNext}
                   className={css({
                     display: "flex",
                     alignItems: "center",
@@ -302,6 +321,7 @@ export function Search({
                     flexShrink: "0",
                     p: "0",
                     "&:hover": { color: "text.default" },
+                    "&:disabled": { cursor: "not-allowed", opacity: "0.5" },
                   })}
                 >
                   <CaretDown size={24} />

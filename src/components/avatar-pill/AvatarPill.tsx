@@ -1,5 +1,6 @@
 import { PencilSimple } from "phosphor-react";
 import type { HTMLAttributes } from "react";
+import { useEffect, useRef } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 import { Avatar, type AvatarColor } from "../avatar";
 
@@ -94,6 +95,17 @@ const renameButton = css({
   },
 });
 
+const renameInput = css({
+  minW: "[96px]",
+  maxW: "[220px]",
+  borderWidth: "0",
+  outline: "none",
+  bg: "[transparent]",
+  color: "text.default",
+  textStyle: "label.md.default",
+  p: "0",
+});
+
 export type AvatarPillState = "default" | "selected" | "typing";
 
 export type AvatarPillProps = Omit<
@@ -116,6 +128,14 @@ export type AvatarPillProps = Omit<
   /** Shown as a pencil icon on hover; omit to hide the rename affordance */
   onRename?: () => void;
   renameLabel?: string;
+  /** Controlled input value rendered when `state="typing"`. */
+  editValue?: string;
+  onEditValueChange?: (value: string) => void;
+  /** Called with the current value when Enter is pressed or the input blurs. */
+  onEditCommit?: (value: string) => void;
+  /** Called when Escape is pressed. */
+  onEditCancel?: () => void;
+  renameInputLabel?: string;
   className?: string;
 } & Omit<HTMLAttributes<HTMLSpanElement>, "color">;
 
@@ -127,11 +147,24 @@ export function AvatarPill({
   color = "primary",
   onRename,
   renameLabel = "Renombrar",
+  editValue,
+  onEditValueChange,
+  onEditCommit,
+  onEditCancel,
+  renameInputLabel = "Editar nombre",
   className,
   ...props
 }: AvatarPillProps) {
   const resolvedState: AvatarPillState =
     state ?? (selected ? "selected" : "default");
+  const editInputRef = useRef<HTMLInputElement>(null);
+  const skipBlurCommitRef = useRef(false);
+
+  useEffect(() => {
+    if (resolvedState !== "typing") return;
+    editInputRef.current?.focus();
+    editInputRef.current?.select();
+  }, [resolvedState]);
 
   return (
     <span
@@ -144,7 +177,39 @@ export function AvatarPill({
       {...props}
     >
       <Avatar initials={initials} size="sm" color={color} />
-      <span className={pillName({ state: resolvedState })}>{name}</span>
+      {resolvedState === "typing" ? (
+        <input
+          ref={editInputRef}
+          type="text"
+          value={editValue ?? name}
+          onChange={(e) => onEditValueChange?.(e.target.value)}
+          onClick={(e) => e.stopPropagation()}
+          onBlur={() => {
+            if (skipBlurCommitRef.current) {
+              skipBlurCommitRef.current = false;
+              return;
+            }
+            onEditCommit?.(editValue ?? name);
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              skipBlurCommitRef.current = true;
+              onEditCommit?.(editValue ?? name);
+            } else if (e.key === "Escape" && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              skipBlurCommitRef.current = true;
+              onEditCancel?.();
+            }
+          }}
+          aria-label={renameInputLabel}
+          className={renameInput}
+          readOnly={!onEditValueChange}
+        />
+      ) : (
+        <span className={pillName({ state: resolvedState })}>{name}</span>
+      )}
       {onRename && resolvedState !== "typing" && (
         <button
           type="button"

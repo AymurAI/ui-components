@@ -15,13 +15,14 @@ import {
 } from "react";
 import { BigIconButton } from "@/components/big-icon-button/BigIconButton";
 import { css } from "@/styled/css";
+import { formatTimestamp } from "@/utils/timestamp";
 
 /**
  * Player — audio player bar. AymurAI UI Library "Player" (node 40001482:38874)
  * and the editor footer (node 40001486:41884).
  *
  * Transport controls (rewind 5s / play-pause / forward 5s / speed cycle),
- * a click-to-seek progress bar, a mm:ss / mm:ss time display, and an optional
+ * a click-to-seek progress bar, an elapsed-time display, and an optional
  * `rightSlot` (used in the editor to inject the "Finalizar" button).
  *
  * The 4 transport controls are `BigIconButton` instances (Figma uses
@@ -33,14 +34,6 @@ import { css } from "@/styled/css";
  * Ported from desktop-app's voice-to-text/audio-player (i18n removed; aria
  * labels are props with Spanish defaults).
  */
-
-// ms → "mm:ss"
-function formatTime(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-}
 
 const playerBar = css({
   display: "flex",
@@ -345,7 +338,7 @@ export function Player({
             />
           </div>
           <span className={timeDisplay}>
-            {formatTime(currentMs)} / {formatTime(durationMs)}
+            {formatTimestamp(currentMs)} / {formatTimestamp(durationMs)}
           </span>
         </div>
       </div>

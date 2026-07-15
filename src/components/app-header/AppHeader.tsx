@@ -1,4 +1,5 @@
 import { DotsNine, Question } from "phosphor-react";
+import type { ReactElement, ReactNode } from "react";
 import { css, cx } from "@/styled/css";
 import { BigIconButton } from "../big-icon-button";
 import { Button } from "../button";
@@ -16,6 +17,10 @@ import { Stepper } from "../stepper";
  * screens (e.g. Editor, node 40002322:57366) show the full logo with a
  * feature name instead. `featureName` covers both: omit it for the bare
  * iso mark, pass it for "iso mark + divider + name".
+ *
+ * `steps` and `current` are supplied together for multi-step flows and may
+ * both be omitted elsewhere. `slots` lets router and Radix consumers wrap the
+ * default logo/buttons without recreating their styles or focus behaviour.
  *
  * The top-bar variant is 1440×96px with 48px horizontal padding. Its three
  * layout regions are 203px (logo), 332px (stepper), and 203px (actions), so
@@ -60,19 +65,41 @@ const actionsWrap = css({
 
 const helpIcon = css({ color: "text.lighter" });
 
-export interface AppHeaderProps {
+export interface AppHeaderSlots {
+  /** Wrap or replace the default Logo while preserving the header layout. */
+  logo?: (defaultElement: ReactElement) => ReactNode;
+  /** Wrap or replace the default help Button (for example with PopoverTrigger). */
+  help?: (defaultElement: ReactElement) => ReactNode;
+  /** Wrap or replace the default apps button (for example with DialogTrigger). */
+  apps?: (defaultElement: ReactElement) => ReactNode;
+}
+
+interface AppHeaderBaseProps {
   /** Feature name shown next to the logo (e.g. "Voz a Texto"). Omit for the bare iso mark. */
   featureName?: string;
-  /** Step labels — only the active step's label is shown, matching Figma. */
-  steps: string[];
-  /** 0-based index of the current step */
-  current: number;
   onHelp?: () => void;
   onOpenApps?: () => void;
   helpLabel?: string;
   appsLabel?: string;
+  /** Optional wrappers for the three interactive/visual header regions. */
+  slots?: AppHeaderSlots;
   className?: string;
 }
+
+type AppHeaderProgressProps =
+  | {
+      /** Step labels — only the active step's label is shown, matching Figma. */
+      steps: string[];
+      /** 0-based index of the current step */
+      current: number;
+    }
+  | {
+      /** Omit both progress props on screens that do not have a step flow. */
+      steps?: undefined;
+      current?: undefined;
+    };
+
+export type AppHeaderProps = AppHeaderBaseProps & AppHeaderProgressProps;
 
 export function AppHeader({
   featureName,
@@ -82,45 +109,57 @@ export function AppHeader({
   onOpenApps,
   helpLabel = "Ayuda",
   appsLabel = "Aplicaciones",
+  slots,
   className,
 }: AppHeaderProps) {
-  const stepperSteps = steps.map((label, i) => ({
-    label: i === current ? label : "",
-  }));
+  const hasProgress = steps !== undefined && current !== undefined;
+  const stepperSteps = hasProgress
+    ? steps.map((label, i) => ({ label: i === current ? label : "" }))
+    : [];
+
+  const defaultLogo = featureName ? (
+    <Logo variant="logo-feature" featureName={featureName} />
+  ) : (
+    <Logo variant="iso" />
+  );
+  const defaultHelp = (
+    <Button
+      variant="tertiary"
+      size="icon-sm"
+      aria-label={helpLabel}
+      onClick={onHelp}
+      style={{ padding: 2, borderRadius: 4 }}
+    >
+      <Question size={32} className={helpIcon} />
+    </Button>
+  );
+  const defaultApps = (
+    <BigIconButton
+      variant="primary"
+      size="small"
+      aria-label={appsLabel}
+      onClick={onOpenApps}
+      style={{ padding: 2, borderRadius: 4 }}
+    >
+      <DotsNine size={32} />
+    </BigIconButton>
+  );
 
   return (
     <div className={cx(root, className)}>
       <div className={logoWrap}>
-        {featureName ? (
-          <Logo variant="logo-feature" featureName={featureName} />
-        ) : (
-          <Logo variant="iso" />
-        )}
+        {slots?.logo ? slots.logo(defaultLogo) : defaultLogo}
       </div>
 
-      <div className={stepperWrap}>
-        <Stepper steps={stepperSteps} current={current} />
-      </div>
+      {hasProgress && (
+        <div className={stepperWrap}>
+          <Stepper steps={stepperSteps} current={current} />
+        </div>
+      )}
 
       <div className={actionsWrap}>
-        <Button
-          variant="tertiary"
-          size="icon-sm"
-          aria-label={helpLabel}
-          onClick={onHelp}
-          style={{ padding: 2, borderRadius: 4 }}
-        >
-          <Question size={32} className={helpIcon} />
-        </Button>
-        <BigIconButton
-          variant="primary"
-          size="small"
-          aria-label={appsLabel}
-          onClick={onOpenApps}
-          style={{ padding: 2, borderRadius: 4 }}
-        >
-          <DotsNine size={32} />
-        </BigIconButton>
+        {slots?.help ? slots.help(defaultHelp) : defaultHelp}
+        {slots?.apps ? slots.apps(defaultApps) : defaultApps}
       </div>
     </div>
   );

@@ -33,17 +33,31 @@ import { ArrowsMerge } from "./ArrowsMergeIcon";
  * "Conflicto Nombre etiqueta", node 40002384:38487) before firing
  * `onMergePrevious`/`onMergeNext` — pass `previousTurnName`/`nextTurnName` to
  * enable it; without them, merge fires immediately (previous behaviour).
+ *
+ * Speaker pills opt into rename with `renamable: true`. Supplying both
+ * `onRenamePerson` and `onMergePeople` enables the pencil/input flow; a name
+ * collision with another editable person asks for confirmation before the
+ * source and target identities are reported to the consumer for merging.
  */
 export type SidePanelPerson = {
+  /** Stable consumer identity, used as the React key when available. */
+  id?: string;
   initials: string;
   name: string;
   color?: AvatarColor;
+  /** Enables the AvatarPill rename affordance when rename callbacks are set. */
+  renamable?: boolean;
 };
 
 type ConfirmState = {
   title: string;
   description: string;
   onConfirm: () => void;
+};
+
+type RenameConflictState = {
+  sourceIndex: number;
+  targetIndex: number;
 };
 
 export type SidePanelProps = {
@@ -55,7 +69,11 @@ export type SidePanelProps = {
   selectedIndex?: number;
   onSelectPerson?: (index: number) => void;
   onNewPerson?: () => void;
-  /** Timestamp field value (e.g. "01:15") — format `[HH:]MM:SS` */
+  /** Persists a non-conflicting speaker rename. Set with `onMergePeople` to enable editing. */
+  onRenamePerson?: (index: number, nextName: string) => void;
+  /** Merges the edited source identity into the existing target identity. Set with `onRenamePerson`. */
+  onMergePeople?: (sourceIndex: number, targetIndex: number) => void;
+  /** Timestamp field value (e.g. "01:15") — `MM:SS` or `H+:MM:SS` */
   timestamp: string;
   onTimestampChange?: (value: string) => void;
   onMergePrevious?: () => void;
@@ -187,6 +205,8 @@ export function SidePanel({
   selectedIndex,
   onSelectPerson,
   onNewPerson,
+  onRenamePerson,
+  onMergePeople,
   timestamp,
   onTimestampChange,
   onMergePrevious,
@@ -198,10 +218,67 @@ export function SidePanel({
   className,
 }: SidePanelProps) {
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editValue, setEditValue] = useState("");
+  const [renameConflict, setRenameConflict] =
+    useState<RenameConflictState | null>(null);
 
   const timestampError = isValidTimestamp(timestamp)
     ? null
-    : "Formato inválido (MM:SS o HH:MM:SS)";
+    : "Formato inválido (MM:SS o H+:MM:SS)";
+
+  function finishEditing() {
+    setEditingIndex(null);
+    setEditValue("");
+    setRenameConflict(null);
+  }
+
+  function startEditing(index: number) {
+    setEditingIndex(index);
+    setEditValue(people[index]?.name ?? "");
+    setRenameConflict(null);
+  }
+
+  function handleRenameCommit(index: number, nextName: string) {
+    const person = people[index];
+    const trimmedName = nextName.trim();
+    if (!person || !trimmedName || trimmedName === person.name) {
+      finishEditing();
+      return;
+    }
+
+    const normalizedName = trimmedName.toLocaleLowerCase();
+    const targetIndex = people.findIndex(
+      (candidate, candidateIndex) =>
+        candidateIndex !== index &&
+        candidate.renamable &&
+        candidate.name.trim().toLocaleLowerCase() === normalizedName,
+    );
+
+    if (targetIndex >= 0) {
+      // Drop out of typing/input mode — the confirm popover is the only
+      // active affordance now. Leaving the input mounted here would sit
+      // inside PopoverAnchor (outside PopoverContent), so a click into it
+      // to keep editing registers as a Radix pointer-down-outside and
+      // cancels the whole edit instead.
+      setEditingIndex(null);
+      setEditValue("");
+      setRenameConflict({
+        sourceIndex: index,
+        targetIndex,
+      });
+      return;
+    }
+
+    onRenamePerson?.(index, trimmedName);
+    finishEditing();
+  }
+
+  function confirmPeopleMerge() {
+    if (!renameConflict) return;
+    onMergePeople?.(renameConflict.sourceIndex, renameConflict.targetIndex);
+    finishEditing();
+  }
 
   function handleMergePrevious() {
     if (previousTurnName && previousTurnName !== turn.name) {
@@ -250,16 +327,81 @@ export function SidePanel({
       {/* Suggested people */}
       <Section heading="Personas sugeridas">
         <div className={pills}>
-          {people.map((person, index) => (
-            <AvatarPill
-              key={`${person.initials}-${person.name}`}
-              initials={person.initials}
-              name={person.name}
-              color={person.color}
-              selected={index === selectedIndex}
-              onClick={() => onSelectPerson?.(index)}
-            />
-          ))}
+          {people.map((person, index) => {
+            const isEditing = editingIndex === index;
+            const hasRenameConflict = renameConflict?.sourceIndex === index;
+            const conflictTarget = hasRenameConflict
+              ? people[renameConflict.targetIndex]
+              : undefined;
+            const canRename =
+              person.renamable && onRenamePerson && onMergePeople;
+
+            return (
+              <Popover
+                key={person.id ?? `${person.initials}-${person.name}-${index}`}
+                open={hasRenameConflict}
+                onOpenChange={(open) => {
+                  if (!open) finishEditing();
+                }}
+              >
+                <PopoverAnchor asChild>
+                  <span className={css({ display: "inline-flex" })}>
+                    <AvatarPill
+                      initials={person.initials}
+                      name={person.name}
+                      color={person.color}
+                      state={
+                        isEditing
+                          ? "typing"
+                          : index === selectedIndex
+                            ? "selected"
+                            : "default"
+                      }
+                      onClick={() => onSelectPerson?.(index)}
+                      onRename={
+                        canRename ? () => startEditing(index) : undefined
+                      }
+                      editValue={isEditing ? editValue : undefined}
+                      onEditValueChange={isEditing ? setEditValue : undefined}
+                      onEditCommit={
+                        isEditing
+                          ? (value) => handleRenameCommit(index, value)
+                          : undefined
+                      }
+                      onEditCancel={isEditing ? finishEditing : undefined}
+                      renameInputLabel={`Editar nombre de ${person.name}`}
+                    />
+                  </span>
+                </PopoverAnchor>
+                {hasRenameConflict && conflictTarget && (
+                  <PopoverContent className={confirmBox} showArrow>
+                    <p className={confirmTitle}>
+                      Ya existe una persona llamada "{conflictTarget.name}".
+                    </p>
+                    <p className={confirmDescription}>
+                      Si continuás, ambas identidades se combinarán en una sola.
+                    </p>
+                    <div className={confirmButtons}>
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={confirmPeopleMerge}
+                      >
+                        Combinar
+                      </Button>
+                      <Button
+                        variant="tertiary"
+                        size="sm"
+                        onClick={finishEditing}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                )}
+              </Popover>
+            );
+          })}
           <Button variant="tertiary" size="sm" onClick={onNewPerson}>
             <Plus size={16} />
             Nuevo

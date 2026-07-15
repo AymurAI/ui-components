@@ -34,6 +34,30 @@ const PEOPLE = [
   { initials: "DE", name: "Defensor 2", color: "green-light" as const },
 ];
 
+const RENAMEABLE_PEOPLE = [
+  {
+    id: "person-1",
+    initials: "AB",
+    name: "Persona 1",
+    color: "violet" as const,
+    renamable: true,
+  },
+  {
+    id: "fiscal",
+    initials: "FI",
+    name: "Fiscal",
+    color: "yellow" as const,
+    renamable: true,
+  },
+  {
+    id: "defender",
+    initials: "DE",
+    name: "Defensor",
+    color: "pink" as const,
+    renamable: true,
+  },
+];
+
 export const Default: Story = {
   render: () => {
     const [selected, setSelected] = useState(0);
@@ -89,7 +113,7 @@ export const MergeConfirmation: Story = {
   },
 };
 
-/** "Marca de tiempo" rejects anything that isn't [HH:]MM:SS. */
+/** "Marca de tiempo" accepts MM:SS or H+:MM:SS. */
 export const InvalidTimestamp: Story = {
   render: () => {
     const [time, setTime] = useState("1:5");
@@ -106,6 +130,55 @@ export const InvalidTimestamp: Story = {
           timestamp={time}
           onTimestampChange={setTime}
         />
+      </div>
+    );
+  },
+};
+
+/**
+ * Hover a pill and use its pencil to edit. Enter commits a unique name; using
+ * "Fiscal" or "Defensor" shows the identity-merge confirmation.
+ */
+export const RenameAndCollision: Story = {
+  render: () => {
+    const [people, setPeople] = useState(RENAMEABLE_PEOPLE);
+    const [selected, setSelected] = useState(0);
+    const [lastAction, setLastAction] = useState("Sin cambios");
+
+    return (
+      <div style={{ width: 479 }}>
+        <SidePanel
+          turn={{
+            initials: "AB",
+            name: "Persona 1",
+            time: "01:15",
+            color: "violet",
+          }}
+          people={people}
+          selectedIndex={selected}
+          onSelectPerson={setSelected}
+          onRenamePerson={(index, nextName) => {
+            setPeople((current) =>
+              current.map((person, currentIndex) =>
+                currentIndex === index ? { ...person, name: nextName } : person,
+              ),
+            );
+            setLastAction(`Renombrada como ${nextName}`);
+          }}
+          onMergePeople={(sourceIndex, targetIndex) => {
+            const source = people[sourceIndex];
+            const target = people[targetIndex];
+            setPeople((current) =>
+              current.filter((_, index) => index !== sourceIndex),
+            );
+            setSelected(0);
+            setLastAction(
+              `${source?.name ?? "Origen"} combinada con ${target?.name ?? "destino"}`,
+            );
+          }}
+          timestamp="01:15"
+        />
+        <p style={{ padding: 16 }}>{lastAction}</p>
       </div>
     );
   },

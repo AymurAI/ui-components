@@ -18,6 +18,7 @@ type Story = StoryObj<typeof meta>;
 
 // 8:12 total, matching the Figma reference.
 const DURATION = 8 * 60 * 1000 + 12 * 1000;
+const LONG_DURATION = (100 * 60 * 60 + 2 * 60 + 3) * 1000;
 
 export const Default: Story = {
   args: { src: "", durationMs: DURATION },
@@ -33,6 +34,16 @@ export const WithFinishButton: Story = {
   render: (args) => (
     <div style={{ width: "100%", maxWidth: 1080 }}>
       <Player {...args} rightSlot={<Button>Finalizar</Button>} />
+    </div>
+  ),
+};
+
+/** Durations of one hour or more use H+:MM:SS without capping the hour field. */
+export const LongAudio: Story = {
+  args: { src: "", durationMs: LONG_DURATION },
+  render: (args) => (
+    <div style={{ width: "100%", maxWidth: 1080 }}>
+      <Player {...args} />
     </div>
   ),
 };
