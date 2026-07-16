@@ -8,7 +8,7 @@ import type { AvatarColor } from "../avatar";
 import { Avatar } from "../avatar";
 import { AvatarPill } from "../avatar-pill";
 import { Button } from "../button";
-import { Popover, PopoverAnchor, PopoverContent } from "../popover";
+import { Dialog, DialogContent, DialogTitle } from "../dialog";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
 import { ArrowsMerge } from "./ArrowsMergeIcon";
@@ -18,7 +18,7 @@ import { ArrowsMerge } from "./ArrowsMergeIcon";
  * AymurAI UI Library node 40002322:53113.
  *
  * Composite assembled from {@link AvatarPill}, {@link TextField},
- * {@link Button}, {@link Popover} and {@link Tooltip}. Sections: selected
+ * {@link Button}, {@link Dialog} and {@link Tooltip}. Sections: selected
  * turn card, suggested people, timestamp, and turn actions (merge
  * previous/next, add below, delete).
  *
@@ -29,7 +29,7 @@ import { ArrowsMerge } from "./ArrowsMergeIcon";
  * Consumers need a `TooltipProvider` somewhere up the tree for the Acciones
  * tooltips (see Tooltip.tsx / this component's story).
  *
- * Merging two turns whose speakers differ shows a confirm popover (Figma
+ * Merging two turns whose speakers differ shows a confirm modal (Figma
  * "Conflicto Nombre etiqueta", node 40002384:38487) before firing
  * `onMergePrevious`/`onMergeNext` — pass `previousTurnName`/`nextTurnName` to
  * enable it; without them, merge fires immediately (previous behaviour).
@@ -78,9 +78,9 @@ export type SidePanelProps = {
   onTimestampChange?: (value: string) => void;
   onMergePrevious?: () => void;
   onMergeNext?: () => void;
-  /** Speaker name of the previous turn — enables the merge confirm popover */
+  /** Speaker name of the previous turn — enables the merge confirm modal */
   previousTurnName?: string;
-  /** Speaker name of the next turn — enables the merge confirm popover */
+  /** Speaker name of the next turn — enables the merge confirm modal */
   nextTurnName?: string;
   onAddBelow?: () => void;
   onDelete?: () => void;
@@ -142,25 +142,20 @@ const divider = css({
   bg: "[#BCBAB8]", // Figma divider line (border/primary colour)
 });
 
-// Confirm popover (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
-// title + description + Combinar/Cancelar. Anchored to the Acciones section.
-const confirmBox = css({
-  ...stack.raw({ gap: "3" }), // 12px
-  p: "6", // 24px
-  maxW: "[341px]",
-});
+// Confirm modal (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
+// title + description + Combinar/Cancelar, centered over a full-screen overlay.
 const confirmTitle = css({
   textStyle: "subtitle.sm.strong",
   color: "text.default",
 });
 const confirmDescription = css({
   textStyle: "label.sm.default",
-  color: "text.lighter",
+  color: "text.default",
 });
 const confirmButtons = css({
   display: "flex",
   alignItems: "center",
-  gap: "4", // 16px
+  gap: "3", // 12px
 });
 
 function Section({
@@ -196,6 +191,65 @@ function ActionButton({
       </TooltipTrigger>
       <TooltipContent side="left">{tooltip}</TooltipContent>
     </Tooltip>
+  );
+}
+
+const visuallyHidden = css({
+  position: "absolute",
+  w: "[1px]",
+  h: "[1px]",
+  p: "0",
+  m: "[-1px]",
+  overflow: "hidden",
+  clip: "[rect(0,0,0,0)]",
+  whiteSpace: "nowrap",
+  borderWidth: "0",
+});
+
+const confirmTextBlock = css({
+  ...stack.raw({ gap: "1" }), // 4px
+});
+
+function ConfirmDialog({
+  open,
+  onOpenChange,
+  title,
+  description,
+  onConfirm,
+  onCancel,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent
+        className={css({
+          ...stack.raw({ gap: "4" }), // 16px
+          boxShadow: "[0px 2px 4px rgba(0,0,0,0.12)]",
+        })}
+      >
+        <DialogTitle asChild>
+          <span className={visuallyHidden}>{title}</span>
+        </DialogTitle>
+        <div className={confirmTextBlock}>
+          <p className={confirmTitle}>{title}</p>
+          <p className={confirmDescription}>{description}</p>
+        </div>
+        <div className={confirmButtons}>
+          <Button variant="primary" size="sm" onClick={onConfirm}>
+            Combinar
+          </Button>
+          <Button variant="tertiary" size="sm" onClick={onCancel}>
+            Cancelar
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -256,11 +310,8 @@ export function SidePanel({
     );
 
     if (targetIndex >= 0) {
-      // Drop out of typing/input mode — the confirm popover is the only
-      // active affordance now. Leaving the input mounted here would sit
-      // inside PopoverAnchor (outside PopoverContent), so a click into it
-      // to keep editing registers as a Radix pointer-down-outside and
-      // cancels the whole edit instead.
+      // Drop out of typing/input mode — the confirm dialog is the only
+      // active affordance now.
       setEditingIndex(null);
       setEditValue("");
       setRenameConflict({
@@ -329,77 +380,38 @@ export function SidePanel({
         <div className={pills}>
           {people.map((person, index) => {
             const isEditing = editingIndex === index;
-            const hasRenameConflict = renameConflict?.sourceIndex === index;
-            const conflictTarget = hasRenameConflict
-              ? people[renameConflict.targetIndex]
-              : undefined;
             const canRename =
               person.renamable && onRenamePerson && onMergePeople;
 
             return (
-              <Popover
+              <span
                 key={person.id ?? `${person.initials}-${person.name}-${index}`}
-                open={hasRenameConflict}
-                onOpenChange={(open) => {
-                  if (!open) finishEditing();
-                }}
+                className={css({ display: "inline-flex" })}
               >
-                <PopoverAnchor asChild>
-                  <span className={css({ display: "inline-flex" })}>
-                    <AvatarPill
-                      initials={person.initials}
-                      name={person.name}
-                      color={person.color}
-                      state={
-                        isEditing
-                          ? "typing"
-                          : index === selectedIndex
-                            ? "selected"
-                            : "default"
-                      }
-                      onClick={() => onSelectPerson?.(index)}
-                      onRename={
-                        canRename ? () => startEditing(index) : undefined
-                      }
-                      editValue={isEditing ? editValue : undefined}
-                      onEditValueChange={isEditing ? setEditValue : undefined}
-                      onEditCommit={
-                        isEditing
-                          ? (value) => handleRenameCommit(index, value)
-                          : undefined
-                      }
-                      onEditCancel={isEditing ? finishEditing : undefined}
-                      renameInputLabel={`Editar nombre de ${person.name}`}
-                    />
-                  </span>
-                </PopoverAnchor>
-                {hasRenameConflict && conflictTarget && (
-                  <PopoverContent className={confirmBox} showArrow>
-                    <p className={confirmTitle}>
-                      Ya existe una persona llamada "{conflictTarget.name}".
-                    </p>
-                    <p className={confirmDescription}>
-                      Si continuás, ambas identidades se combinarán en una sola.
-                    </p>
-                    <div className={confirmButtons}>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={confirmPeopleMerge}
-                      >
-                        Combinar
-                      </Button>
-                      <Button
-                        variant="tertiary"
-                        size="sm"
-                        onClick={finishEditing}
-                      >
-                        Cancelar
-                      </Button>
-                    </div>
-                  </PopoverContent>
-                )}
-              </Popover>
+                <AvatarPill
+                  initials={person.initials}
+                  name={person.name}
+                  color={person.color}
+                  state={
+                    isEditing
+                      ? "typing"
+                      : index === selectedIndex
+                        ? "selected"
+                        : "default"
+                  }
+                  onClick={() => onSelectPerson?.(index)}
+                  onRename={canRename ? () => startEditing(index) : undefined}
+                  editValue={isEditing ? editValue : undefined}
+                  onEditValueChange={isEditing ? setEditValue : undefined}
+                  onEditCommit={
+                    isEditing
+                      ? (value) => handleRenameCommit(index, value)
+                      : undefined
+                  }
+                  onEditCancel={isEditing ? finishEditing : undefined}
+                  renameInputLabel={`Editar nombre de ${person.name}`}
+                />
+              </span>
             );
           })}
           <Button variant="tertiary" size="sm" onClick={onNewPerson}>
@@ -407,6 +419,24 @@ export function SidePanel({
             Nuevo
           </Button>
         </div>
+        <ConfirmDialog
+          open={renameConflict !== null}
+          onOpenChange={(open) => {
+            if (!open) finishEditing();
+          }}
+          title={
+            renameConflict
+              ? `Ya existe "${people[renameConflict.targetIndex]?.name}".`
+              : ""
+          }
+          description={
+            renameConflict
+              ? `Al combinar, los turnos de "${people[renameConflict.sourceIndex]?.name}" pasan a "${people[renameConflict.targetIndex]?.name}".`
+              : ""
+          }
+          onConfirm={confirmPeopleMerge}
+          onCancel={finishEditing}
+        />
       </Section>
       <div className={divider} />
 
@@ -423,63 +453,43 @@ export function SidePanel({
 
       {/* Actions */}
       <Section heading="Acciones">
-        <Popover
+        <div className={actions}>
+          <ActionButton
+            tooltip="Combina este turno con el anterior"
+            onClick={handleMergePrevious}
+          >
+            <ArrowsMerge size={16} style={{ transform: "rotate(180deg)" }} />
+            Unir con el anterior
+          </ActionButton>
+          <ActionButton
+            tooltip="Combina este turno con el siguiente"
+            onClick={handleMergeNext}
+          >
+            <ArrowsMerge size={16} />
+            Unir con el siguiente
+          </ActionButton>
+          <ActionButton
+            tooltip="Agrega un turno nuevo debajo de este"
+            onClick={onAddBelow}
+          >
+            <Plus size={16} />
+            Agregar debajo
+          </ActionButton>
+          <ActionButton tooltip="Elimina este turno" onClick={onDelete}>
+            <Trash size={16} />
+            Eliminar
+          </ActionButton>
+        </div>
+        <ConfirmDialog
           open={confirm !== null}
           onOpenChange={(open) => {
             if (!open) setConfirm(null);
           }}
-        >
-          <PopoverAnchor asChild>
-            <div className={actions}>
-              <ActionButton
-                tooltip="Combina este turno con el anterior"
-                onClick={handleMergePrevious}
-              >
-                <ArrowsMerge
-                  size={16}
-                  style={{ transform: "rotate(180deg)" }}
-                />
-                Unir con el anterior
-              </ActionButton>
-              <ActionButton
-                tooltip="Combina este turno con el siguiente"
-                onClick={handleMergeNext}
-              >
-                <ArrowsMerge size={16} />
-                Unir con el siguiente
-              </ActionButton>
-              <ActionButton
-                tooltip="Agrega un turno nuevo debajo de este"
-                onClick={onAddBelow}
-              >
-                <Plus size={16} />
-                Agregar debajo
-              </ActionButton>
-              <ActionButton tooltip="Elimina este turno" onClick={onDelete}>
-                <Trash size={16} />
-                Eliminar
-              </ActionButton>
-            </div>
-          </PopoverAnchor>
-          {confirm && (
-            <PopoverContent className={confirmBox}>
-              <p className={confirmTitle}>{confirm.title}</p>
-              <p className={confirmDescription}>{confirm.description}</p>
-              <div className={confirmButtons}>
-                <Button variant="primary" size="sm" onClick={confirm.onConfirm}>
-                  Combinar
-                </Button>
-                <Button
-                  variant="tertiary"
-                  size="sm"
-                  onClick={() => setConfirm(null)}
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </PopoverContent>
-          )}
-        </Popover>
+          title={confirm?.title ?? ""}
+          description={confirm?.description ?? ""}
+          onConfirm={() => confirm?.onConfirm()}
+          onCancel={() => setConfirm(null)}
+        />
       </Section>
     </div>
   );
