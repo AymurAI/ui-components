@@ -174,10 +174,13 @@ export function Toolbar({
         </>
       )}
 
-      {/* Right slot (optional) */}
+      {/* Right slot (optional). No divider in search-switch — Figma node
+          40002322-57362 shows search + switch with plain space between
+          them, not a vertical rule (unlike anonimizador/set-de-datos, which
+          both explicitly call for one). */}
       {rightSlot && (
         <>
-          <ToolbarDivider />
+          {!isSearchSwitch && <ToolbarDivider />}
           <div
             className={css({
               display: "flex",
