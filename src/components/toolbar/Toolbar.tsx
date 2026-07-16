@@ -102,7 +102,8 @@ export function Toolbar({
   //   set-de-datos  — items: end, justify: start, gap: 24px, py: 24px
   //   search-switch — items: center, justify: space-between, pt: 42px, pb: 24px
   const isSetDeDatos = context === "set-de-datos";
-  const alignItems = context === "search-switch" ? "center" : "flex-end";
+  const isSearchSwitch = context === "search-switch";
+  const alignItems = isSearchSwitch ? "center" : "flex-end";
   return (
     <div
       className={cx(
@@ -120,14 +121,17 @@ export function Toolbar({
         className,
       )}
     >
-      {/* Search zone — always present, fills available space */}
+      {/* Search zone. Fills available space in anonimizador/set-de-datos;
+          fixed at 711.5px in search-switch (Figma node 40001478:54722) so it
+          doesn't crowd the Switch+label on the right. */}
       <div
         className={css({
           display: "flex",
           alignItems: "center",
-          flex: "1",
-          minW: "[0px]",
           h: "12",
+          flex: isSearchSwitch ? undefined : "1",
+          minW: isSearchSwitch ? undefined : "[0px]",
+          flexShrink: isSearchSwitch ? "0" : undefined,
         })}
       >
         <Search
@@ -140,7 +144,10 @@ export function Toolbar({
           onPrev={onSearchPrev}
           onNext={onSearchNext}
           onClear={onSearchClear}
-          className={css({ flex: "1" })}
+          className={css({
+            flex: isSearchSwitch ? undefined : "1",
+            w: isSearchSwitch ? "[711.5px]" : undefined,
+          })}
         />
       </div>
 
