@@ -150,11 +150,11 @@ const divider = css({
 // Confirm modal (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
 // title + description + Combinar/Cancelar, centered over a full-screen overlay.
 const confirmTitle = css({
-  textStyle: "subtitle.sm.strong",
+  textStyle: "subtitle.md.strong",
   color: "text.default",
 });
 const confirmDescription = css({
-  textStyle: "label.sm.default",
+  textStyle: "subtitle.sm.default",
   color: "text.default",
 });
 const confirmButtons = css({
