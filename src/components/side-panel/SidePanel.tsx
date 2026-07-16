@@ -8,7 +8,12 @@ import type { AvatarColor } from "../avatar";
 import { Avatar } from "../avatar";
 import { AvatarPill } from "../avatar-pill";
 import { Button } from "../button";
-import { Dialog, DialogContent, DialogTitle } from "../dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "../dialog";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
 import { ArrowsMerge } from "./ArrowsMergeIcon";
@@ -194,18 +199,6 @@ function ActionButton({
   );
 }
 
-const visuallyHidden = css({
-  position: "absolute",
-  w: "[1px]",
-  h: "[1px]",
-  p: "0",
-  m: "[-1px]",
-  overflow: "hidden",
-  clip: "[rect(0,0,0,0)]",
-  whiteSpace: "nowrap",
-  borderWidth: "0",
-});
-
 const confirmTextBlock = css({
   ...stack.raw({ gap: "1" }), // 4px
 });
@@ -230,15 +223,16 @@ function ConfirmDialog({
       <DialogContent
         className={css({
           ...stack.raw({ gap: "4" }), // 16px
-          boxShadow: "[0px 2px 4px rgba(0,0,0,0.12)]",
+          maxW: "[389px]", // Figma node 40002384:38487 card width
         })}
       >
-        <DialogTitle asChild>
-          <span className={visuallyHidden}>{title}</span>
-        </DialogTitle>
         <div className={confirmTextBlock}>
-          <p className={confirmTitle}>{title}</p>
-          <p className={confirmDescription}>{description}</p>
+          <DialogTitle asChild>
+            <p className={confirmTitle}>{title}</p>
+          </DialogTitle>
+          <DialogDescription asChild>
+            <p className={confirmDescription}>{description}</p>
+          </DialogDescription>
         </div>
         <div className={confirmButtons}>
           <Button variant="primary" size="sm" onClick={onConfirm}>
