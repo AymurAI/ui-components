@@ -12,3 +12,6 @@ src/styled
 
 # Figma fidelity audit scratch (playwright + screenshots)
 .audit/
+
+# Local-only superpowers specs and plans (never committed)
+docs/superpowers/
