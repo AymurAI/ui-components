@@ -46,7 +46,7 @@ export const Default: Story = {
 /** Voz a Texto file list — leading play button + trailing delete. */
 export const WithLeadingAction: Story = {
   args: {
-    icon: <File size={24} />,
+    variant: "outlined",
     title: "audiencia.wav",
     description: "11 seg. · 344 kb",
     leadingAction: (

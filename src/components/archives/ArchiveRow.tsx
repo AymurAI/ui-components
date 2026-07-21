@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { css, cx } from "@/styled/css";
+import { css, cva, cx } from "@/styled/css";
 
 /**
  * ArchiveRow — horizontal file presentation: icon, title, description, and
@@ -56,10 +56,34 @@ const descriptionStyle = css({
   textOverflow: "ellipsis",
 });
 
+const root = cva({
+  base: {
+    display: "flex",
+    alignItems: "center",
+    gap: "4", // 16px
+    w: "full",
+  },
+  variants: {
+    variant: {
+      plain: {},
+      outlined: {
+        p: "6",
+        rounded: "[8px]",
+        borderWidth: "[4px]",
+        borderStyle: "solid",
+        borderColor: "[#BCBAB8]",
+        bg: "bg.secondary",
+      },
+    },
+  },
+  defaultVariants: { variant: "plain" },
+});
+
 export interface ArchiveRowProps {
-  icon: ReactNode;
+  icon?: ReactNode;
   title: string;
   description: string;
+  variant?: "plain" | "outlined";
   leadingAction?: ReactNode;
   trailingAction?: ReactNode;
   className?: string;
@@ -69,24 +93,15 @@ export function ArchiveRow({
   icon,
   title,
   description,
+  variant = "plain",
   leadingAction,
   trailingAction,
   className,
 }: ArchiveRowProps) {
   return (
-    <div
-      className={cx(
-        css({
-          display: "flex",
-          alignItems: "center",
-          gap: "4", // 16px
-          w: "full",
-        }),
-        className,
-      )}
-    >
+    <div className={cx(root({ variant }), className)}>
       {leadingAction}
-      <span className={iconContainer}>{icon}</span>
+      {icon && <span className={iconContainer}>{icon}</span>}
       <div className={content}>
         <p className={titleStyle}>{title}</p>
         <p className={descriptionStyle}>{description}</p>
