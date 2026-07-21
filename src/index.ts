@@ -53,5 +53,6 @@ export * from "./components/tool-button";
 export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/transcript-block";
+export * from "./components/tutorial";
 // Utils
 export * from "./utils/timestamp";
