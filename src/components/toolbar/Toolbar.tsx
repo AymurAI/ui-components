@@ -103,6 +103,7 @@ export function Toolbar({
   //   search-switch — items: center, justify: space-between, pt: 42px, pb: 24px
   const isSetDeDatos = context === "set-de-datos";
   const isSearchSwitch = context === "search-switch";
+  const isAnonymizer = context === "anonimizador";
   const alignItems = isSearchSwitch ? "center" : "flex-end";
   return (
     <div
@@ -116,7 +117,9 @@ export function Toolbar({
           pb: "6",
           px: "12",
           w: "full",
-          gap: isSetDeDatos ? "6" : "0",
+          columnGap: isSetDeDatos || isAnonymizer ? "6" : "0",
+          rowGap: isAnonymizer ? "4" : "0",
+          flexWrap: isAnonymizer ? "wrap" : "nowrap",
         }),
         className,
       )}
@@ -130,7 +133,11 @@ export function Toolbar({
           alignItems: "center",
           h: "12",
           flex: isSearchSwitch ? undefined : "1",
-          minW: isSearchSwitch ? undefined : "[0px]",
+          minW: isSearchSwitch
+            ? undefined
+            : isAnonymizer
+              ? "[min(100%,320px)]"
+              : "[0px]",
           flexShrink: isSearchSwitch ? "0" : undefined,
         })}
       >
@@ -179,18 +186,30 @@ export function Toolbar({
           them, not a vertical rule (unlike anonimizador/set-de-datos, which
           both explicitly call for one). */}
       {rightSlot && (
-        <>
+        <div
+          className={css({
+            display: "flex",
+            alignItems: "center",
+            gap: isAnonymizer ? "6" : "0",
+            flexShrink: "0",
+            minW: "0",
+            maxW: "full",
+            ml: isAnonymizer ? "auto" : undefined,
+          })}
+        >
           {!isSearchSwitch && <ToolbarDivider />}
           <div
             className={css({
               display: "flex",
               alignItems: "center",
               flexShrink: "0",
+              minW: "0",
+              maxW: "full",
             })}
           >
             {rightSlot}
           </div>
-        </>
+        </div>
       )}
 
       {/* Fully custom children override */}
