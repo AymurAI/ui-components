@@ -64,6 +64,7 @@ export const aymuraiPreset = definePreset({
           dropdown: { value: "0px 16px 16px rgba(0, 0, 0, 0.08)" },
           "card-hover": { value: "0px 0px 7.5px rgba(63, 71, 157, 0.4)" },
           tooltip: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
+          menu: { value: "0px 0px 7.5px rgba(0, 0, 0, 0.15)" },
           // Dialog/Popover have no Figma node yet — tokenised at current values.
           dialog: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
           popover: { value: "0px 0px 15px 0px #00000026" },
