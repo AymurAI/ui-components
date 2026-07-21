@@ -76,6 +76,7 @@ const timestamp = css({
 
 const transcriptBody = cva({
   base: {
+    margin: "0", // no preflight — <p> keeps the UA default margin otherwise
     fontFamily: "primary", // Archivo
     fontWeight: "[300]", // Light
     fontSize: "[16px]",

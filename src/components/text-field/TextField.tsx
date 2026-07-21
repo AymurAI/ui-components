@@ -61,11 +61,13 @@ const input = sva({
     },
     label: { textStyle: "label.sm.default", color: "text.lighter" },
     errorMessage: {
+      margin: "0", // no preflight — <p> keeps the UA default margin otherwise
       ...hstack.raw({ gap: "1" }),
       textStyle: "label.sm.default",
       color: "system.error",
     },
     helper: {
+      margin: "0",
       textStyle: "label.sm.default",
       color: "text.lighter",
     },

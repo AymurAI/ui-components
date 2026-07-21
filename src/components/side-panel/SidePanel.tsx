@@ -134,6 +134,7 @@ const card = css({
 });
 
 const cardTitle = css({
+  margin: "0", // no preflight — <p> keeps the UA default margin otherwise
   textStyle: "subtitle.sm.default",
   color: "text.default",
 });
@@ -150,6 +151,7 @@ const turnTime = css({
 });
 
 const sectionHeading = css({
+  margin: "0",
   textStyle: "subtitle.md.strong", // Archivo SemiBold 20px
   color: "text.default",
 });
@@ -171,10 +173,12 @@ const divider = css({
 // Confirm modal (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
 // title + description + Combinar/Cancelar, centered over a full-screen overlay.
 const confirmTitle = css({
+  margin: "0",
   textStyle: "subtitle.md.strong",
   color: "text.default",
 });
 const confirmDescription = css({
+  margin: "0",
   textStyle: "subtitle.sm.default",
   color: "text.default",
 });

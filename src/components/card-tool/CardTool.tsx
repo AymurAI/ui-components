@@ -37,8 +37,12 @@ const copy = css({
   minW: "0",
 });
 
-const titleStyle = css({ textStyle: "subtitle.md.strong" });
+const titleStyle = css({
+  margin: "0", // no preflight — <h2>/<p> keep the UA default margin otherwise
+  textStyle: "subtitle.md.strong",
+});
 const descriptionStyle = css({
+  margin: "0",
   textStyle: "subtitle.sm.default",
   color: "text.lighter",
 });
