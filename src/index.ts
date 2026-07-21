@@ -29,6 +29,7 @@ export * from "./components/category-item";
 export * from "./components/check-circle";
 export * from "./components/checkbox";
 export * from "./components/dialog";
+export * from "./components/file-drop-zone";
 export * from "./components/logo";
 // Voz a texto (speech-to-text)
 export * from "./components/option";
