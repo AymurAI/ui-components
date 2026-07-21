@@ -5,6 +5,7 @@ export {
   type ArchiveProgressStatus,
   default,
 } from "./ArchiveProgress";
+export { ArchiveRow, type ArchiveRowProps } from "./ArchiveRow";
 export {
   type ArchiveTabStatus,
   ArchiveTabs,
@@ -13,5 +14,6 @@ export {
 export {
   ArchiveView,
   type ArchiveViewProps,
+  type ArchiveViewSize,
   type ArchiveViewType,
 } from "./ArchiveView";
