@@ -53,9 +53,14 @@ self-host Archivo (weights 400/600/700).
 Buttons & actions: `Button`, `ButtonLink`, `BigIconButton`, `ToolButton` ·
 Inputs: `TextField`, `Search`, `Select`, `Checkbox`, `Radio`, `Switch`,
 `Suggestion` · Feedback: `Callout`, `Toast`, `Tooltip`, `Spinner`,
-`CheckCircle`, `Stepper` · Surfaces: `Card`, `Dialog`, `Popover` · Chrome:
-`Toolbar`, `StatusBar`, `Tag`, `Logo` · Archives: `ArchiveProgress`,
+`CheckCircle`, `Stepper` · Surfaces: `Card`, `CardTool`, `Dialog`, `Popover` · Chrome:
+`AppHeader`, `Toolbar`, `StatusBar`, `Tag`, `Logo` · Archives: `ArchiveProgress`,
 `ArchiveTabs`, `ArchiveView`.
+
+`CardTool` owns the shared feature-card visuals, including its disabled state.
+Consumers keep navigation in their router: wrap enabled cards in a link and
+render disabled placeholders directly, so unavailable tools never become
+interactive elements.
 
 Browse every component and variant in Storybook (`pnpm storybook`).
 
