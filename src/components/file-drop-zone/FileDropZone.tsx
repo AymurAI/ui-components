@@ -83,6 +83,7 @@ const iconContainer = cva({
 });
 
 const titleStyle = css({
+  margin: "0", // no preflight — <p> keeps the UA default margin otherwise
   textStyle: "subtitle.md.default",
   color: "text.default",
   textAlign: "center",
@@ -91,6 +92,7 @@ const titleStyle = css({
 });
 
 const descriptionStyle = css({
+  margin: "0",
   textStyle: "subtitle.sm.default",
   color: "text.lighter",
   textAlign: "center",
