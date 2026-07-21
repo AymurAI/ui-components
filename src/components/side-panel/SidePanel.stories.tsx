@@ -63,23 +63,71 @@ export const Default: Story = {
     const [selected, setSelected] = useState(0);
     const [time, setTime] = useState("01:15");
     return (
-      <div style={{ width: 479 }}>
-        <SidePanel
-          turn={{
-            initials: "AB",
-            name: "Persona1",
-            time: "01:15",
-            color: "violet",
-          }}
-          people={PEOPLE}
-          selectedIndex={selected}
-          onSelectPerson={setSelected}
-          timestamp={time}
-          onTimestampChange={setTime}
-        />
+      <SidePanel
+        turn={{
+          initials: "AB",
+          name: "Persona1",
+          time: "01:15",
+          color: "violet",
+        }}
+        people={PEOPLE}
+        selectedIndex={selected}
+        onSelectPerson={setSelected}
+        timestamp={time}
+        onTimestampChange={setTime}
+      />
+    );
+  },
+};
+
+/** Intrinsic widths — Voz a Texto wrapper (sm) · entities panel (md) · Figma reference (lg, default) */
+export const Sizes: Story = {
+  render: () => {
+    const [selected, setSelected] = useState(0);
+    return (
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+        {(["sm", "md", "lg"] as const).map((size) => (
+          <SidePanel
+            key={size}
+            size={size}
+            turn={{
+              initials: "AB",
+              name: "Persona1",
+              time: "01:15",
+              color: "violet",
+            }}
+            people={PEOPLE}
+            selectedIndex={selected}
+            onSelectPerson={setSelected}
+            timestamp="01:15"
+          />
+        ))}
       </div>
     );
   },
+};
+
+/**
+ * `maxW:"full"` only shrinks the panel below its intrinsic size when a
+ * bounding ancestor actually constrains the available width — here a fixed
+ * 280px column, narrower than even `size="sm"` (360px).
+ */
+export const NarrowContainer: Story = {
+  render: () => (
+    <div style={{ width: 280, border: "1px dashed #9F99A5" }}>
+      <SidePanel
+        size="sm"
+        turn={{
+          initials: "AB",
+          name: "Persona1",
+          time: "01:15",
+          color: "violet",
+        }}
+        people={PEOPLE}
+        timestamp="01:15"
+      />
+    </div>
+  ),
 };
 
 /**
@@ -91,24 +139,22 @@ export const MergeConfirmation: Story = {
   render: () => {
     const [selected, setSelected] = useState(0);
     return (
-      <div style={{ width: 479 }}>
-        <SidePanel
-          turn={{
-            initials: "AB",
-            name: "Persona1",
-            time: "01:15",
-            color: "violet",
-          }}
-          people={PEOPLE}
-          selectedIndex={selected}
-          onSelectPerson={setSelected}
-          timestamp="01:15"
-          previousTurnName="Fiscal"
-          nextTurnName="Defensor"
-          onMergePrevious={() => window.alert("Unido con Fiscal")}
-          onMergeNext={() => window.alert("Unido con Defensor")}
-        />
-      </div>
+      <SidePanel
+        turn={{
+          initials: "AB",
+          name: "Persona1",
+          time: "01:15",
+          color: "violet",
+        }}
+        people={PEOPLE}
+        selectedIndex={selected}
+        onSelectPerson={setSelected}
+        timestamp="01:15"
+        previousTurnName="Fiscal"
+        nextTurnName="Defensor"
+        onMergePrevious={() => window.alert("Unido con Fiscal")}
+        onMergeNext={() => window.alert("Unido con Defensor")}
+      />
     );
   },
 };
@@ -118,19 +164,17 @@ export const InvalidTimestamp: Story = {
   render: () => {
     const [time, setTime] = useState("1:5");
     return (
-      <div style={{ width: 479 }}>
-        <SidePanel
-          turn={{
-            initials: "AB",
-            name: "Persona1",
-            time: "01:15",
-            color: "violet",
-          }}
-          people={PEOPLE}
-          timestamp={time}
-          onTimestampChange={setTime}
-        />
-      </div>
+      <SidePanel
+        turn={{
+          initials: "AB",
+          name: "Persona1",
+          time: "01:15",
+          color: "violet",
+        }}
+        people={PEOPLE}
+        timestamp={time}
+        onTimestampChange={setTime}
+      />
     );
   },
 };
@@ -146,7 +190,7 @@ export const RenameAndCollision: Story = {
     const [lastAction, setLastAction] = useState("Sin cambios");
 
     return (
-      <div style={{ width: 479 }}>
+      <div>
         <SidePanel
           turn={{
             initials: "AB",

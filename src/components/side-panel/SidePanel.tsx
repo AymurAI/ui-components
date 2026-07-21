@@ -1,7 +1,7 @@
 import { Plus, Trash } from "phosphor-react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
-import { css } from "@/styled/css";
+import { css, cva, cx } from "@/styled/css";
 import { stack } from "@/styled/patterns";
 import { isValidTimestamp } from "@/utils/timestamp";
 import type { AvatarColor } from "../avatar";
@@ -20,7 +20,14 @@ import { ArrowsMerge } from "./ArrowsMergeIcon";
 
 /**
  * SidePanel — "Side Panel Voz a texto" (speech-to-text turn editor).
- * AymurAI UI Library node 40002322:53113.
+ * AymurAI UI Library node 40002322:53113 — the only width Figma documents
+ * (479px); there's no sm/md/lg variant in Figma. `size="lg"` (default)
+ * matches that reference exactly. `size="sm"` (360px) and `size="md"`
+ * (400px) formalize desktop-app's own real widths instead: the fixed
+ * wrapper around this component in the Voz a Texto turn editor, and the
+ * fully-custom (not yet using this component) entities panel in
+ * Anonimizador, respectively — both currently impose width themselves
+ * because this component had none of its own.
  *
  * Composite assembled from {@link AvatarPill}, {@link TextField},
  * {@link Button}, {@link Dialog} and {@link Tooltip}. Sections: selected
@@ -89,18 +96,32 @@ export type SidePanelProps = {
   nextTurnName?: string;
   onAddBelow?: () => void;
   onDelete?: () => void;
+  /** Intrinsic width: Voz a Texto wrapper (360px) · entities panel (400px) · Figma reference (479px, default) */
+  size?: SidePanelSize;
   className?: string;
 };
 
-const root = css({
-  display: "flex",
-  flexDirection: "column",
-  gap: "6", // 24px
-  pt: "[42px]",
-  px: "8", // 32px
-  pb: "8",
-  bg: "bg.primary",
-  w: "full",
+export type SidePanelSize = "sm" | "md" | "lg";
+
+const root = cva({
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6", // 24px
+    pt: "[42px]",
+    px: "8", // 32px
+    pb: "8",
+    bg: "bg.primary",
+    maxW: "full",
+  },
+  variants: {
+    size: {
+      sm: { w: "[360px]" },
+      md: { w: "[400px]" },
+      lg: { w: "[479px]" },
+    },
+  },
+  defaultVariants: { size: "lg" },
 });
 
 const card = css({
@@ -263,6 +284,7 @@ export function SidePanel({
   nextTurnName,
   onAddBelow,
   onDelete,
+  size = "lg",
   className,
 }: SidePanelProps) {
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
@@ -358,7 +380,7 @@ export function SidePanel({
   }
 
   return (
-    <div className={className ? `${root} ${className}` : root}>
+    <div className={cx(root({ size }), className)}>
       {/* Selected turn */}
       <div className={card}>
         <p className={cardTitle}>Turno seleccionado</p>
