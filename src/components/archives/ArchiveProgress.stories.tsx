@@ -20,9 +20,6 @@ export const Default50: Story = { args: { status: "default", progress: 50 } };
 /** Figma: Status=Stoped */
 export const Stopped: Story = { args: { status: "stopped", progress: 20 } };
 
-/** Figma: Status=Replace archive */
-export const Replace: Story = { args: { status: "replace", progress: 0 } };
-
 /** Figma: Status=Error */
 export const ErrorState: Story = { args: { status: "error", progress: 0 } };
 
@@ -52,12 +49,11 @@ export const Matrix: Story = {
         progress={20}
         fileName="Archivo 3.doc"
       />
-      <ArchiveProgress status="replace" progress={0} fileName="Archivo 4.doc" />
-      <ArchiveProgress status="error" progress={0} fileName="Archivo 5.doc" />
+      <ArchiveProgress status="error" progress={0} fileName="Archivo 4.doc" />
       <ArchiveProgress
         status="completed"
         progress={100}
-        fileName="Archivo 6.doc"
+        fileName="Archivo 5.doc"
       />
     </div>
   ),

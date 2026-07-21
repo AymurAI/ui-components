@@ -1,4 +1,4 @@
-import { ArrowsClockwise, CheckCircle, Stop, X } from "phosphor-react";
+import { ArrowsClockwise, CheckCircle, Stop } from "phosphor-react";
 import { Button } from "@/components/button/Button";
 import { css, cx } from "@/styled/css";
 
@@ -9,17 +9,21 @@ import { css, cx } from "@/styled/css";
  *   Default 20%     — active progress bar at 20%, "Detener" (stop) button
  *   Default 50%     — active progress bar at 50%
  *   Stopped         — disabled bar (grey), disabled "Detener" button
- *   Replace archive — error state, "Reemplazar" button
  *   Error           — error text + error bar (system.error-secondary bg), "Reemplazar" button
  *   Completed       — full bar (action.alt-default), CheckCircle + "Carga finalizada 100%"
+ *
+ * Figma also defines a "Replace archive" state (identical to Error minus the
+ * error styling) and a dismiss (X) action on every state; product decided
+ * against exposing either — "Reemplazar" only shows for the real failure
+ * case (Error), and dismiss isn't exposed at all. Deliberately not
+ * implemented here.
  *
  * Props:
  *   fileName   — file name string
  *   progress   — 0–100 number
- *   status     — one of the 6 states
+ *   status     — one of the 4 states
  *   onStop     — called when "Detener" clicked
- *   onReplace  — called when "Reemplazar" clicked
- *   onDismiss  — called when X (dismiss) clicked
+ *   onReplace  — called when "Reemplazar" clicked (Error state only)
  *
  * Tokens:
  *   action.progress       = #CED1F4   (active progress fill, Figma-exact)
@@ -38,7 +42,6 @@ import { css, cx } from "@/styled/css";
 export type ArchiveProgressStatus =
   | "default"
   | "stopped"
-  | "replace"
   | "error"
   | "completed";
 
@@ -49,7 +52,6 @@ export interface ArchiveProgressProps {
   status?: ArchiveProgressStatus;
   onStop?: () => void;
   onReplace?: () => void;
-  onDismiss?: () => void;
   className?: string;
 }
 
@@ -195,23 +197,6 @@ function ProgressLabel({
     );
   }
 
-  // Figma: "Replace archive" shows a light-italic caption (text.lighter), not a %.
-  if (status === "replace") {
-    return (
-      <span
-        className={css({
-          textStyle: "label.md.default",
-          fontWeight: "[300]",
-          color: "text.lighter",
-          fontStyle: "italic",
-          whiteSpace: "nowrap",
-        })}
-      >
-        Detuviste el procesamiento de este archivo
-      </span>
-    );
-  }
-
   return (
     <span
       className={css({
@@ -235,20 +220,17 @@ export function ArchiveProgress({
   status = "default",
   onStop,
   onReplace,
-  onDismiss,
   className,
 }: ArchiveProgressProps) {
   const nameColor =
     status === "error"
       ? "system.error"
-      : status === "stopped" || status === "replace"
+      : status === "stopped"
         ? "text.onbutton-disabled"
         : "text.default";
 
   const showStopButton = status === "default" || status === "stopped";
-  const showReplaceButton = status === "replace" || status === "error";
-  // Figma shows the dismiss X on every state, including completed.
-  const showDismiss = true;
+  const showReplaceButton = status === "error";
 
   return (
     <div
@@ -346,28 +328,6 @@ export function ArchiveProgress({
             </Button>
           )}
         </div>
-      )}
-
-      {/* Dismiss X */}
-      {showDismiss && (
-        <button
-          type="button"
-          onClick={onDismiss}
-          aria-label="Descartar"
-          className={css({
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: "0",
-            borderWidth: "0",
-            bg: "[transparent]",
-            cursor: "pointer",
-            color: "text.default",
-            "&:hover": { color: "action.hover" },
-          })}
-        >
-          <X size={24} />
-        </button>
       )}
     </div>
   );
