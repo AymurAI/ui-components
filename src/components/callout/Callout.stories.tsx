@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import {
   CheckCircle,
+  Info as InfoIcon,
   WarningCircle,
   Warning as WarningIcon,
 } from "phosphor-react";
@@ -42,6 +43,17 @@ export const Dismissable: Story = {
 };
 export const NoBorder: Story = {
   args: { variant: "success", noBorder: true },
+};
+
+/** Voz a Texto processing notice — formalizes the local hand-rolled version. */
+export const Compact: Story = {
+  args: {
+    size: "compact",
+    variant: "info",
+    icon: InfoIcon,
+    noBorder: true,
+    message: "Transcribiendo audio…",
+  },
 };
 
 /** Full variant matrix */
