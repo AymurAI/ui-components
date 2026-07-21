@@ -1,3 +1,4 @@
+import type { HTMLAttributes } from "react";
 import { cva, cx } from "@/styled/css";
 
 /**
@@ -64,8 +65,7 @@ const styles = cva({
   },
 });
 
-export interface CardProps {
-  children?: React.ReactNode;
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   disabled?: boolean;
   size?: "lg" | "sm";
   clickable?: boolean;
@@ -78,9 +78,14 @@ export function Card({
   clickable = false,
   children,
   className,
+  ...props
 }: CardProps) {
   const classes = styles({ size, disabled, clickable });
-  return <div className={cx(className, classes)}>{children}</div>;
+  return (
+    <div {...props} className={cx(className, classes)}>
+      {children}
+    </div>
+  );
 }
 
 export default Card;

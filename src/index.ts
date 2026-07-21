@@ -24,6 +24,7 @@ export * from "./components/button-link";
 export * from "./components/callout";
 // Surfaces & overlays
 export * from "./components/card";
+export * from "./components/card-tool";
 export * from "./components/category-item";
 export * from "./components/check-circle";
 export * from "./components/checkbox";
