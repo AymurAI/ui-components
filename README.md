@@ -55,12 +55,18 @@ Inputs: `TextField`, `Search`, `Select`, `Checkbox`, `Radio`, `Switch`,
 `Suggestion` · Feedback: `Callout`, `Toast`, `Tooltip`, `Spinner`,
 `CheckCircle`, `Stepper` · Surfaces: `Card`, `CardTool`, `Dialog`, `Popover` · Chrome:
 `AppHeader`, `Toolbar`, `StatusBar`, `Tag`, `Logo` · Archives: `ArchiveProgress`,
-`ArchiveTabs`, `ArchiveView`.
+`ArchiveTabs`, `ArchiveView` · Workflow: `WorkflowStepLayout`, `PageTitle`,
+`AppFooter`.
 
 `CardTool` owns the shared feature-card visuals, including its disabled state.
 Consumers keep navigation in their router: wrap enabled cards in a link and
 render disabled placeholders directly, so unavailable tools never become
 interactive elements.
+
+`WorkflowStepLayout` owns the common viewport, content width and single-scroll
+page structure. Consumers provide `AppHeader`, `AppFooter`, back controls and
+page actions through its slots; routing, step state and domain logic remain in
+the application.
 
 Browse every component and variant in Storybook (`pnpm storybook`).
 

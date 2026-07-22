@@ -35,6 +35,7 @@ export * from "./components/file-drop-zone";
 export * from "./components/logo";
 // Voz a texto (speech-to-text)
 export * from "./components/option";
+export * from "./components/page-title";
 export * from "./components/player";
 export * from "./components/popover";
 export * from "./components/radio";
@@ -56,5 +57,6 @@ export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/transcript-block";
 export * from "./components/tutorial";
+export * from "./components/workflow-step-layout";
 // Utils
 export * from "./utils/timestamp";
