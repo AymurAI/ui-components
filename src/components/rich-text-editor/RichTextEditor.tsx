@@ -1,4 +1,6 @@
 import {
+  Copy as CopyIcon,
+  HighlighterCircle,
   PencilSimpleLine,
   TextBolder,
   TextItalic,
@@ -6,9 +8,14 @@ import {
 } from "phosphor-react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { css, cx } from "@/styled/css";
 import { HStack, Stack } from "@/styled/jsx";
-import { paragraphPlainText, toggleMark } from "@/utils/rich-text/model";
+import {
+  paragraphPlainText,
+  serializeToPlainText,
+  toggleMark,
+} from "@/utils/rich-text/model";
 import { reconcileParagraphText } from "@/utils/rich-text/reconcile";
 import { getRangeOffsets } from "@/utils/rich-text/selection";
 import type {
@@ -45,6 +52,33 @@ const body = css({
 });
 
 const toolbar = css({ borderBottom: "primary", pb: "3" });
+
+export const RICH_TEXT_HIGHLIGHT_COLORS = [
+  "category.yellow-light",
+  "category.green-light",
+  "category.blue-light",
+  "category.violet-light",
+  "category.pink-light",
+  "category.orange-light",
+  "category.red-light",
+];
+
+const swatch = (color: string) =>
+  css({
+    w: "6",
+    h: "6",
+    rounded: "full",
+    bg: color as never,
+    border: "primary",
+    cursor: "pointer",
+  });
+
+const swatchGrid = css({
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "2",
+  p: "3",
+});
 
 function markClassName(mark: TextMark): string | undefined {
   if (mark.type === "highlight") {
@@ -108,6 +142,7 @@ export function RichTextEditor({
   readOnly = false,
   title,
   onTitleChange,
+  highlightColors = RICH_TEXT_HIGHLIGHT_COLORS,
   "aria-label": ariaLabel,
 }: RichTextEditorProps) {
   const [editingTitle, setEditingTitle] = useState(false);
@@ -258,6 +293,42 @@ export function RichTextEditor({
             onClick={() => applyMark({ type: "underline" })}
           >
             <TextUnderline size={20} />
+          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Resaltar"
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <HighlighterCircle size={20} />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className={swatchGrid}>
+                {highlightColors.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    aria-label={color}
+                    className={swatch(color)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyMark({ type: "highlight", color })}
+                  />
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+          <Button
+            variant="none"
+            size="icon-sm"
+            aria-label="Copiar"
+            onClick={() =>
+              navigator.clipboard.writeText(serializeToPlainText(doc))
+            }
+          >
+            <CopyIcon size={20} />
           </Button>
         </HStack>
       )}

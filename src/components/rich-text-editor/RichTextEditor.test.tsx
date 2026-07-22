@@ -111,3 +111,55 @@ describe("RichTextEditor — toolbar", () => {
     });
   });
 });
+
+describe("RichTextEditor — highlight + copy", () => {
+  it("applies the clicked swatch's color as a highlight mark on the selection", () => {
+    const onChange = vi.fn();
+    const singleRunDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+    };
+    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
+
+    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
+    const range = document.createRange();
+    range.selectNodeContents(paragraphEl);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    fireEvent.select(paragraphEl);
+
+    fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /category.yellow-light/i }),
+    );
+
+    expect(onChange).toHaveBeenCalledWith({
+      paragraphs: [
+        {
+          id: "p1",
+          runs: [
+            {
+              text: "hola mundo",
+              marks: [{ type: "highlight", color: "category.yellow-light" }],
+            },
+          ],
+        },
+      ],
+    });
+  });
+
+  it("copies the serialized plain text to the clipboard", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+
+    render(
+      <RichTextEditor
+        document={{
+          paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+        }}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /copiar/i }));
+    expect(writeText).toHaveBeenCalledWith("hola mundo");
+  });
+});
