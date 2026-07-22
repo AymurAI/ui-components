@@ -167,7 +167,7 @@ export const aymuraiPreset = definePreset({
         },
         borders: {
           primary: { value: "1px solid #BCBAB8" },
-          secondary: { value: "1px solid #EDF2F7" },
+          secondary: { value: "1px solid #9F99A5" },
           "primary-alt": { value: "1px solid #110041" },
           error: { value: "1px solid {colors.system.error}" },
         },

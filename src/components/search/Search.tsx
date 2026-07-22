@@ -11,9 +11,7 @@ import { css, cx, sva } from "@/styled/css";
  *   bg.secondary              = #FFFFFF  (input background)
  *   border/primary            = 1px solid #BCBAB8  (Default border)
  *   border/primary-alt        = 1px solid #110041  (Focus border)
- *   [1px_solid_#9F99A5]       = Field + Suggestion border (border/secondary in Figma;
- *                               promote to preset as `border.tertiary` or rename
- *                               existing `border.secondary` which is currently #EDF2F7)
+ *   border/secondary          = 1px solid #9F99A5  (Field + Suggestion border)
  *   text.lighter              = #625C68  (placeholder, result counter)
  *   text.default              = #110041  (typed text / suggestion text)
  *   [#2D3748]                 = Suggestion typed+caret colour (promote as text.secondary)
@@ -147,7 +145,7 @@ export function Search({
           // Field + Suggestion: border/secondary in Figma (#9F99A5)
           (isField || isSuggestion) &&
             css({
-              border: "[1px_solid_#9F99A5]",
+              border: "secondary",
             }),
           // Suggestion: also gets the drop-shadow (same as Focus)
           isSuggestion &&
