@@ -103,10 +103,12 @@ const input = sva({
       },
       false: {},
     },
-    // Typed: Figma uses border/secondary (#9F99A5) when a value is present
+    // Typed: Figma uses border/secondary (#9F99A5) when a value is present,
+    // and darkens the label to text.default.
     typed: {
       true: {
         inputBox: { border: "secondary" },
+        label: { color: "text.default" },
       },
       false: {},
     },
@@ -238,8 +240,6 @@ export function TextField({
           </div>
         )}
 
-        {suggestion && <Suggestion clickable>{suggestion}</Suggestion>}
-
         <input
           {...props}
           ref={ref}
@@ -254,6 +254,14 @@ export function TextField({
           aria-describedby={errorMessageId}
           aria-invalid={!!error}
         />
+
+        {/* Suggestion sits to the RIGHT of the value, behind the affix's
+            border separator (the "pipe"), matching the pre-v0.5 layout. */}
+        {suggestion && (
+          <div className={affix({ position: "suffix" })}>
+            <Suggestion clickable>{suggestion}</Suggestion>
+          </div>
+        )}
 
         {suffix && (
           <div className={affix({ position: "suffix" })}>
