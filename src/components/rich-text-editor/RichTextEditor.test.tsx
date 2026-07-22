@@ -51,3 +51,63 @@ describe("RichTextEditor", () => {
     expect(body).toHaveAttribute("contenteditable", "false");
   });
 });
+
+describe("RichTextEditor — toolbar", () => {
+  function selectAll(paragraphEl: Element) {
+    const range = document.createRange();
+    range.selectNodeContents(paragraphEl);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  }
+
+  it("toggles bold on the current selection and calls onChange", () => {
+    const onChange = vi.fn();
+    const singleRunDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+    };
+    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
+
+    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
+    selectAll(paragraphEl);
+    fireEvent.select(paragraphEl);
+
+    fireEvent.click(screen.getByRole("button", { name: /negrita/i }));
+
+    expect(onChange).toHaveBeenCalledWith({
+      paragraphs: [
+        { id: "p1", runs: [{ text: "hola mundo", marks: [{ type: "bold" }] }] },
+      ],
+    });
+  });
+
+  it("hides the toolbar entirely in readOnly mode", () => {
+    render(
+      <RichTextEditor
+        document={{
+          paragraphs: [{ id: "p1", runs: [{ text: "x", marks: [] }] }],
+        }}
+        readOnly
+      />,
+    );
+    expect(
+      screen.queryByRole("button", { name: /negrita/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("reconciles typed text back into the model on input", () => {
+    const onChange = vi.fn();
+    const singleRunDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+    };
+    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
+
+    const paragraphEl = screen.getByText("hola").closest("p")!;
+    paragraphEl.textContent = "hola mundo";
+    fireEvent.input(paragraphEl);
+
+    expect(onChange).toHaveBeenCalledWith({
+      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+    });
+  });
+});
