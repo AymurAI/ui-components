@@ -1,9 +1,15 @@
 import * as RadixSelect from "@radix-ui/react-select";
-import { CaretDown, CaretUp, Check } from "phosphor-react";
-import { type Ref, useId, useImperativeHandle } from "react";
+import { CaretDown, CaretUp, Check, XCircle } from "phosphor-react";
+import {
+  type Ref,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useState,
+} from "react";
 
 import { Suggestion } from "@/components/suggestion/Suggestion";
-import { sva } from "@/styled/css";
+import { css, sva } from "@/styled/css";
 import { styled } from "@/styled/jsx";
 import { stack } from "@/styled/patterns";
 
@@ -36,6 +42,8 @@ export interface SelectProps {
   placeholder?: string;
   disabled?: boolean;
   size?: "md" | "sm";
+  /** Show a clear (×) control once an option is selected. Default: true. */
+  clearable?: boolean;
   ref?: Ref<{ value: string | undefined }>;
 }
 
@@ -202,6 +210,7 @@ export function Select({
   placeholder = "",
   disabled = false,
   size = "md",
+  clearable = true,
   ref,
 }: SelectProps) {
   const triggerId = useId();
@@ -210,9 +219,28 @@ export function Select({
   const orderedOptions = orderByPriority(options, priorityOrder);
   const securedSuggestion = secureSuggestion(suggestion, options);
 
-  useImperativeHandle(ref, () => ({ value }), [value]);
+  // Self-managed selection. Works both ways:
+  //  - Controlled: parent passes `value` + `onChange` and re-renders (e.g. the
+  //    Voz a Texto export format select). The effect keeps us in sync.
+  //  - Uncontrolled/ref: consumers that only read the selection back through
+  //    `ref` and never re-render on change (the dataset validation forms'
+  //    register/useForm pattern). Here `value` is just the initial seed, so the
+  //    component must own the selection or picking an option would revert.
+  // Seed with "" (never undefined) so Radix stays controlled throughout and
+  // doesn't emit an uncontrolled→controlled warning on first selection.
+  const [selectedValue, setSelectedValue] = useState(value ?? "");
+
+  useEffect(() => {
+    setSelectedValue(value ?? "");
+  }, [value]);
+
+  // Expose the live selection (not the initial `value`) so ref-based consumers
+  // capture user changes — useImperativeHandle re-runs when it changes, which is
+  // what re-fires the forms' registration callback ref.
+  useImperativeHandle(ref, () => ({ value: selectedValue }), [selectedValue]);
 
   const handleChange = (id: string) => {
+    setSelectedValue(id);
     const option = options.find((o) => o.id === id);
     if (option) onChange?.(option);
   };
@@ -234,7 +262,7 @@ export function Select({
       {label && (
         <styled.label
           textStyle="label.sm.default"
-          color="text.lighter"
+          color={selectedValue ? "text.default" : "text.lighter"}
           htmlFor={triggerId}
         >
           {label}
@@ -242,7 +270,7 @@ export function Select({
       )}
 
       <RadixSelect.Root
-        value={value}
+        value={selectedValue}
         onValueChange={handleChange}
         disabled={disabled}
       >
@@ -252,7 +280,7 @@ export function Select({
             {prefix && <Affix aria-hidden="true">{prefix} |</Affix>}
 
             <span className={classes.value}>
-              {!value && securedSuggestion ? (
+              {!selectedValue && securedSuggestion ? (
                 <button
                   type="button"
                   onPointerDown={(e) => e.stopPropagation()}
@@ -267,6 +295,34 @@ export function Select({
             </span>
 
             {suffix && <Affix aria-hidden="true">| {suffix}</Affix>}
+
+            {/* Clear control — resets the selection back to empty. Reads back
+                through `ref` as "" for the forms' register pattern. */}
+            {clearable && selectedValue && !disabled && (
+              <button
+                type="button"
+                aria-label="Limpiar selección"
+                className={css({
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: "0",
+                  p: "0",
+                  borderWidth: "0",
+                  bg: "[transparent]",
+                  cursor: "pointer",
+                  color: "text.lighter",
+                  "&:hover": { color: "text.default" },
+                })}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedValue("");
+                }}
+              >
+                <XCircle size={16} />
+              </button>
+            )}
 
             {/* Caret sits at the trailing edge — matches Figma layout */}
             <RadixSelect.Icon asChild>
