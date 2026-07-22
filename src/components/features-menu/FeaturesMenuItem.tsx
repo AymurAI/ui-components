@@ -43,7 +43,7 @@ const item = cva({
       boxShadow: "focus",
     },
     "&:disabled": {
-      cursor: "not-allowed",
+      cursor: "default",
       bg: "bg.primary",
       color: "text.lighter",
     },
