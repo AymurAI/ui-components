@@ -56,27 +56,43 @@ const body = css({
 
 const toolbar = css({ borderBottom: "primary", pb: "3" });
 
+// 6 hues x 2 shades (light + solid), matching Figma's swatch popover exactly
+// (verified via get_variable_defs on the popover node — no violet, no
+// single-shade-only hues). Order: light-then-solid per hue, hues in
+// blue/green/orange/pink/red/yellow order — a stable default; the Figma
+// screenshot's exact on-screen grid order could not be pixel-verified at the
+// available render resolution.
 export const RICH_TEXT_HIGHLIGHT_COLORS = [
-  "category.yellow-light",
-  "category.green-light",
   "category.blue-light",
-  "category.violet-light",
-  "category.pink-light",
+  "category.blue",
+  "category.green-light",
+  "category.green",
   "category.orange-light",
+  "category.orange",
+  "category.pink-light",
+  "category.pink",
   "category.red-light",
+  "category.red",
+  "category.yellow-light",
+  "category.yellow",
 ];
 
 // Human-readable Spanish names for the highlight swatches, so screen readers
-// announce "Amarillo" instead of reading the raw token path "category dot
-// yellow dash light".
+// announce "Azul claro" instead of reading the raw token path "category dot
+// blue dash light".
 const HIGHLIGHT_COLOR_LABELS: Record<string, string> = {
-  "category.yellow-light": "Amarillo",
-  "category.green-light": "Verde",
-  "category.blue-light": "Azul",
-  "category.violet-light": "Violeta",
-  "category.pink-light": "Rosa",
-  "category.orange-light": "Naranja",
-  "category.red-light": "Rojo",
+  "category.blue-light": "Azul claro",
+  "category.blue": "Azul",
+  "category.green-light": "Verde claro",
+  "category.green": "Verde",
+  "category.orange-light": "Naranja claro",
+  "category.orange": "Naranja",
+  "category.pink-light": "Rosa claro",
+  "category.pink": "Rosa",
+  "category.red-light": "Rojo claro",
+  "category.red": "Rojo",
+  "category.yellow-light": "Amarillo claro",
+  "category.yellow": "Amarillo",
 };
 
 // Unique-enough id generator for paragraphs created at runtime (Enter split,

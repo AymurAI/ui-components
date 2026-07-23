@@ -144,7 +144,35 @@ describe("RichTextEditor — toolbar", () => {
 });
 
 describe("RichTextEditor — highlight + copy", () => {
-  it("applies the clicked swatch's color as a highlight mark on the selection", () => {
+  it("renders exactly the 12 Figma-specified highlight swatches with human Spanish labels", () => {
+    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
+
+    const expectedLabels = [
+      "Azul claro",
+      "Azul",
+      "Verde claro",
+      "Verde",
+      "Naranja claro",
+      "Naranja",
+      "Rosa claro",
+      "Rosa",
+      "Rojo claro",
+      "Rojo",
+      "Amarillo claro",
+      "Amarillo",
+    ];
+    for (const label of expectedLabels) {
+      expect(
+        screen.getByRole("button", { name: new RegExp(`^${label}$`, "i") }),
+      ).toBeInTheDocument();
+    }
+    expect(
+      screen.queryByRole("button", { name: /violeta/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("applies the correct highlight color for a solid-shade swatch click", () => {
     const onChange = vi.fn();
     const singleRunDoc: RichTextDocument = {
       paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
@@ -159,7 +187,7 @@ describe("RichTextEditor — highlight + copy", () => {
     fireEvent.select(paragraphEl);
 
     fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
-    fireEvent.click(screen.getByRole("button", { name: /amarillo/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^azul$/i }));
 
     expect(onChange).toHaveBeenCalledWith({
       paragraphs: [
@@ -168,7 +196,7 @@ describe("RichTextEditor — highlight + copy", () => {
           runs: [
             {
               text: "hola mundo",
-              marks: [{ type: "highlight", color: "category.yellow-light" }],
+              marks: [{ type: "highlight", color: "category.blue" }],
             },
           ],
         },
