@@ -39,6 +39,7 @@ export * from "./components/page-title";
 export * from "./components/player";
 export * from "./components/popover";
 export * from "./components/radio";
+export * from "./components/rich-text-editor";
 export * from "./components/search";
 export * from "./components/select";
 export * from "./components/side-panel";
