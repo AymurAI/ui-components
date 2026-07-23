@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
+import { documentFromMarkdown } from "@/utils/rich-text/model";
 import type { RichTextDocument } from "@/utils/rich-text/types";
 import { RichTextEditor } from "./RichTextEditor";
 
@@ -63,5 +64,22 @@ export const Empty: Story = {
   args: {
     document: { paragraphs: [] },
     title: "Resumen",
+  },
+};
+
+export const FromMarkdown: Story = {
+  render: () => {
+    const [doc, setDoc] = useState(
+      documentFromMarkdown(
+        "## Resumen del documento\n\nEl presente caso tramita ante el **Juzgado en lo Penal, Contravencional y de Faltas N.º 10**.\n\n- Hecho relevante uno\n- Hecho relevante dos\n\nSe dispusieron *medidas de protección* urgentes.",
+      ),
+    );
+    return (
+      <RichTextEditor
+        document={doc}
+        onChange={setDoc}
+        title="Resumen 10/04/2025"
+      />
+    );
   },
 };
