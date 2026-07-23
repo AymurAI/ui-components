@@ -78,6 +78,20 @@ describe("RichTextEditor", () => {
     expect(panel).toContainElement(card);
     expect(card).toContainElement(screen.getByRole("textbox"));
   });
+
+  it("defaults the body card's max height to 532px", () => {
+    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    const card = screen.getByTestId("rich-text-editor-card");
+    expect(card.style.maxHeight).toBe("532px");
+  });
+
+  it("lets a consumer override the body card's max height via maxBodyHeight", () => {
+    render(
+      <RichTextEditor document={{ paragraphs: [] }} maxBodyHeight="800px" />,
+    );
+    const card = screen.getByTestId("rich-text-editor-card");
+    expect(card.style.maxHeight).toBe("800px");
+  });
 });
 
 describe("RichTextEditor — toolbar", () => {

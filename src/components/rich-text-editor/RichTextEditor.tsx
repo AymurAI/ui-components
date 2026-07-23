@@ -68,7 +68,6 @@ const card = css({
   rounded: "[12px]",
   boxShadow: "card",
   p: "8",
-  maxH: "[532px]",
   overflowY: "auto",
 });
 
@@ -191,6 +190,14 @@ export interface RichTextEditorProps {
   onTitleChange?: (next: string) => void;
   highlightColors?: string[];
   "aria-label"?: string;
+  /**
+   * Maximum height of the scrollable body card, as a CSS length (e.g.
+   * "532px") or Panda token. Defaults to Figma's static mockup dimension
+   * ("532px") so existing behavior is unchanged unless a consumer opts into
+   * a different value — e.g. a taller real layout that has more vertical
+   * space available than the Figma mock did.
+   */
+  maxBodyHeight?: string;
 }
 
 interface ActiveSelection {
@@ -214,6 +221,7 @@ export function RichTextEditor({
   onTitleChange,
   highlightColors = RICH_TEXT_HIGHLIGHT_COLORS,
   "aria-label": ariaLabel,
+  maxBodyHeight = "532px",
 }: RichTextEditorProps) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title ?? "");
@@ -515,6 +523,7 @@ export function RichTextEditor({
           contentEditable={!readOnly}
           suppressContentEditableWarning
           className={cx(body, card)}
+          style={{ maxHeight: maxBodyHeight }}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
         >
