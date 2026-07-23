@@ -60,4 +60,6 @@ export * from "./components/transcript-block";
 export * from "./components/tutorial";
 export * from "./components/workflow-step-layout";
 // Utils
+export * from "./utils/rich-text/model";
+export * from "./utils/rich-text/types";
 export * from "./utils/timestamp";
