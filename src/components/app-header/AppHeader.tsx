@@ -23,8 +23,10 @@ import { Stepper } from "../stepper";
  * default logo/buttons without recreating their styles or focus behaviour.
  *
  * The top-bar variant is 1440×96px with 48px horizontal padding. Its three
- * layout regions are 203px (logo), 332px (stepper), and 203px (actions), so
- * the stepper remains centered even when the logo content changes width.
+ * layout regions are min 203px (logo — grows for a long `featureName`,
+ * e.g. "Resumen de Documento"), 332px (stepper), and 203px (actions), so the
+ * stepper stays centered for the Figma-sized case and only shifts if a
+ * longer feature name pushes past 203px.
  */
 const root = css({
   display: "flex",
@@ -44,7 +46,7 @@ const root = css({
 const logoWrap = css({
   display: "flex",
   alignItems: "center",
-  w: "[203px]",
+  minW: "[203px]",
   flexShrink: "0",
 });
 
