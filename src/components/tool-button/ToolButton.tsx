@@ -1,4 +1,4 @@
-import { Backspace, Repeat, TrashSimple } from "phosphor-react";
+import { Repeat, TagSimple, TrashSimple } from "phosphor-react";
 import type { ButtonHTMLAttributes } from "react";
 import { css, cva, cx } from "@/styled/css";
 
@@ -67,17 +67,25 @@ const iconWrapperStyle = css({
   justifyContent: "center",
 });
 
-/** "ALL" badge — positioned bottom-right of the 24×24 icon area. */
+/**
+ * "ALL" badge — Figma (node 40000041:10521/10525) hand-draws these three
+ * letterforms centered on the 28×28 button canvas (bounding box center is
+ * ~14,14 — dead center), overlapping the base icon, not offset to a corner.
+ * Measured cap-height of the real vectors is ~3.5px — a 6px font (~4.2-4.5px
+ * cap-height) ran noticeably larger than that; 4.5px tracks the real size.
+ */
 const allBadgeStyle = css({
   position: "absolute",
-  bottom: "[0px]",
-  right: "[0px]",
-  fontSize: "[6px]",
+  inset: "[0px]",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: "[4.5px]",
   fontWeight: "[700]",
   lineHeight: "[1]",
   letterSpacing: "[0.02em]",
   color: "text.onbutton-alternative",
-  // Tight background patch so the badge is readable over the icon's bottom-right
+  // Tight background patch so the badge is readable over the icon
   bg: "[transparent]",
   pointerEvents: "none",
   userSelect: "none",
@@ -103,13 +111,11 @@ const ACTION_LABELS: Record<ToolButtonAction, string> = {
 /**
  * Icon per action — matches Figma layer structure (node 40000041:10526).
  *
- * "Todo/Todas" variants composite the singular icon with an absolute "ALL"
- * badge overlaid in the bottom-right quadrant, matching the Figma SVG layout.
- * "Agregar" uses Backspace rotated 180° (produces the right-pointing tag shape).
+ * "Todo/Todas" variants composite the singular icon with an "ALL" badge
+ * centered on top of it, matching the Figma SVG layout.
  */
 function ActionIcon({ action }: { action: ToolButtonAction }) {
   const size = 24;
-  const flipped = { transform: "rotate(180deg)" };
 
   switch (action) {
     case "reemplazar":
@@ -135,12 +141,12 @@ function ActionIcon({ action }: { action: ToolButtonAction }) {
       );
 
     case "agregar-etiqueta":
-      return <Backspace size={size} style={flipped} />;
+      return <TagSimple size={size} />;
 
     case "agregar-todas":
       return (
         <div className={iconWrapperStyle}>
-          <Backspace size={size} style={flipped} />
+          <TagSimple size={size} />
           <span className={allBadgeStyle}>ALL</span>
         </div>
       );
@@ -159,6 +165,8 @@ export function ToolButton({
   action,
   className,
   type = "button",
+  "aria-label": ariaLabel,
+  title,
   ...props
 }: ToolButtonProps) {
   const label = ACTION_LABELS[action];
@@ -166,8 +174,8 @@ export function ToolButton({
     <button
       {...props}
       type={type}
-      aria-label={label}
-      title={label}
+      aria-label={ariaLabel ?? label}
+      title={title ?? label}
       className={cx(toolButton(), className)}
     >
       <ActionIcon action={action} />
