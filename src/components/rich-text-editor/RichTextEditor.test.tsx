@@ -70,6 +70,14 @@ describe("RichTextEditor", () => {
     const body = screen.getByRole("textbox");
     expect(body).toHaveAttribute("contenteditable", "false");
   });
+
+  it("wraps the body in a bordered, rounded, shadowed card inside a gray panel", () => {
+    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    const panel = screen.getByTestId("rich-text-editor-panel");
+    const card = screen.getByTestId("rich-text-editor-card");
+    expect(panel).toContainElement(card);
+    expect(card).toContainElement(screen.getByRole("textbox"));
+  });
 });
 
 describe("RichTextEditor — toolbar", () => {

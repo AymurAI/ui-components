@@ -68,6 +68,9 @@ export const aymuraiPreset = definePreset({
           // Dialog/Popover have no Figma node yet — tokenised at current values.
           dialog: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
           popover: { value: "0px 0px 15px 0px #00000026" },
+          // Figma "Document-Card" drop shadow (RichTextEditor's body
+          // container) — get_design_context on node 40002572:59916/40002573:62459.
+          card: { value: "0px 4px 10px rgba(0, 0, 0, 0.05)" },
         },
       },
       textStyles: {
@@ -170,6 +173,9 @@ export const aymuraiPreset = definePreset({
           secondary: { value: "1px solid #9F99A5" },
           "primary-alt": { value: "1px solid #110041" },
           error: { value: "1px solid {colors.system.error}" },
+          // Figma "Document-Card" border (RichTextEditor's body container) —
+          // get_design_context on node 40002572:59916/40002573:62459.
+          card: { value: "1px solid #E0DFE8" },
         },
         gradients: {
           primary: {

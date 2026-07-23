@@ -54,6 +54,24 @@ const body = css({
   "& p + p": { marginTop: "4" },
 });
 
+const panel = css({
+  display: "flex",
+  flexDirection: "column",
+  gap: "10",
+  bg: "bg.primary",
+  p: "8",
+});
+
+const card = css({
+  bg: "bg.secondary",
+  border: "card",
+  rounded: "[12px]",
+  boxShadow: "card",
+  p: "8",
+  maxH: "[532px]",
+  overflowY: "auto",
+});
+
 const toolbar = css({ borderBottom: "primary", pb: "3" });
 
 const divider = css({
@@ -373,136 +391,139 @@ export function RichTextEditor({
   };
 
   return (
-    <Stack gap="6">
-      {title !== undefined && (
-        <div className={titleRow}>
-          {editingTitle ? (
-            <input
-              className={titleInput}
-              value={draftTitle}
-              onChange={(e) => setDraftTitle(e.target.value)}
-              onBlur={commitTitle}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") commitTitle();
-              }}
-              // biome-ignore lint/a11y/noAutofocus: replaces an inline click-to-edit label, not a dialog
-              autoFocus
-            />
-          ) : (
-            <span className={titleText}>{title}</span>
-          )}
-          {!readOnly && !editingTitle && (
-            <Button
-              variant="none"
-              size="icon-sm"
-              aria-label="Editar título"
-              onClick={() => {
-                setDraftTitle(title ?? "");
-                setEditingTitle(true);
-              }}
-            >
-              <PencilSimpleLine size={16} />
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Copy stays available in both modes — the readOnly export preview
-          (Finalización) treats copy-to-clipboard as a core action. The
-          formatting controls below are editing affordances and stay hidden
-          when readOnly. */}
-      <HStack gap="2" className={toolbar}>
-        {!readOnly && (
-          <>
-            <Button
-              variant="none"
-              size="icon-sm"
-              aria-label="Subrayado"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => applyMark({ type: "underline" })}
-            >
-              <TextUnderline size={20} />
-            </Button>
-            <Button
-              variant="none"
-              size="icon-sm"
-              aria-label="Cursiva"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => applyMark({ type: "italic" })}
-            >
-              <TextItalic size={20} />
-            </Button>
-            <Button
-              variant="none"
-              size="icon-sm"
-              aria-label="Negrita"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => applyMark({ type: "bold" })}
-            >
-              <TextBolder size={20} />
-            </Button>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="none"
-                  size="icon-sm"
-                  aria-label="Resaltar"
-                  onMouseDown={(e) => e.preventDefault()}
-                >
-                  <HighlighterCircle size={20} />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent>
-                <div className={swatchGrid}>
-                  {highlightColors.map((color) => (
-                    <button
-                      key={color}
-                      type="button"
-                      aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
-                      className={swatch(color)}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => applyMark({ type: "highlight", color })}
-                    />
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            <div
-              data-testid="rich-text-editor-toolbar-divider"
-              className={divider}
-            />
-          </>
+    <div data-testid="rich-text-editor-panel" className={panel}>
+      <Stack gap="6">
+        {title !== undefined && (
+          <div className={titleRow}>
+            {editingTitle ? (
+              <input
+                className={titleInput}
+                value={draftTitle}
+                onChange={(e) => setDraftTitle(e.target.value)}
+                onBlur={commitTitle}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitTitle();
+                }}
+                // biome-ignore lint/a11y/noAutofocus: replaces an inline click-to-edit label, not a dialog
+                autoFocus
+              />
+            ) : (
+              <span className={titleText}>{title}</span>
+            )}
+            {!readOnly && !editingTitle && (
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Editar título"
+                onClick={() => {
+                  setDraftTitle(title ?? "");
+                  setEditingTitle(true);
+                }}
+              >
+                <PencilSimpleLine size={16} />
+              </Button>
+            )}
+          </div>
         )}
-        <Button
-          variant="none"
-          size="icon-sm"
-          aria-label="Copiar"
-          onClick={() => {
-            navigator.clipboard
-              ?.writeText(serializeToPlainText(doc))
-              .catch(() => {});
-          }}
-        >
-          <CopyIcon size={20} />
-        </Button>
-      </HStack>
 
-      <div
-        ref={bodyRef}
-        role="textbox"
-        aria-label={ariaLabel ?? "Resumen"}
-        aria-multiline="true"
-        contentEditable={!readOnly}
-        suppressContentEditableWarning
-        className={cx(body)}
-        onInput={handleInput}
-        onKeyDown={handleKeyDown}
-      >
-        {doc.paragraphs.map((paragraph) => (
-          <ParagraphView key={paragraph.id} paragraph={paragraph} />
-        ))}
-      </div>
-    </Stack>
+        {/* Copy stays available in both modes — the readOnly export preview
+            (Finalización) treats copy-to-clipboard as a core action. The
+            formatting controls below are editing affordances and stay hidden
+            when readOnly. */}
+        <HStack gap="2" className={toolbar}>
+          {!readOnly && (
+            <>
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Subrayado"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyMark({ type: "underline" })}
+              >
+                <TextUnderline size={20} />
+              </Button>
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Cursiva"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyMark({ type: "italic" })}
+              >
+                <TextItalic size={20} />
+              </Button>
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Negrita"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => applyMark({ type: "bold" })}
+              >
+                <TextBolder size={20} />
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="none"
+                    size="icon-sm"
+                    aria-label="Resaltar"
+                    onMouseDown={(e) => e.preventDefault()}
+                  >
+                    <HighlighterCircle size={20} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent>
+                  <div className={swatchGrid}>
+                    {highlightColors.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
+                        className={swatch(color)}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => applyMark({ type: "highlight", color })}
+                      />
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <div
+                data-testid="rich-text-editor-toolbar-divider"
+                className={divider}
+              />
+            </>
+          )}
+          <Button
+            variant="none"
+            size="icon-sm"
+            aria-label="Copiar"
+            onClick={() => {
+              navigator.clipboard
+                ?.writeText(serializeToPlainText(doc))
+                .catch(() => {});
+            }}
+          >
+            <CopyIcon size={20} />
+          </Button>
+        </HStack>
+
+        <div
+          data-testid="rich-text-editor-card"
+          ref={bodyRef}
+          role="textbox"
+          aria-label={ariaLabel ?? "Resumen"}
+          aria-multiline="true"
+          contentEditable={!readOnly}
+          suppressContentEditableWarning
+          className={cx(body, card)}
+          onInput={handleInput}
+          onKeyDown={handleKeyDown}
+        >
+          {doc.paragraphs.map((paragraph) => (
+            <ParagraphView key={paragraph.id} paragraph={paragraph} />
+          ))}
+        </div>
+      </Stack>
+    </div>
   );
 }
 
