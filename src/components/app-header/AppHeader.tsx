@@ -41,6 +41,9 @@ const root = css({
   borderBottomColor: "[#BCBAB8]", // border.primary colour, no bare token
   flexShrink: "0",
   w: "full",
+  // Anchor for stepperWrap, which centers on the header itself rather than
+  // on the (variable-width) space between logo and actions.
+  position: "relative",
 });
 
 const logoWrap = css({
@@ -51,8 +54,16 @@ const logoWrap = css({
 });
 
 const stepperWrap = css({
+  // Absolutely centered on `root` so a long featureName growing logoWrap
+  // past 203px can't push the stepper off-center — space-between would
+  // otherwise shift it toward whichever side has more room.
+  position: "absolute",
+  left: "[50%]",
+  top: "[50%]",
+  transform: "[translate(-50%, -50%)]",
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   w: "[332px]",
   h: "[52px]",
   flexShrink: "0",
