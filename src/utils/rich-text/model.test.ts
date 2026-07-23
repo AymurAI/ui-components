@@ -233,4 +233,25 @@ describe("documentFromMarkdown", () => {
     const doc = documentFromMarkdown("\n\nSolo esto.\n\n");
     expect(doc.paragraphs).toHaveLength(1);
   });
+
+  it("does not double whitespace when joining a wrapped multi-line paragraph", () => {
+    const doc = documentFromMarkdown("Hello\n  World");
+    expect(paragraphPlainText(doc.paragraphs[0])).toBe("Hello World");
+  });
+
+  it("parses inline emphasis inside headings, combining it with the heading's bold mark", () => {
+    const boldHeading = documentFromMarkdown("## **Importante** nota");
+    expect(boldHeading.paragraphs[0].runs).toEqual([
+      { text: "Importante nota", marks: [{ type: "bold" }] },
+    ]);
+
+    const italicHeading = documentFromMarkdown("## Nota *importante*");
+    expect(italicHeading.paragraphs[0].runs).toEqual([
+      { text: "Nota ", marks: [{ type: "bold" }] },
+      {
+        text: "importante",
+        marks: [{ type: "italic" }, { type: "bold" }],
+      },
+    ]);
+  });
 });

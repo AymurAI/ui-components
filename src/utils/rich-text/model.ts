@@ -94,9 +94,15 @@ export function documentFromMarkdown(markdown: string): RichTextDocument {
     const heading = line.match(HEADING_RE);
     if (heading) {
       flushBufferedParagraph();
+      const headingRuns = parseInlineRuns(heading[2].trim()).map((run) => ({
+        text: run.text,
+        marks: run.marks.some((m) => m.type === "bold")
+          ? run.marks
+          : [...run.marks, { type: "bold" as const }],
+      }));
       paragraphs.push({
         id: `p${paragraphIndex++}`,
-        runs: [{ text: heading[2].trim(), marks: [{ type: "bold" }] }],
+        runs: mergeAdjacentRuns(headingRuns),
       });
       continue;
     }
@@ -113,7 +119,7 @@ export function documentFromMarkdown(markdown: string): RichTextDocument {
       continue;
     }
 
-    bufferedLines.push(rawLine);
+    bufferedLines.push(line);
   }
   flushBufferedParagraph();
 
