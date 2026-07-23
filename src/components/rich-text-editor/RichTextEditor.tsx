@@ -12,8 +12,11 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { css, cx } from "@/styled/css";
 import { HStack, Stack } from "@/styled/jsx";
 import {
+  createParagraph,
+  mergeAdjacentRuns,
   paragraphPlainText,
   serializeToPlainText,
+  splitRunsAtOffsets,
   toggleMark,
 } from "@/utils/rich-text/model";
 import { reconcileParagraphText } from "@/utils/rich-text/reconcile";
@@ -62,6 +65,33 @@ export const RICH_TEXT_HIGHLIGHT_COLORS = [
   "category.orange-light",
   "category.red-light",
 ];
+
+// Human-readable Spanish names for the highlight swatches, so screen readers
+// announce "Amarillo" instead of reading the raw token path "category dot
+// yellow dash light".
+const HIGHLIGHT_COLOR_LABELS: Record<string, string> = {
+  "category.yellow-light": "Amarillo",
+  "category.green-light": "Verde",
+  "category.blue-light": "Azul",
+  "category.violet-light": "Violeta",
+  "category.pink-light": "Rosa",
+  "category.orange-light": "Naranja",
+  "category.red-light": "Rojo",
+};
+
+// Unique-enough id generator for paragraphs created at runtime (Enter split,
+// typing into an empty document). Runs in real browsers only, so Date.now +
+// a monotonic counter is sufficient and collision-free within a session.
+let paragraphIdCounter = 0;
+function nextParagraphId(): string {
+  paragraphIdCounter += 1;
+  return `rte-p-${Date.now().toString(36)}-${paragraphIdCounter}`;
+}
+
+function elementOf(node: Node | null): Element | null {
+  if (!node) return null;
+  return node instanceof Element ? node : node.parentElement;
+}
 
 const swatch = (color: string) =>
   css({
@@ -159,18 +189,32 @@ export function RichTextEditor({
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
     const range = selection.getRangeAt(0);
-    const paragraphEl = (
-      range.startContainer instanceof Element
-        ? range.startContainer
-        : range.startContainer.parentElement
-    )?.closest("[data-paragraph-id]");
-    if (!paragraphEl) return;
+    const startParagraphEl = elementOf(range.startContainer)?.closest(
+      "[data-paragraph-id]",
+    );
+    if (!startParagraphEl) return;
 
-    const paragraphId = paragraphEl.getAttribute("data-paragraph-id");
+    const paragraphId = startParagraphEl.getAttribute("data-paragraph-id");
     if (!paragraphId) return;
 
-    const { start, end } = getRangeOffsets(paragraphEl as HTMLElement, range);
-    activeSelectionRef.current = { paragraphId, start, end };
+    const { start, end } = getRangeOffsets(
+      startParagraphEl as HTMLElement,
+      range,
+    );
+
+    const endParagraphEl = elementOf(range.endContainer)?.closest(
+      "[data-paragraph-id]",
+    );
+    // Cross-paragraph selection: this editor's mark model is paragraph-scoped
+    // (`toggleMark` operates on a single paragraph), and `getRangeOffsets`
+    // would compute the end offset against the wrong container. Clamp the
+    // selection to the end of the start paragraph — the simplest safe default.
+    const clampedEnd =
+      endParagraphEl === startParagraphEl
+        ? end
+        : (startParagraphEl.textContent?.length ?? start);
+
+    activeSelectionRef.current = { paragraphId, start, end: clampedEnd };
   }, []);
 
   // Selection tracking is wired via native listeners rather than React's
@@ -222,12 +266,88 @@ export function RichTextEditor({
   const handleInput = () => {
     const root = bodyRef.current;
     if (!root) return;
+
+    // Empty document: there is no paragraph element to reconcile against, so
+    // typed text lands directly in the contentEditable body. Seed a first
+    // paragraph from it.
+    if (doc.paragraphs.length === 0) {
+      const text = root.textContent ?? "";
+      if (text.length === 0) return;
+      onChange?.({ paragraphs: [createParagraph(nextParagraphId(), text)] });
+      return;
+    }
+
     const nextParagraphs = doc.paragraphs.map((paragraph) => {
       const el = root.querySelector(`[data-paragraph-id="${paragraph.id}"]`);
       if (!el) return paragraph;
       return reconcileParagraphText(paragraph, el.textContent ?? "");
     });
     onChange?.({ paragraphs: nextParagraphs });
+  };
+
+  // Structural edits contentEditable can't express through plain-text
+  // reconciliation: Enter splits a paragraph, Backspace-at-start merges into
+  // the previous one. Caret restoration after these edits is a known
+  // limitation (out of scope) — only the document model is kept correct here.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (readOnly) return;
+
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    const paragraphEl = elementOf(range.startContainer)?.closest(
+      "[data-paragraph-id]",
+    );
+    if (!paragraphEl) return;
+    const paragraphId = paragraphEl.getAttribute("data-paragraph-id");
+    if (!paragraphId) return;
+    const index = doc.paragraphs.findIndex((p) => p.id === paragraphId);
+    if (index === -1) return;
+    const paragraph = doc.paragraphs[index];
+    const { start, end } = getRangeOffsets(paragraphEl as HTMLElement, range);
+
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      const splitRuns = splitRunsAtOffsets(paragraph.runs, [start]);
+      const beforeRuns: TextRun[] = [];
+      const afterRuns: TextRun[] = [];
+      let pos = 0;
+      for (const run of splitRuns) {
+        if (pos < start) beforeRuns.push(run);
+        else afterRuns.push(run);
+        pos += run.text.length;
+      }
+      const first: RichTextParagraph = {
+        ...paragraph,
+        runs: mergeAdjacentRuns(beforeRuns),
+      };
+      const second: RichTextParagraph = {
+        id: nextParagraphId(),
+        runs: mergeAdjacentRuns(afterRuns),
+      };
+      const nextParagraphs = [...doc.paragraphs];
+      nextParagraphs.splice(index, 1, first, second);
+      onChange?.({ paragraphs: nextParagraphs });
+      return;
+    }
+
+    if (
+      event.key === "Backspace" &&
+      selection.isCollapsed &&
+      start === 0 &&
+      end === 0 &&
+      index > 0
+    ) {
+      event.preventDefault();
+      const prev = doc.paragraphs[index - 1];
+      const merged: RichTextParagraph = {
+        ...prev,
+        runs: mergeAdjacentRuns([...prev.runs, ...paragraph.runs]),
+      };
+      const nextParagraphs = [...doc.paragraphs];
+      nextParagraphs.splice(index - 1, 2, merged);
+      onChange?.({ paragraphs: nextParagraphs });
+    }
   };
 
   return (
@@ -265,73 +385,81 @@ export function RichTextEditor({
         </div>
       )}
 
-      {!readOnly && (
-        <HStack gap="2" className={toolbar}>
-          <Button
-            variant="none"
-            size="icon-sm"
-            aria-label="Negrita"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => applyMark({ type: "bold" })}
-          >
-            <TextBolder size={20} />
-          </Button>
-          <Button
-            variant="none"
-            size="icon-sm"
-            aria-label="Cursiva"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => applyMark({ type: "italic" })}
-          >
-            <TextItalic size={20} />
-          </Button>
-          <Button
-            variant="none"
-            size="icon-sm"
-            aria-label="Subrayado"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => applyMark({ type: "underline" })}
-          >
-            <TextUnderline size={20} />
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="none"
-                size="icon-sm"
-                aria-label="Resaltar"
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <HighlighterCircle size={20} />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <div className={swatchGrid}>
-                {highlightColors.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    aria-label={color}
-                    className={swatch(color)}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => applyMark({ type: "highlight", color })}
-                  />
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Button
-            variant="none"
-            size="icon-sm"
-            aria-label="Copiar"
-            onClick={() =>
-              navigator.clipboard.writeText(serializeToPlainText(doc))
-            }
-          >
-            <CopyIcon size={20} />
-          </Button>
-        </HStack>
-      )}
+      {/* Copy stays available in both modes — the readOnly export preview
+          (Finalización) treats copy-to-clipboard as a core action. The
+          formatting controls below are editing affordances and stay hidden
+          when readOnly. */}
+      <HStack gap="2" className={toolbar}>
+        {!readOnly && (
+          <>
+            <Button
+              variant="none"
+              size="icon-sm"
+              aria-label="Negrita"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyMark({ type: "bold" })}
+            >
+              <TextBolder size={20} />
+            </Button>
+            <Button
+              variant="none"
+              size="icon-sm"
+              aria-label="Cursiva"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyMark({ type: "italic" })}
+            >
+              <TextItalic size={20} />
+            </Button>
+            <Button
+              variant="none"
+              size="icon-sm"
+              aria-label="Subrayado"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyMark({ type: "underline" })}
+            >
+              <TextUnderline size={20} />
+            </Button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="none"
+                  size="icon-sm"
+                  aria-label="Resaltar"
+                  onMouseDown={(e) => e.preventDefault()}
+                >
+                  <HighlighterCircle size={20} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <div className={swatchGrid}>
+                  {highlightColors.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
+                      className={swatch(color)}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => applyMark({ type: "highlight", color })}
+                    />
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </>
+        )}
+        <Button
+          variant="none"
+          size="icon-sm"
+          aria-label="Copiar"
+          onClick={() => {
+            navigator.clipboard
+              ?.writeText(serializeToPlainText(doc))
+              .catch(() => {});
+          }}
+        >
+          <CopyIcon size={20} />
+        </Button>
+      </HStack>
 
       <div
         ref={bodyRef}
@@ -342,6 +470,7 @@ export function RichTextEditor({
         suppressContentEditableWarning
         className={cx(body)}
         onInput={handleInput}
+        onKeyDown={handleKeyDown}
       >
         {doc.paragraphs.map((paragraph) => (
           <ParagraphView key={paragraph.id} paragraph={paragraph} />
