@@ -11,11 +11,8 @@ export const PopoverTrigger = PopoverPrimitive.Trigger;
 export const PopoverAnchor = PopoverPrimitive.Anchor;
 export const PopoverClose = PopoverPrimitive.Close;
 
-const contentStyles = css({
+const baseStyles = css({
   zIndex: 50,
-  bg: "bg.primary",
-  rounded: "lg",
-  boxShadow: "popover",
 
   "&[data-state='open']": {
     animation: "fadeIn",
@@ -23,6 +20,16 @@ const contentStyles = css({
   "&[data-state='closed']": {
     animation: "fadeOut",
   },
+});
+
+// The default look: a light surface, rounded corners, and the standard
+// popover shadow. `surface={false}` skips this for consumers that render
+// their own fully-styled surface (a custom menu grid, a colored toolbar)
+// and only want this shell for positioning/animation/focus-trap behavior.
+const surfaceStyles = css({
+  bg: "bg.primary",
+  rounded: "lg",
+  boxShadow: "popover",
 });
 
 const arrowStyles = css({
@@ -35,6 +42,15 @@ export interface PopoverContentProps
   extends ComponentPropsWithoutRef<typeof PopoverPrimitive.Content> {
   showArrow?: boolean;
   container?: HTMLElement;
+  /**
+   * Set to `false` when the content renders its own fully-styled surface
+   * (background, radius, shadow) and this shell should stay inert apart
+   * from positioning/animation — e.g. FeaturesMenu's grid or an
+   * already-colored toolbar. Defaults to `true` (the standard light-surface
+   * look). Pair with `showArrow={false}` when disabling the surface, since
+   * the default arrow is colored to match it.
+   */
+  surface?: boolean;
 }
 
 export function PopoverContent({
@@ -43,13 +59,14 @@ export function PopoverContent({
   showArrow = false,
   container,
   children,
+  surface = true,
   ...props
 }: PopoverContentProps) {
   return (
     <PopoverPrimitive.Portal container={container}>
       <PopoverPrimitive.Content
         sideOffset={sideOffset}
-        className={cx(contentStyles, className)}
+        className={cx(baseStyles, surface && surfaceStyles, className)}
         {...props}
       >
         {children}

@@ -74,6 +74,41 @@ export const WithArrow: Story = {
   ),
 };
 
+export const NoSurface: Story = {
+  render: () => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className={css({
+            px: "4",
+            py: "2",
+            border: "primary",
+            rounded: "sm",
+            cursor: "pointer",
+          })}
+        >
+          Bare content
+        </button>
+      </PopoverTrigger>
+      <PopoverContent surface={false} showArrow={false}>
+        <div
+          className={css({
+            p: "3",
+            bg: "action.alt-default",
+            rounded: "md",
+            textStyle: "paragraph.sm.default",
+            color: "text.onbutton-alternative",
+          })}
+        >
+          Content owns its own background/radius/shadow — this shell only
+          positions and animates it.
+        </div>
+      </PopoverContent>
+    </Popover>
+  ),
+};
+
 export const BottomPlacement: Story = {
   render: () => (
     <Popover>
