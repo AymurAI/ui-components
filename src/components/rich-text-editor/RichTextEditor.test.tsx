@@ -126,6 +126,29 @@ describe("RichTextEditor — toolbar", () => {
     expect(screen.getByRole("button", { name: /copiar/i })).toBeInTheDocument();
   });
 
+  it("renders formatting buttons in Figma order (Underline, Italic, Bold, Highlight) with a divider before Copy", () => {
+    render(
+      <RichTextEditor
+        document={{
+          paragraphs: [{ id: "p1", runs: [{ text: "x", marks: [] }] }],
+        }}
+      />,
+    );
+    const buttons = screen.getAllByRole("button", {
+      name: /subrayado|cursiva|negrita|resaltar|copiar/i,
+    });
+    expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual([
+      "Subrayado",
+      "Cursiva",
+      "Negrita",
+      "Resaltar",
+      "Copiar",
+    ]);
+    expect(
+      screen.getByTestId("rich-text-editor-toolbar-divider"),
+    ).toBeInTheDocument();
+  });
+
   it("reconciles typed text back into the model on input", () => {
     const onChange = vi.fn();
     const singleRunDoc: RichTextDocument = {

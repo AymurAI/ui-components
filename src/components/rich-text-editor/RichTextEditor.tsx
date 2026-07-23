@@ -56,6 +56,12 @@ const body = css({
 
 const toolbar = css({ borderBottom: "primary", pb: "3" });
 
+const divider = css({
+  w: "[1px]",
+  h: "6",
+  bg: "[#BCBAB8]",
+});
+
 // 6 hues x 2 shades (light + solid), matching Figma's swatch popover exactly
 // (verified via get_variable_defs on the popover node — no violet, no
 // single-shade-only hues). Order: light-then-solid per hue, hues in
@@ -411,11 +417,11 @@ export function RichTextEditor({
             <Button
               variant="none"
               size="icon-sm"
-              aria-label="Negrita"
+              aria-label="Subrayado"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => applyMark({ type: "bold" })}
+              onClick={() => applyMark({ type: "underline" })}
             >
-              <TextBolder size={20} />
+              <TextUnderline size={20} />
             </Button>
             <Button
               variant="none"
@@ -429,11 +435,11 @@ export function RichTextEditor({
             <Button
               variant="none"
               size="icon-sm"
-              aria-label="Subrayado"
+              aria-label="Negrita"
               onMouseDown={(e) => e.preventDefault()}
-              onClick={() => applyMark({ type: "underline" })}
+              onClick={() => applyMark({ type: "bold" })}
             >
-              <TextUnderline size={20} />
+              <TextBolder size={20} />
             </Button>
             <Popover>
               <PopoverTrigger asChild>
@@ -461,6 +467,10 @@ export function RichTextEditor({
                 </div>
               </PopoverContent>
             </Popover>
+            <div
+              data-testid="rich-text-editor-toolbar-divider"
+              className={divider}
+            />
           </>
         )}
         <Button
