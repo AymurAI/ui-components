@@ -3,7 +3,7 @@ import {
   ArrowCounterClockwise,
   Pause,
   Play,
-} from "phosphor-react";
+} from "@phosphor-icons/react";
 import {
   type MouseEvent,
   type ReactNode,

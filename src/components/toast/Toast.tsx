@@ -1,4 +1,4 @@
-import type { Icon } from "phosphor-react";
+import type { Icon } from "@phosphor-icons/react";
 import { type Toast as HotToast, toast } from "react-hot-toast";
 
 import { Callout, type CalloutVariant } from "@/components/callout/Callout";

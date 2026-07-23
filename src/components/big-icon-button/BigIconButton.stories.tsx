@@ -1,5 +1,5 @@
+import { MagnifyingGlass, Pencil, PlusCircle } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { MagnifyingGlass, Pencil, PlusCircle } from "phosphor-react";
 import { BigIconButton } from "./BigIconButton";
 
 const meta = {

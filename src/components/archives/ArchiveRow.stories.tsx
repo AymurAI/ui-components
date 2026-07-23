@@ -1,5 +1,5 @@
+import { File, Play, Trash } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { File, Play, Trash } from "phosphor-react";
 import { css } from "@/styled/css";
 import { Button } from "../button";
 import { ArchiveRow } from "./ArchiveRow";

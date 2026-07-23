@@ -1,5 +1,5 @@
+import { FileAudio } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { FileAudio } from "phosphor-react";
 import { FileDropZone } from "./FileDropZone";
 
 const meta = {

@@ -1,5 +1,5 @@
+import { CaretDown, CaretUp, Check, XCircle } from "@phosphor-icons/react";
 import * as RadixSelect from "@radix-ui/react-select";
-import { CaretDown, CaretUp, Check, XCircle } from "phosphor-react";
 import {
   type Ref,
   useEffect,

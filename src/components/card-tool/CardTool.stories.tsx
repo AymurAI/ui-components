@@ -1,5 +1,5 @@
+import { Article } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Article } from "phosphor-react";
 import { CardTool } from "./CardTool";
 
 const meta = {

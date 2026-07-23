@@ -1,4 +1,4 @@
-import { DotsNine, Question } from "phosphor-react";
+import { DotsNine, Question } from "@phosphor-icons/react";
 import type { ReactElement, ReactNode } from "react";
 import { css, cx } from "@/styled/css";
 import { BigIconButton } from "../big-icon-button";

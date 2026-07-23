@@ -1,4 +1,4 @@
-import { PencilSimple } from "phosphor-react";
+import { PencilSimple } from "@phosphor-icons/react";
 import type { HTMLAttributes } from "react";
 import { useEffect, useRef } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";

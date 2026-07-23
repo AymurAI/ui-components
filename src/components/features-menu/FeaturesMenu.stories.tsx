@@ -1,5 +1,11 @@
+import {
+  Article,
+  Database,
+  Detective,
+  FileAudio,
+  Gear,
+} from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Article, Database, Detective, FileAudio, Gear } from "phosphor-react";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { FeaturesMenu } from "./FeaturesMenu";
 import { FeaturesMenuItem } from "./FeaturesMenuItem";

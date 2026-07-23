@@ -1,4 +1,4 @@
-import { CaretDown } from "phosphor-react";
+import { CaretDown } from "@phosphor-icons/react";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { cva, cx, type RecipeVariantProps } from "@/styled/css";
 

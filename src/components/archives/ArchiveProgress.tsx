@@ -1,4 +1,4 @@
-import { ArrowsClockwise, CheckCircle, Stop } from "phosphor-react";
+import { ArrowsClockwise, CheckCircle, Stop } from "@phosphor-icons/react";
 import { Button } from "@/components/button/Button";
 import { css, cx } from "@/styled/css";
 

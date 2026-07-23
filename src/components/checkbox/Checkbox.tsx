@@ -1,4 +1,4 @@
-import { Check } from "phosphor-react";
+import { Check } from "@phosphor-icons/react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 

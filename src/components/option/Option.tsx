@@ -1,4 +1,4 @@
-import { XCircle } from "phosphor-react";
+import { XCircle } from "@phosphor-icons/react";
 import type { HTMLAttributes, MouseEventHandler } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 

@@ -1,5 +1,5 @@
+import { ArrowLeft } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ArrowLeft } from "phosphor-react";
 import { css } from "@/styled/css";
 import { AppFooter } from "../app-footer";
 import { AppHeader } from "../app-header";

@@ -1,4 +1,4 @@
-import { CircleNotch } from "phosphor-react";
+import { CircleNotch } from "@phosphor-icons/react";
 import type { ButtonHTMLAttributes } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 

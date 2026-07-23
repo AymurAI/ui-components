@@ -1,5 +1,10 @@
+import {
+  CheckCircle,
+  Info,
+  Warning,
+  WarningCircle,
+} from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { CheckCircle, Info, Warning, WarningCircle } from "phosphor-react";
 import { toast as hotToast, Toaster } from "react-hot-toast";
 import { Toast } from "./Toast";
 

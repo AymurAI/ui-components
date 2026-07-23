@@ -5,7 +5,7 @@ import {
   TextBolder,
   TextItalic,
   TextUnderline,
-} from "phosphor-react";
+} from "@phosphor-icons/react";
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";

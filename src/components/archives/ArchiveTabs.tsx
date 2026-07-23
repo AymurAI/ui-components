@@ -1,4 +1,4 @@
-import { CheckCircle } from "phosphor-react";
+import { CheckCircle } from "@phosphor-icons/react";
 import { cva, cx } from "@/styled/css";
 
 /**

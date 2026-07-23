@@ -1,5 +1,5 @@
-import type { Icon } from "phosphor-react";
-import { Bell, X } from "phosphor-react";
+import type { Icon } from "@phosphor-icons/react";
+import { Bell, X } from "@phosphor-icons/react";
 import type { HTMLAttributes } from "react";
 import { cva, cx } from "@/styled/css";
 import { styled } from "@/styled/jsx";

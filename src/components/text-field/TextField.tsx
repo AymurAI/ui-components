@@ -1,4 +1,4 @@
-import { WarningCircle } from "phosphor-react";
+import { WarningCircle } from "@phosphor-icons/react";
 import { useId } from "react";
 
 import { Suggestion } from "@/components/suggestion/Suggestion";

@@ -1,5 +1,5 @@
+import { CaretDown } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { CaretDown } from "phosphor-react";
 import { Button } from "./Button";
 
 const meta = {

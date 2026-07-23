@@ -1,4 +1,4 @@
-import { Repeat, TagSimple, TrashSimple } from "phosphor-react";
+import { Repeat, TagSimple, TrashSimple } from "@phosphor-icons/react";
 import type { ButtonHTMLAttributes } from "react";
 import { css, cva, cx } from "@/styled/css";
 

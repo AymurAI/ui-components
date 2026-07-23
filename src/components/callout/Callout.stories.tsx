@@ -1,10 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import {
   CheckCircle,
   Info as InfoIcon,
   WarningCircle,
   Warning as WarningIcon,
-} from "phosphor-react";
+} from "@phosphor-icons/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import { Callout } from "./Callout";
 
 const meta = {

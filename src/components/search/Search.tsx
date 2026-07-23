@@ -1,4 +1,4 @@
-import { CaretDown, CaretUp, MagnifyingGlass, X } from "phosphor-react";
+import { CaretDown, CaretUp, MagnifyingGlass, X } from "@phosphor-icons/react";
 import type { InputHTMLAttributes } from "react";
 import { css, cx, sva } from "@/styled/css";
 

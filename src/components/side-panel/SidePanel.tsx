@@ -1,4 +1,4 @@
-import { Plus, Trash } from "phosphor-react";
+import { Plus, Trash } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
 import { css, cva, cx } from "@/styled/css";

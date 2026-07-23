@@ -1,5 +1,5 @@
+import { ArrowLeft, CaretDown } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { ArrowLeft, CaretDown } from "phosphor-react";
 import { ButtonLink } from "./ButtonLink";
 
 const meta = {
