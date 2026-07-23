@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createParagraph,
+  documentFromMarkdown,
   documentFromPlainText,
   mergeAdjacentRuns,
   paragraphPlainText,
@@ -171,5 +172,65 @@ describe("toggleMark", () => {
   it("is a no-op for a collapsed (zero-length) range", () => {
     const p = createParagraph("p1", "hello");
     expect(toggleMark(p, 2, 2, { type: "bold" })).toBe(p);
+  });
+});
+
+describe("documentFromMarkdown", () => {
+  it("splits paragraphs on blank lines, same as plain text", () => {
+    const doc = documentFromMarkdown("Primero.\n\nSegundo.");
+    expect(doc.paragraphs).toHaveLength(2);
+    expect(paragraphPlainText(doc.paragraphs[0])).toBe("Primero.");
+    expect(paragraphPlainText(doc.paragraphs[1])).toBe("Segundo.");
+  });
+
+  it("maps **bold** and *italic* inline syntax to marks", () => {
+    const doc = documentFromMarkdown("hola **mundo** y *chau*");
+    expect(doc.paragraphs[0].runs).toEqual([
+      { text: "hola ", marks: [] },
+      { text: "mundo", marks: [{ type: "bold" }] },
+      { text: " y ", marks: [] },
+      { text: "chau", marks: [{ type: "italic" }] },
+    ]);
+  });
+
+  it("also accepts __bold__ and _italic_ underscore syntax", () => {
+    const doc = documentFromMarkdown("__fuerte__ y _suave_");
+    expect(doc.paragraphs[0].runs).toEqual([
+      { text: "fuerte", marks: [{ type: "bold" }] },
+      { text: " y ", marks: [] },
+      { text: "suave", marks: [{ type: "italic" }] },
+    ]);
+  });
+
+  it("flattens headers to a single bold paragraph, stripping the # markers", () => {
+    const doc = documentFromMarkdown(
+      "## Resumen del documento\n\nCuerpo del texto.",
+    );
+    expect(doc.paragraphs).toHaveLength(2);
+    expect(doc.paragraphs[0].runs).toEqual([
+      { text: "Resumen del documento", marks: [{ type: "bold" }] },
+    ]);
+    expect(paragraphPlainText(doc.paragraphs[1])).toBe("Cuerpo del texto.");
+  });
+
+  it("flattens bullet list items to plain paragraphs with a leading marker", () => {
+    const doc = documentFromMarkdown("- Primero\n- Segundo");
+    expect(doc.paragraphs.map((p) => paragraphPlainText(p))).toEqual([
+      "• Primero",
+      "• Segundo",
+    ]);
+  });
+
+  it("flattens numbered list items the same way", () => {
+    const doc = documentFromMarkdown("1. Uno\n2. Dos");
+    expect(doc.paragraphs.map((p) => paragraphPlainText(p))).toEqual([
+      "• Uno",
+      "• Dos",
+    ]);
+  });
+
+  it("ignores leading/trailing blank lines, same as documentFromPlainText", () => {
+    const doc = documentFromMarkdown("\n\nSolo esto.\n\n");
+    expect(doc.paragraphs).toHaveLength(1);
   });
 });

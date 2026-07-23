@@ -22,6 +22,104 @@ export function documentFromPlainText(text: string): RichTextDocument {
   };
 }
 
+const HEADING_RE = /^(#{1,3})\s+(.+)$/;
+const UNORDERED_ITEM_RE = /^[-*]\s+(.+)$/;
+const ORDERED_ITEM_RE = /^\d+[.)]\s+(.+)$/;
+// Combined inline tokenizer for **bold**/__bold__ and *italic*/_italic_,
+// ported from backend's feature/summarization-ui branch
+// (frontend/src/renderer/src/utils/markdown/markdown.ts,
+// markdownToSafeInlineParts) — proven regex, not reinvented. Link syntax is
+// deliberately unhandled: this editor has no link mark, so a markdown link
+// is left as literal text for now (out of scope, same as the original
+// plan's "no links" boundary).
+const INLINE_TOKEN_RE =
+  /(\*\*([^*]+)\*\*)|(__([^_]+)__)|(\*([^*]+)\*)|(_([^_]+)_)/g;
+
+function parseInlineRuns(text: string): TextRun[] {
+  const runs: TextRun[] = [];
+  let lastIndex = 0;
+  INLINE_TOKEN_RE.lastIndex = 0;
+
+  let match = INLINE_TOKEN_RE.exec(text);
+  while (match !== null) {
+    if (match.index > lastIndex) {
+      runs.push({ text: text.slice(lastIndex, match.index), marks: [] });
+    }
+    if (match[2] !== undefined || match[4] !== undefined) {
+      runs.push({
+        text: (match[2] ?? match[4]) as string,
+        marks: [{ type: "bold" }],
+      });
+    } else if (match[6] !== undefined || match[8] !== undefined) {
+      runs.push({
+        text: (match[6] ?? match[8]) as string,
+        marks: [{ type: "italic" }],
+      });
+    }
+    lastIndex = INLINE_TOKEN_RE.lastIndex;
+    match = INLINE_TOKEN_RE.exec(text);
+  }
+
+  if (lastIndex < text.length) {
+    runs.push({ text: text.slice(lastIndex), marks: [] });
+  }
+
+  return runs.length > 0 ? runs : [{ text, marks: [] }];
+}
+
+export function documentFromMarkdown(markdown: string): RichTextDocument {
+  const lines = markdown.replace(/\r\n/g, "\n").split("\n");
+  const paragraphs: RichTextParagraph[] = [];
+  let bufferedLines: string[] = [];
+  let paragraphIndex = 0;
+
+  const flushBufferedParagraph = () => {
+    const text = bufferedLines.join(" ").trim();
+    bufferedLines = [];
+    if (text.length === 0) return;
+    paragraphs.push({
+      id: `p${paragraphIndex++}`,
+      runs: mergeAdjacentRuns(parseInlineRuns(text)),
+    });
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+
+    if (line.length === 0) {
+      flushBufferedParagraph();
+      continue;
+    }
+
+    const heading = line.match(HEADING_RE);
+    if (heading) {
+      flushBufferedParagraph();
+      paragraphs.push({
+        id: `p${paragraphIndex++}`,
+        runs: [{ text: heading[2].trim(), marks: [{ type: "bold" }] }],
+      });
+      continue;
+    }
+
+    const unorderedItem = line.match(UNORDERED_ITEM_RE);
+    const orderedItem = line.match(ORDERED_ITEM_RE);
+    const listItemText = unorderedItem?.[1] ?? orderedItem?.[1];
+    if (listItemText !== undefined) {
+      flushBufferedParagraph();
+      paragraphs.push({
+        id: `p${paragraphIndex++}`,
+        runs: mergeAdjacentRuns(parseInlineRuns(`• ${listItemText}`)),
+      });
+      continue;
+    }
+
+    bufferedLines.push(rawLine);
+  }
+  flushBufferedParagraph();
+
+  return { paragraphs };
+}
+
 export function paragraphPlainText(paragraph: RichTextParagraph): string {
   return paragraph.runs.map((run) => run.text).join("");
 }
