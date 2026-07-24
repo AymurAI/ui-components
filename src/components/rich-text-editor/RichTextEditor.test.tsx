@@ -92,6 +92,17 @@ describe("RichTextEditor", () => {
     const card = screen.getByTestId("rich-text-editor-card");
     expect(card.style.maxHeight).toBe("800px");
   });
+
+  it("renders a <br> fallback for a paragraph with no runs, instead of an empty <p>", () => {
+    const emptyParagraphDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [] }],
+    };
+    const { container } = render(
+      <RichTextEditor document={emptyParagraphDoc} />,
+    );
+    const paragraphEl = container.querySelector('[data-paragraph-id="p1"]');
+    expect(paragraphEl?.querySelector("br")).toBeTruthy();
+  });
 });
 
 describe("RichTextEditor — toolbar", () => {
@@ -360,6 +371,28 @@ describe("RichTextEditor — highlight + copy", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /copiar/i }));
     expect(writeText).toHaveBeenCalledWith("solo lectura");
+  });
+
+  it("does not apply a highlight or show a swatch as active when clicked with no active selection", () => {
+    const onChange = vi.fn();
+    render(
+      <RichTextEditor
+        document={{
+          paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+        }}
+        onChange={onChange}
+      />,
+    );
+
+    // No selection is ever made — open the popover and click a swatch cold.
+    fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
+    const blueSwatch = screen.getByRole("button", { name: /^azul$/i });
+    fireEvent.click(blueSwatch);
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(blueSwatch.className).not.toMatch(
+      /(?:^|\s)aym-bd_primary-alt(?:\s|$)/,
+    );
   });
 });
 

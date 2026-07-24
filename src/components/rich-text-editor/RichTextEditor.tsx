@@ -203,11 +203,20 @@ function RunView({ run }: { run: TextRun }) {
 function ParagraphView({ paragraph }: { paragraph: RichTextParagraph }) {
   return (
     <p data-paragraph-id={paragraph.id}>
-      {paragraph.runs.map((run, index) => (
-        // Runs are recreated on every edit — index is the only stable-enough
-        // key available (no persistent run ids in the model).
-        <RunView key={index} run={run} />
-      ))}
+      {paragraph.runs.length === 0 ? (
+        // A paragraph with no runs (list-exit, or all text deleted) renders
+        // with zero children and thus zero height without this fallback —
+        // contentEditable can't host a caret in an empty block, which
+        // misroutes native typing to the previous paragraph.
+        <br />
+      ) : (
+        paragraph.runs.map((run, index) => (
+          // Runs are recreated on every edit — index is the only
+          // stable-enough key available (no persistent run ids in the
+          // model).
+          <RunView key={index} run={run} />
+        ))
+      )}
     </p>
   );
 }
@@ -625,6 +634,7 @@ export function RichTextEditor({
                         )}
                         onMouseDown={(e) => e.preventDefault()}
                         onClick={() => {
+                          if (!activeSelectionRef.current) return;
                           applyMark({ type: "highlight", color });
                           setActiveHighlightColor((prev) =>
                             prev === color ? null : color,
