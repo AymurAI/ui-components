@@ -54,12 +54,12 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-switch": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.2.8",
-    "@tiptap/core": "^3.29.0",
-    "@tiptap/extension-highlight": "^3.23.6",
-    "@tiptap/markdown": "^3.27.1",
-    "@tiptap/pm": "^3.27.1",
+    "@tiptap/core": "^3.28.0",
+    "@tiptap/extension-highlight": "^3.28.0",
+    "@tiptap/markdown": "^3.28.0",
+    "@tiptap/pm": "^3.28.0",
     "@tiptap/react": "^3.28.0",
-    "@tiptap/starter-kit": "^3.27.1",
+    "@tiptap/starter-kit": "^3.28.0",
     "react-hot-toast": "^2.6.0"
   },
   "devDependencies": {

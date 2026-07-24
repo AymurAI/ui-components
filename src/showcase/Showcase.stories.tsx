@@ -13,10 +13,10 @@ import {
   Trash,
 } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
+import type { JSONContent } from "@tiptap/core";
 import { type ReactNode, useState } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { css, cva } from "@/styled/css";
-import type { RichTextDocument } from "@/utils/rich-text/types";
 import {
   AppFooter,
   AppHeader,
@@ -679,30 +679,35 @@ function getPeople(locale: Locale) {
   ];
 }
 
-function getRichTextDocument(locale: Locale): RichTextDocument {
+function getRichTextDocument(locale: Locale): JSONContent {
   if (locale === "en") {
     return {
-      paragraphs: [
+      type: "doc",
+      content: [
         {
-          id: "p1",
-          runs: [
+          type: "paragraph",
+          content: [
+            { type: "text", text: "This case is before Criminal, " },
             {
-              text: "This case is before Criminal, ",
-              marks: [],
-            },
-            {
+              type: "text",
               text: "Misdemeanor and Offences Court",
               marks: [{ type: "bold" }],
             },
-            { text: " No. 10.", marks: [] },
+            { type: "text", text: " No. 10." },
           ],
         },
         {
-          id: "p2",
-          runs: [
+          type: "paragraph",
+          content: [
             {
+              type: "text",
               text: "Urgent protection measures were ordered.",
-              marks: [{ type: "highlight", color: "category.yellow-light" }],
+              marks: [
+                {
+                  type: "highlight",
+                  attrs: { color: "category.yellow-light" },
+                },
+              ],
             },
           ],
         },
@@ -711,27 +716,32 @@ function getRichTextDocument(locale: Locale): RichTextDocument {
   }
 
   return {
-    paragraphs: [
+    type: "doc",
+    content: [
       {
-        id: "p1",
-        runs: [
+        type: "paragraph",
+        content: [
           {
+            type: "text",
             text: "El presente caso tramita ante el Juzgado en lo Penal, ",
-            marks: [],
           },
           {
+            type: "text",
             text: "Contravencional y de Faltas",
             marks: [{ type: "bold" }],
           },
-          { text: " N.º 10.", marks: [] },
+          { type: "text", text: " N.º 10." },
         ],
       },
       {
-        id: "p2",
-        runs: [
+        type: "paragraph",
+        content: [
           {
+            type: "text",
             text: "Se dispusieron medidas de protección urgentes.",
-            marks: [{ type: "highlight", color: "category.yellow-light" }],
+            marks: [
+              { type: "highlight", attrs: { color: "category.yellow-light" } },
+            ],
           },
         ],
       },

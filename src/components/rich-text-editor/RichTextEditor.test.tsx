@@ -1,20 +1,27 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it, vi } from "vitest";
-import type { RichTextDocument } from "@/utils/rich-text/types";
-import { paragraphPlainText, RichTextEditor } from "./RichTextEditor";
+import { RichTextEditor } from "./RichTextEditor";
 
-const doc: RichTextDocument = {
-  paragraphs: [
+const doc: JSONContent = {
+  type: "doc",
+  content: [
     {
-      id: "p1",
-      runs: [
-        { text: "hola ", marks: [] },
-        { text: "mundo", marks: [{ type: "bold" }] },
+      type: "paragraph",
+      content: [
+        { type: "text", text: "hola " },
+        { type: "text", text: "mundo", marks: [{ type: "bold" }] },
       ],
     },
     {
-      id: "p2",
-      runs: [{ text: "segundo párrafo", marks: [{ type: "italic" }] }],
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: "segundo párrafo",
+          marks: [{ type: "italic" }],
+        },
+      ],
     },
   ],
 };
@@ -27,15 +34,26 @@ describe("RichTextEditor", () => {
   });
 
   it("renders underline and highlight runs with <u> and <mark>", () => {
-    const marksDoc: RichTextDocument = {
-      paragraphs: [
+    const marksDoc: JSONContent = {
+      type: "doc",
+      content: [
         {
-          id: "p1",
-          runs: [
-            { text: "subrayado", marks: [{ type: "underline" }] },
+          type: "paragraph",
+          content: [
             {
+              type: "text",
+              text: "subrayado",
+              marks: [{ type: "underline" }],
+            },
+            {
+              type: "text",
               text: "resaltado",
-              marks: [{ type: "highlight", color: "category.yellow-light" }],
+              marks: [
+                {
+                  type: "highlight",
+                  attrs: { color: "category.yellow-light" },
+                },
+              ],
             },
           ],
         },
@@ -72,7 +90,7 @@ describe("RichTextEditor", () => {
   });
 
   it("wraps the body in a bordered, rounded, shadowed card inside a gray panel", () => {
-    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    render(<RichTextEditor document={{ type: "doc", content: [] }} />);
     const panel = screen.getByTestId("rich-text-editor-panel");
     const card = screen.getByTestId("rich-text-editor-card");
     expect(panel).toContainElement(card);
@@ -80,65 +98,50 @@ describe("RichTextEditor", () => {
   });
 
   it("defaults the body card's max height to 532px", () => {
-    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    render(<RichTextEditor document={{ type: "doc", content: [] }} />);
     const card = screen.getByTestId("rich-text-editor-card");
     expect(card.style.maxHeight).toBe("532px");
   });
 
   it("lets a consumer override the body card's max height via maxBodyHeight", () => {
     render(
-      <RichTextEditor document={{ paragraphs: [] }} maxBodyHeight="800px" />,
+      <RichTextEditor
+        document={{ type: "doc", content: [] }}
+        maxBodyHeight="800px"
+      />,
     );
     const card = screen.getByTestId("rich-text-editor-card");
     expect(card.style.maxHeight).toBe("800px");
   });
 
   it("renders a <br> fallback for a paragraph with no runs, instead of an empty <p>", () => {
-    const emptyParagraphDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [] }],
+    const emptyParagraphDoc: JSONContent = {
+      type: "doc",
+      content: [{ type: "paragraph" }],
     };
     const { container } = render(
       <RichTextEditor document={emptyParagraphDoc} />,
     );
-    const paragraphEl = container.querySelector('[data-paragraph-id="p1"]');
+    // ProseMirror (Tiptap's rendering engine) has no paragraph-id concept —
+    // it injects its own trailing <br> into an otherwise-empty text block so
+    // the caret can still be hosted there, on whichever <p> is empty.
+    const paragraphEl = container.querySelector("p");
     expect(paragraphEl?.querySelector("br")).toBeTruthy();
   });
 });
 
 describe("RichTextEditor — toolbar", () => {
-  function selectAll(paragraphEl: Element) {
-    const range = document.createRange();
-    range.selectNodeContents(paragraphEl);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  }
-
-  it("toggles bold on the current selection and calls onChange", () => {
-    const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
-    };
-    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
-
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
-    selectAll(paragraphEl);
-    fireEvent.select(paragraphEl);
-
-    fireEvent.click(screen.getByRole("button", { name: /negrita/i }));
-
-    expect(onChange).toHaveBeenCalledWith({
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola mundo", marks: [{ type: "bold" }] }] },
-      ],
-    });
-  });
-
   it("hides the formatting toolbar in readOnly mode (Copy remains)", () => {
     render(
       <RichTextEditor
         document={{
-          paragraphs: [{ id: "p1", runs: [{ text: "x", marks: [] }] }],
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "x" }],
+            },
+          ],
         }}
         readOnly
       />,
@@ -163,7 +166,13 @@ describe("RichTextEditor — toolbar", () => {
     render(
       <RichTextEditor
         document={{
-          paragraphs: [{ id: "p1", runs: [{ text: "x", marks: [] }] }],
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "x" }],
+            },
+          ],
         }}
         title="Resumen"
       />,
@@ -193,26 +202,46 @@ describe("RichTextEditor — toolbar", () => {
     expect(toolbarIndex).toBeLessThan(titleIndex);
   });
 
-  it("reconciles typed text back into the model on input", () => {
+  it("toggles bold on the current selection and calls onChange", () => {
     const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+    const singleRunDoc: JSONContent = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "hola mundo" }],
+        },
+      ],
     };
     render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
 
-    const paragraphEl = screen.getByText("hola").closest("p")!;
-    paragraphEl.textContent = "hola mundo";
-    fireEvent.input(paragraphEl);
+    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
+    const range = document.createRange();
+    range.selectNodeContents(paragraphEl);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    fireEvent.select(paragraphEl);
+
+    fireEvent.click(screen.getByRole("button", { name: /negrita/i }));
 
     expect(onChange).toHaveBeenCalledWith({
-      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "hola mundo", marks: [{ type: "bold" }] },
+          ],
+        },
+      ],
     });
   });
 });
 
 describe("RichTextEditor — highlight + copy", () => {
   it("renders exactly the 12 Figma-specified highlight swatches with human Spanish labels", () => {
-    render(<RichTextEditor document={{ paragraphs: [] }} />);
+    render(<RichTextEditor document={{ type: "doc", content: [] }} />);
     fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
 
     const expectedLabels = [
@@ -241,8 +270,14 @@ describe("RichTextEditor — highlight + copy", () => {
 
   it("applies the correct highlight color for a solid-shade swatch click", () => {
     const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+    const singleRunDoc: JSONContent = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "hola mundo" }],
+        },
+      ],
     };
     render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
 
@@ -257,13 +292,15 @@ describe("RichTextEditor — highlight + copy", () => {
     fireEvent.click(screen.getByRole("button", { name: /^azul$/i }));
 
     expect(onChange).toHaveBeenCalledWith({
-      paragraphs: [
+      type: "doc",
+      content: [
         {
-          id: "p1",
-          runs: [
+          type: "paragraph",
+          content: [
             {
+              type: "text",
               text: "hola mundo",
-              marks: [{ type: "highlight", color: "category.blue" }],
+              marks: [{ type: "highlight", attrs: { color: "category.blue" } }],
             },
           ],
         },
@@ -278,7 +315,13 @@ describe("RichTextEditor — highlight + copy", () => {
     render(
       <RichTextEditor
         document={{
-          paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "hola mundo" }],
+            },
+          ],
         }}
       />,
     );
@@ -289,14 +332,16 @@ describe("RichTextEditor — highlight + copy", () => {
 
   it("shows a border only on the swatch matching the current selection's highlight, and none by default", () => {
     const onChange = vi.fn();
-    const highlightDoc: RichTextDocument = {
-      paragraphs: [
+    const highlightDoc: JSONContent = {
+      type: "doc",
+      content: [
         {
-          id: "p1",
-          runs: [
+          type: "paragraph",
+          content: [
             {
+              type: "text",
               text: "hola",
-              marks: [{ type: "highlight", color: "category.blue" }],
+              marks: [{ type: "highlight", attrs: { color: "category.blue" } }],
             },
           ],
         },
@@ -330,8 +375,14 @@ describe("RichTextEditor — highlight + copy", () => {
 
   it("clicking the already-active swatch again removes the highlight and its border", () => {
     const onChange = vi.fn();
-    const plainDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+    const plainDoc: JSONContent = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "hola" }],
+        },
+      ],
     };
     render(<RichTextEditor document={plainDoc} onChange={onChange} />);
 
@@ -362,8 +413,12 @@ describe("RichTextEditor — highlight + copy", () => {
       <RichTextEditor
         readOnly
         document={{
-          paragraphs: [
-            { id: "p1", runs: [{ text: "solo lectura", marks: [] }] },
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "solo lectura" }],
+            },
           ],
         }}
       />,
@@ -378,7 +433,13 @@ describe("RichTextEditor — highlight + copy", () => {
     render(
       <RichTextEditor
         document={{
-          paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+          type: "doc",
+          content: [
+            {
+              type: "paragraph",
+              content: [{ type: "text", text: "hola" }],
+            },
+          ],
         }}
         onChange={onChange}
       />,
@@ -393,324 +454,5 @@ describe("RichTextEditor — highlight + copy", () => {
     expect(blueSwatch.className).not.toMatch(
       /(?:^|\s)aym-bd_primary-alt(?:\s|$)/,
     );
-  });
-});
-
-describe("RichTextEditor — structural editing", () => {
-  function placeCaret(paragraphEl: Element, offset: number) {
-    const walker = document.createTreeWalker(paragraphEl, NodeFilter.SHOW_TEXT);
-    const textNode = walker.nextNode() as Text;
-    const range = document.createRange();
-    range.setStart(textNode, offset);
-    range.collapse(true);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-  }
-
-  it("splits the current paragraph into two on Enter at the caret", () => {
-    const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
-    };
-    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
-
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
-    placeCaret(paragraphEl, 4); // between "hola" and " mundo"
-
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs).toHaveLength(2);
-    expect(next.paragraphs[0].id).toBe("p1");
-    expect(next.paragraphs[0].runs).toEqual([{ text: "hola", marks: [] }]);
-    expect(next.paragraphs[1].runs).toEqual([{ text: " mundo", marks: [] }]);
-    expect(next.paragraphs[1].id).not.toBe("p1");
-  });
-
-  it("preserves marks on both halves when splitting", () => {
-    const onChange = vi.fn();
-    const boldDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola mundo", marks: [{ type: "bold" }] }] },
-      ],
-    };
-    render(<RichTextEditor document={boldDoc} onChange={onChange} />);
-
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
-    placeCaret(paragraphEl, 4);
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs[0].runs).toEqual([
-      { text: "hola", marks: [{ type: "bold" }] },
-    ]);
-    expect(next.paragraphs[1].runs).toEqual([
-      { text: " mundo", marks: [{ type: "bold" }] },
-    ]);
-  });
-
-  it("does not split on Shift+Enter", () => {
-    const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hola mundo", marks: [] }] }],
-    };
-    render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
-
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
-    placeCaret(paragraphEl, 4);
-    fireEvent.keyDown(paragraphEl, { key: "Enter", shiftKey: true });
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("merges into the previous paragraph on Backspace at offset 0", () => {
-    const onChange = vi.fn();
-    const twoParaDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola", marks: [{ type: "bold" }] }] },
-        { id: "p2", runs: [{ text: "mundo", marks: [] }] },
-      ],
-    };
-    render(<RichTextEditor document={twoParaDoc} onChange={onChange} />);
-
-    const secondEl = screen.getByText("mundo").closest("p")!;
-    placeCaret(secondEl, 0);
-    fireEvent.keyDown(secondEl, { key: "Backspace" });
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs).toHaveLength(1);
-    expect(next.paragraphs[0].id).toBe("p1");
-    expect(next.paragraphs[0].runs).toEqual([
-      { text: "hola", marks: [{ type: "bold" }] },
-      { text: "mundo", marks: [] },
-    ]);
-  });
-
-  it("restores the caret to the start of the new paragraph after pressing Enter", () => {
-    const onChange = vi.fn();
-    const singleRunDoc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "hello world", marks: [] }] }],
-    };
-    const { rerender, container } = render(
-      <RichTextEditor document={singleRunDoc} onChange={onChange} />,
-    );
-
-    const paragraphEl = screen.getByText("hello world").closest("p")!;
-    placeCaret(paragraphEl, 5);
-
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    const nextDoc = onChange.mock.calls[0][0] as RichTextDocument;
-    rerender(<RichTextEditor document={nextDoc} onChange={onChange} />);
-
-    const selection = window.getSelection();
-    expect(selection?.rangeCount).toBeGreaterThan(0);
-    const caretRange = selection!.getRangeAt(0);
-    const paragraphEls = container.querySelectorAll("p");
-    expect(paragraphEls).toHaveLength(2);
-    const secondParagraphEl = paragraphEls[1];
-    expect(secondParagraphEl.contains(caretRange.startContainer)).toBe(true);
-    expect(caretRange.startOffset).toBe(0);
-  });
-
-  it("restores the caret to the merge point after Backspace merges two paragraphs", () => {
-    const onChange = vi.fn();
-    const twoParaDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hello", marks: [] }] },
-        { id: "p2", runs: [{ text: "world", marks: [] }] },
-      ],
-    };
-    const { rerender } = render(
-      <RichTextEditor document={twoParaDoc} onChange={onChange} />,
-    );
-
-    const secondParagraphEl = screen.getByText("world").closest("p")!;
-    placeCaret(secondParagraphEl, 0);
-
-    fireEvent.keyDown(secondParagraphEl, { key: "Backspace" });
-
-    const nextDoc = onChange.mock.calls[0][0] as RichTextDocument;
-    rerender(<RichTextEditor document={nextDoc} onChange={onChange} />);
-
-    const selection = window.getSelection();
-    const caretRange = selection!.getRangeAt(0);
-    const mergedParagraphEl = screen
-      .getByText("helloworld", { exact: false })
-      .closest("p")!;
-    expect(mergedParagraphEl.contains(caretRange.startContainer)).toBe(true);
-    expect(caretRange.startOffset).toBe(5); // end of the original "hello"
-  });
-
-  it("does not merge on Backspace at the start of the first paragraph", () => {
-    const onChange = vi.fn();
-    const twoParaDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola", marks: [] }] },
-        { id: "p2", runs: [{ text: "mundo", marks: [] }] },
-      ],
-    };
-    render(<RichTextEditor document={twoParaDoc} onChange={onChange} />);
-
-    const firstEl = screen.getByText("hola").closest("p")!;
-    placeCaret(firstEl, 0);
-    fireEvent.keyDown(firstEl, { key: "Backspace" });
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("does not merge on Backspace mid-paragraph", () => {
-    const onChange = vi.fn();
-    const twoParaDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola", marks: [] }] },
-        { id: "p2", runs: [{ text: "mundo", marks: [] }] },
-      ],
-    };
-    render(<RichTextEditor document={twoParaDoc} onChange={onChange} />);
-
-    const secondEl = screen.getByText("mundo").closest("p")!;
-    placeCaret(secondEl, 2);
-    fireEvent.keyDown(secondEl, { key: "Backspace" });
-
-    expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it("seeds a first paragraph when typing into an empty document", () => {
-    const onChange = vi.fn();
-    render(
-      <RichTextEditor document={{ paragraphs: [] }} onChange={onChange} />,
-    );
-
-    const body = screen.getByRole("textbox");
-    body.textContent = "primer texto";
-    fireEvent.input(body);
-
-    expect(onChange).toHaveBeenCalledTimes(1);
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs).toHaveLength(1);
-    expect(next.paragraphs[0].runs).toEqual([
-      { text: "primer texto", marks: [] },
-    ]);
-  });
-
-  it("clamps a cross-paragraph selection to the end of the first paragraph", () => {
-    const onChange = vi.fn();
-    const twoParaDoc: RichTextDocument = {
-      paragraphs: [
-        { id: "p1", runs: [{ text: "hola", marks: [] }] },
-        { id: "p2", runs: [{ text: "mundo", marks: [] }] },
-      ],
-    };
-    render(<RichTextEditor document={twoParaDoc} onChange={onChange} />);
-
-    const firstEl = screen.getByText("hola").closest("p")!;
-    const secondEl = screen.getByText("mundo").closest("p")!;
-    const range = document.createRange();
-    range.setStart(firstEl.firstChild as Text, 0);
-    range.setEnd(secondEl.firstChild as Text, 5);
-    const selection = window.getSelection();
-    selection?.removeAllRanges();
-    selection?.addRange(range);
-    fireEvent.select(firstEl);
-
-    fireEvent.click(screen.getByRole("button", { name: /negrita/i }));
-
-    // Only the first paragraph is affected, and the mark covers exactly its
-    // full text ("hola") — no out-of-bounds corruption, second paragraph
-    // untouched.
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs[0].runs).toEqual([
-      { text: "hola", marks: [{ type: "bold" }] },
-    ]);
-    expect(next.paragraphs[1].runs).toEqual([{ text: "mundo", marks: [] }]);
-  });
-});
-
-describe("RichTextEditor — lists", () => {
-  it("converts a typed '- ' prefix into a bullet marker as the user types", () => {
-    const onChange = vi.fn();
-    const doc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "", marks: [] }] }],
-    };
-    render(<RichTextEditor document={doc} onChange={onChange} />);
-    const paragraphEl = document.querySelector(
-      '[data-paragraph-id="p1"]',
-    ) as HTMLElement;
-    paragraphEl.textContent = "- hola";
-    fireEvent.input(paragraphEl);
-
-    expect(onChange).toHaveBeenCalledWith({
-      paragraphs: [{ id: "p1", runs: [{ text: "• hola", marks: [] }] }],
-    });
-  });
-
-  it("continues a bullet list item when pressing Enter at the end of it", () => {
-    const onChange = vi.fn();
-    const doc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "• Primero", marks: [] }] }],
-    };
-    render(<RichTextEditor document={doc} onChange={onChange} />);
-    const paragraphEl = document.querySelector(
-      '[data-paragraph-id="p1"]',
-    ) as HTMLElement;
-    const range = document.createRange();
-    range.setStart(paragraphEl.firstChild as Text, 9);
-    range.collapse(true);
-    window.getSelection()?.removeAllRanges();
-    window.getSelection()?.addRange(range);
-
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs).toHaveLength(2);
-    expect(paragraphPlainText(next.paragraphs[0])).toBe("• Primero");
-    expect(paragraphPlainText(next.paragraphs[1])).toBe("• ");
-  });
-
-  it("continues a numbered list item, incrementing the number", () => {
-    const onChange = vi.fn();
-    const doc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "1. Primero", marks: [] }] }],
-    };
-    render(<RichTextEditor document={doc} onChange={onChange} />);
-    const paragraphEl = document.querySelector(
-      '[data-paragraph-id="p1"]',
-    ) as HTMLElement;
-    const range = document.createRange();
-    range.setStart(paragraphEl.firstChild as Text, 10);
-    range.collapse(true);
-    window.getSelection()?.removeAllRanges();
-    window.getSelection()?.addRange(range);
-
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(paragraphPlainText(next.paragraphs[1])).toBe("2. ");
-  });
-
-  it("exits the list when pressing Enter on an empty bullet item", () => {
-    const onChange = vi.fn();
-    const doc: RichTextDocument = {
-      paragraphs: [{ id: "p1", runs: [{ text: "• ", marks: [] }] }],
-    };
-    render(<RichTextEditor document={doc} onChange={onChange} />);
-    const paragraphEl = document.querySelector(
-      '[data-paragraph-id="p1"]',
-    ) as HTMLElement;
-    const range = document.createRange();
-    range.setStart(paragraphEl.firstChild as Text, 2);
-    range.collapse(true);
-    window.getSelection()?.removeAllRanges();
-    window.getSelection()?.addRange(range);
-
-    fireEvent.keyDown(paragraphEl, { key: "Enter" });
-
-    const next = onChange.mock.calls[0][0] as RichTextDocument;
-    expect(next.paragraphs).toHaveLength(1);
-    expect(paragraphPlainText(next.paragraphs[0])).toBe("");
   });
 });

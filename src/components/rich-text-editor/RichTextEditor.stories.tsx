@@ -1,28 +1,35 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import type { JSONContent } from "@tiptap/core";
 import { useState } from "react";
-import { documentFromMarkdown } from "@/utils/rich-text/model";
-import type { RichTextDocument } from "@/utils/rich-text/types";
 import { RichTextEditor } from "./RichTextEditor";
 
-const sampleDoc: RichTextDocument = {
-  paragraphs: [
+const sampleDoc: JSONContent = {
+  type: "doc",
+  content: [
     {
-      id: "p1",
-      runs: [
+      type: "paragraph",
+      content: [
         {
+          type: "text",
           text: "El presente caso tramita ante el Juzgado en lo Penal, ",
-          marks: [],
         },
-        { text: "Contravencional y de Faltas", marks: [{ type: "bold" }] },
-        { text: " N.º 10.", marks: [] },
+        {
+          type: "text",
+          text: "Contravencional y de Faltas",
+          marks: [{ type: "bold" }],
+        },
+        { type: "text", text: " N.º 10." },
       ],
     },
     {
-      id: "p2",
-      runs: [
+      type: "paragraph",
+      content: [
         {
+          type: "text",
           text: "Se dispusieron medidas de protección urgentes.",
-          marks: [{ type: "highlight", color: "category.yellow-light" }],
+          marks: [
+            { type: "highlight", attrs: { color: "category.yellow-light" } },
+          ],
         },
       ],
     },
@@ -62,32 +69,99 @@ export const ReadOnlyPreview: Story = {
 
 export const Empty: Story = {
   args: {
-    document: { paragraphs: [] },
+    document: { type: "doc", content: [] },
     title: "Resumen",
   },
 };
 
 export const Lists: Story = {
   render: () => {
-    const [doc, setDoc] = useState<RichTextDocument>({
-      paragraphs: [
-        { id: "p1", runs: [{ text: "• Primer punto", marks: [] }] },
-        { id: "p2", runs: [{ text: "• Segundo punto", marks: [] }] },
-        { id: "p3", runs: [{ text: "1. Paso uno", marks: [] }] },
-        { id: "p4", runs: [{ text: "2. Paso dos", marks: [] }] },
+    const [doc, setDoc] = useState<JSONContent>({
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "• Primer punto" }],
+        },
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "• Segundo punto" }],
+        },
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "1. Paso uno" }],
+        },
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "2. Paso dos" }],
+        },
       ],
     });
     return <RichTextEditor document={doc} onChange={setDoc} title="Listas" />;
   },
 };
 
+// TODO(later task): re-derive this from real markdown once a JSONContent-
+// producing markdown parser exists (Task 2 only added plain-text helpers).
 export const FromMarkdown: Story = {
   render: () => {
-    const [doc, setDoc] = useState(
-      documentFromMarkdown(
-        "## Resumen del documento\n\nEl presente caso tramita ante el **Juzgado en lo Penal, Contravencional y de Faltas N.º 10**.\n\n- Hecho relevante uno\n- Hecho relevante dos\n\nSe dispusieron *medidas de protección* urgentes.",
-      ),
-    );
+    const [doc, setDoc] = useState<JSONContent>({
+      type: "doc",
+      content: [
+        {
+          type: "heading",
+          attrs: { level: 2 },
+          content: [{ type: "text", text: "Resumen del documento" }],
+        },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "El presente caso tramita ante el " },
+            {
+              type: "text",
+              text: "Juzgado en lo Penal, Contravencional y de Faltas N.º 10",
+              marks: [{ type: "bold" }],
+            },
+            { type: "text", text: "." },
+          ],
+        },
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "Hecho relevante uno" }],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [{ type: "text", text: "Hecho relevante dos" }],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          content: [
+            { type: "text", text: "Se dispusieron " },
+            {
+              type: "text",
+              text: "medidas de protección",
+              marks: [{ type: "italic" }],
+            },
+            { type: "text", text: " urgentes." },
+          ],
+        },
+      ],
+    });
     return (
       <RichTextEditor
         document={doc}
