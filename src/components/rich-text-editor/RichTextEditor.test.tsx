@@ -402,7 +402,7 @@ describe("RichTextEditor — highlight + copy", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("applies the correct highlight color for a solid-shade swatch click", () => {
+  it("applies the correct highlight color for a solid-shade swatch click", async () => {
     const onChange = vi.fn();
     const singleRunDoc: JSONContent = {
       type: "doc",
@@ -418,9 +418,16 @@ describe("RichTextEditor — highlight + copy", () => {
     const paragraphEl = screen.getByText("hola mundo").closest("p")!;
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
+    // The contentEditable must be focused first — ProseMirror's view only
+    // reacts to a "selectionchange" event when its own DOM root has focus
+    // (see the "toggles bold via toolbar" test above for the same pattern).
+    (screen.getByRole("textbox") as HTMLElement).focus();
     window.getSelection()?.removeAllRanges();
     window.getSelection()?.addRange(range);
     fireEvent.select(paragraphEl);
+    await waitFor(() => {
+      expect(window.getSelection()?.isCollapsed).toBe(false);
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
     fireEvent.click(screen.getByRole("button", { name: /^azul$/i }));
@@ -507,7 +514,7 @@ describe("RichTextEditor — highlight + copy", () => {
     );
   });
 
-  it("clicking the already-active swatch again removes the highlight and its border", () => {
+  it("clicking the already-active swatch again removes the highlight and its border", async () => {
     const onChange = vi.fn();
     const plainDoc: JSONContent = {
       type: "doc",
@@ -523,9 +530,16 @@ describe("RichTextEditor — highlight + copy", () => {
     const paragraphEl = screen.getByText("hola").closest("p")!;
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
+    // The contentEditable must be focused first — ProseMirror's view only
+    // reacts to a "selectionchange" event when its own DOM root has focus
+    // (see the "toggles bold via toolbar" test above for the same pattern).
+    (screen.getByRole("textbox") as HTMLElement).focus();
     window.getSelection()?.removeAllRanges();
     window.getSelection()?.addRange(range);
     fireEvent.select(paragraphEl);
+    await waitFor(() => {
+      expect(window.getSelection()?.isCollapsed).toBe(false);
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
     const blueSwatch = screen.getByRole("button", { name: /^azul$/i });

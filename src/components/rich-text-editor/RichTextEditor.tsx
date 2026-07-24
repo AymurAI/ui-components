@@ -364,17 +364,31 @@ export function RichTextEditor({
                 </PopoverTrigger>
                 <PopoverContent>
                   <div className={swatchGrid}>
-                    {highlightColors.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
-                        className={swatch(color, false)}
-                        onMouseDown={(e) => e.preventDefault()}
-                        // TODO(Task 5): wire to editor?.chain().focus().toggleHighlight({ color }).run()
-                        onClick={() => {}}
-                      />
-                    ))}
+                    {highlightColors.map((color) => {
+                      const active =
+                        editor?.isActive("highlight", { color }) ?? false;
+                      return (
+                        <button
+                          key={color}
+                          type="button"
+                          aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
+                          className={swatch(color, active)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            if (!editor || editor.state.selection.empty) return;
+                            if (editor.isActive("highlight", { color })) {
+                              editor.chain().focus().unsetHighlight().run();
+                            } else {
+                              editor
+                                .chain()
+                                .focus()
+                                .setHighlight({ color })
+                                .run();
+                            }
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                 </PopoverContent>
               </Popover>
