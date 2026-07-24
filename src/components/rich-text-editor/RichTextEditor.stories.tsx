@@ -67,6 +67,20 @@ export const Empty: Story = {
   },
 };
 
+export const Lists: Story = {
+  render: () => {
+    const [doc, setDoc] = useState<RichTextDocument>({
+      paragraphs: [
+        { id: "p1", runs: [{ text: "• Primer punto", marks: [] }] },
+        { id: "p2", runs: [{ text: "• Segundo punto", marks: [] }] },
+        { id: "p3", runs: [{ text: "1. Paso uno", marks: [] }] },
+        { id: "p4", runs: [{ text: "2. Paso dos", marks: [] }] },
+      ],
+    });
+    return <RichTextEditor document={doc} onChange={setDoc} title="Listas" />;
+  },
+};
+
 export const FromMarkdown: Story = {
   render: () => {
     const [doc, setDoc] = useState(
