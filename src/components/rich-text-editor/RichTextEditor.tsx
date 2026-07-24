@@ -40,6 +40,12 @@ const body = css({
   outline: "none",
   "& p": { margin: "0" },
   "& p + p": { marginTop: "4" },
+  // Real <ul>/<ol> nodes didn't exist before this migration (lists used to
+  // be plain marker-prefixed paragraphs) — 1.25rem is a reasonable default
+  // indent, not a re-verified Figma measurement; re-check against the Figma
+  // lists reference if pixel-exact spacing is needed later.
+  "& ul, & ol": { paddingLeft: "[1.25rem]", margin: "0" },
+  "& li + li": { marginTop: "4" },
 });
 
 // Figma (node 40002572:59897, "Main-Content"): pt:42px, px:48px, pb:32px —

@@ -610,3 +610,118 @@ describe("RichTextEditor — highlight + copy", () => {
     );
   });
 });
+
+// StarterKit bundles BulletList/OrderedList/ListItem/ListKeymap (backed by
+// @tiptap/extension-list) with zero extra configuration. Verified empirically
+// here rather than assumed: typing "- "/"1. " autoformats into real list
+// nodes, Enter continues/exits the list, and — critically — the pre-Tiptap
+// hand-rolled-paragraph bug where typing into the paragraph produced by
+// exiting an empty list item landed in the *previous* paragraph instead
+// (documented in an earlier plan's task-7-report.md) does not reproduce with
+// real ProseMirror list nodes.
+//
+// Each scenario is driven as a single, uninterrupted `userEvent.type(...)`
+// call starting from a fresh empty paragraph, rather than programmatically
+// setting a DOM Range/Selection mid-sequence and then continuing to type.
+// That's a deliberate choice, not a style preference: jsdom has no real
+// layout engine, so once a re-render moves the selection, userEvent's own
+// pointer-position-based caret tracking (which falls back to a stubbed
+// `elementFromPoint`) can desync from the Range we set by hand, and the
+// following keystrokes land in the wrong node. Typing the whole scenario in
+// one call lets userEvent track the caret itself the whole way through,
+// which is reliable in this environment; splitting it up is not.
+describe("RichTextEditor — lists", () => {
+  it("autoformats '- ' into a real bullet list item while typing", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+    await user.type(editable, "- Primer punto");
+
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].type).toBe("bulletList");
+    expect(lastCall.content[0].content[0].type).toBe("listItem");
+    expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
+      "Primer punto",
+    );
+  });
+
+  it("autoformats '1. ' into a real ordered list item while typing", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+    await user.type(editable, "1. Paso uno");
+
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].type).toBe("orderedList");
+    expect(lastCall.content[0].content[0].type).toBe("listItem");
+    expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
+      "Paso uno",
+    );
+  });
+
+  it("continues an ordered list on Enter, adding a sibling item", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+    await user.type(editable, "1. Paso uno{Enter}Paso dos");
+
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const items = lastCall.content[0].content;
+    expect(lastCall.content[0].type).toBe("orderedList");
+    expect(items).toHaveLength(2);
+    expect(items[0].content[0].content[0].text).toBe("Paso uno");
+    expect(items[1].content[0].content[0].text).toBe("Paso dos");
+  });
+
+  it("exits the list when Enter is pressed on an empty list item", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+    // "- Primer punto" autoformats to a bullet item; the first Enter
+    // continues the list with a new empty item; the second Enter, pressed
+    // on that now-empty item, exits the list instead of adding another one.
+    await user.type(editable, "- Primer punto{Enter}{Enter}");
+
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].type).toBe("bulletList");
+    expect(lastCall.content[0].content).toHaveLength(1);
+    expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
+      "Primer punto",
+    );
+    expect(lastCall.content[1].type).toBe("paragraph");
+  });
+
+  it("regression: typing into the paragraph produced by exiting an empty list item lands there, not in the previous item (task-7-report.md bug)", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+    await user.type(editable, "- Primer punto{Enter}{Enter}texto");
+
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    // The bulletList item's own text must be untouched — this is exactly
+    // the failure mode from the pre-Tiptap bug, where the typed text was
+    // misrouted into the previous (list) paragraph instead of the new one.
+    expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
+      "Primer punto",
+    );
+    const typedNode = lastCall.content.find(
+      (node: JSONContent) => node.type === "paragraph" && node.content,
+    );
+    expect(typedNode?.content?.[0].text).toBe("texto");
+  });
+});
