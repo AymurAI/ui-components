@@ -725,3 +725,98 @@ describe("RichTextEditor — lists", () => {
     expect(typedNode?.content?.[0].text).toBe("texto");
   });
 });
+
+// `EditableRecoveryBoundary` was carried over from the pre-Tiptap,
+// hand-rolled-contentEditable implementation to catch a React
+// "Failed to execute 'removeChild'" crash: React's fiber for a paragraph's
+// child text/mark nodes drifting out of sync with the live DOM after a
+// native contentEditable mutation (e.g. select-all-and-delete) touched those
+// exact nodes directly. The Final whole-branch review flagged that this
+// boundary's continued necessity was never empirically verified against the
+// new Tiptap/ProseMirror-backed engine — only "we didn't touch it" was
+// recorded. These tests do that verification.
+//
+// Empirical finding: the crash class is NOT reachable anymore, and this is
+// provable structurally, not just by absence of a crash in these particular
+// tests. `@tiptap/react`'s `EditorContent` (see `PureEditorContent.render` in
+// `@tiptap/react/dist/index.js`) renders a bare `<div ref={...} />` with NO
+// `children` prop — React's fiber for that div has no child nodes to
+// reconcile, ever. All of the actual editor DOM (paragraphs, marks, text)
+// is appended into that div imperatively by ProseMirror's own view
+// (`element.append(...editor.view.dom.parentNode.childNodes)` in
+// `componentDidMount`/`componentDidUpdate`), entirely outside React's
+// reconciliation. Directly mutating nodes inside `.ProseMirror` therefore
+// cannot desync a React fiber from the live DOM the way it could in the old
+// hand-rolled implementation, because React was never tracking those nodes
+// as its own children to begin with — ProseMirror owns and re-diffs that
+// subtree itself on every transaction.
+describe("RichTextEditor — EditableRecoveryBoundary stress test", () => {
+  it("survives rapid successive userEvent.type() calls without crashing", async () => {
+    const handleChange = vi.fn();
+    const doc: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+    const user = userEvent.setup();
+    const editable = screen.getByRole("textbox");
+    await user.click(editable);
+
+    // Several back-to-back, uninterrupted typing bursts — the closest
+    // analogue to "rapid" native input a test environment can drive.
+    await user.type(editable, "primera ráfaga de texto");
+    await user.type(editable, " segunda ráfaga");
+    await user.type(editable, " tercera ráfaga final");
+
+    expect(screen.getByTestId("rich-text-editor-panel")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+  });
+
+  it("does not crash (and the boundary never has to recover) when the ProseMirror-owned DOM is mutated directly, simulating the old native contentEditable desync bug", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const handleChange = vi.fn();
+    const doc: JSONContent = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "hola mundo" }],
+        },
+      ],
+    };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+
+    const proseMirrorRoot = screen.getByRole("textbox");
+    expect(proseMirrorRoot.className).toMatch(/ProseMirror/);
+    const paragraphEl = proseMirrorRoot.querySelector("p")!;
+
+    // This is exactly the class of native DOM mutation the boundary's
+    // comment describes: ripping out the exact text node the (in the old
+    // implementation) React fiber still expected to be there, bypassing
+    // React/ProseMirror's own transaction pipeline entirely.
+    while (paragraphEl.firstChild) {
+      paragraphEl.firstChild.remove();
+    }
+    paragraphEl.textContent = "";
+
+    // Force a re-render of the surrounding React tree the way a consumer
+    // naturally would after such an edit (e.g. toggling readOnly, or any
+    // other prop change) — this is the moment the old implementation threw
+    // "Failed to execute 'removeChild': the node to be removed is not a
+    // child of this node" while reconciling.
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /negrita/i }));
+    await user.type(proseMirrorRoot, "nuevo texto");
+
+    // No crash reached `EditableRecoveryBoundary` — the panel and its
+    // children are still the original mounted instance, not a post-recovery
+    // remount (which would have reset the toolbar/body via the `key` bump).
+    expect(screen.getByTestId("rich-text-editor-panel")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
+    const removeChildErrors = consoleError.mock.calls.filter(([msg]) =>
+      String(msg).includes("removeChild"),
+    );
+    expect(removeChildErrors).toHaveLength(0);
+
+    consoleError.mockRestore();
+  });
+});

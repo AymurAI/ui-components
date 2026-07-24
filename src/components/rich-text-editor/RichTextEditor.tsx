@@ -201,6 +201,17 @@ interface EditableRecoveryBoundaryProps {
  * drifted apart — only a full remount from the current `document` model
  * recovers cleanly, so this boundary catches the crash and asks the parent
  * to bump a `key` to force one.
+ *
+ * Empirically stress-tested against the Tiptap/ProseMirror-backed engine
+ * (see the "EditableRecoveryBoundary stress test" describe block in
+ * RichTextEditor.test.tsx, including a test that directly rips out DOM nodes
+ * inside `.ProseMirror` the same way the original bug did) and found to no
+ * longer be load-bearing: `@tiptap/react`'s `EditorContent` renders a bare
+ * `<div>` with no `children` prop, so React's fiber for it has nothing of
+ * the editor's internal DOM to reconcile — ProseMirror owns and re-diffs
+ * that subtree itself, entirely outside React. This boundary is kept as a
+ * low-probability defense-in-depth safety net, not because the new engine
+ * requires it.
  */
 class EditableRecoveryBoundary extends Component<
   EditableRecoveryBoundaryProps,
