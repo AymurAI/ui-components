@@ -2,11 +2,19 @@ import {
   Copy as CopyIcon,
   HighlighterCircle,
   PencilSimpleLine,
-  TextBolder,
+  TextBolderIcon as TextBolder,
   TextItalic,
   TextUnderline,
 } from "@phosphor-icons/react";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Component,
+  Fragment,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { css, cx } from "@/styled/css";
@@ -60,8 +68,14 @@ const panel = css({
   gap: "10",
   bg: "bg.primary",
   p: "8",
+  height: "full",
+  minHeight: "[0]",
+  overflow: "hidden",
 });
 
+// Matches the thumb styling of the app's own ScrollArea (Radix) so both
+// panes of the validation screen share one visual scrollbar language, even
+// though this contentEditable card can't use the Radix primitive directly.
 const card = css({
   bg: "bg.secondary",
   border: "card",
@@ -69,6 +83,19 @@ const card = css({
   boxShadow: "card",
   p: "8",
   overflowY: "auto",
+  flex: "[1]",
+  minHeight: "[0]",
+  _scrollbar: {
+    width: "[10px]",
+  },
+  _scrollbarThumb: {
+    bg: "[#576171]",
+    opacity: "[0.24]",
+    rounded: "full",
+  },
+  _scrollbarTrack: {
+    bg: "[transparent]",
+  },
 });
 
 const toolbar = css({ borderBottom: "primary", pb: "3" });
@@ -195,7 +222,10 @@ export interface RichTextEditorProps {
    * "532px") or Panda token. Defaults to Figma's static mockup dimension
    * ("532px") so existing behavior is unchanged unless a consumer opts into
    * a different value — e.g. a taller real layout that has more vertical
-   * space available than the Figma mock did.
+   * space available than the Figma mock did. Pass "none" to remove the cap
+   * entirely and let the card fill its flex parent instead (it already
+   * flex-grows and clips its own overflow) — the right choice whenever the
+   * consumer's layout gives this editor a real, non-static height to fill.
    */
   maxBodyHeight?: string;
 }
@@ -213,6 +243,42 @@ function findParagraph(
   return doc.paragraphs.find((p) => p.id === paragraphId);
 }
 
+interface EditableRecoveryBoundaryProps {
+  onRecover: () => void;
+  children: ReactNode;
+}
+
+/**
+ * A native contentEditable edit (e.g. selecting all text and deleting it)
+ * mutates the DOM directly — removing the exact <strong>/<mark>/text nodes
+ * React's fiber still expects to be there. The next re-render then throws
+ * "Failed to execute 'removeChild': the node to be removed is not a child of
+ * this node" while trying to patch a subtree the browser already changed out
+ * from under it. There's no partial patch once fiber and the live DOM have
+ * drifted apart — only a full remount from the current `document` model
+ * recovers cleanly, so this boundary catches the crash and asks the parent
+ * to bump a `key` to force one.
+ */
+class EditableRecoveryBoundary extends Component<
+  EditableRecoveryBoundaryProps,
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch() {
+    this.props.onRecover();
+  }
+
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 export function RichTextEditor({
   document: doc,
   onChange,
@@ -225,6 +291,7 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title ?? "");
+  const [bodyEpoch, setBodyEpoch] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const activeSelectionRef = useRef<ActiveSelection | null>(null);
 
@@ -400,7 +467,7 @@ export function RichTextEditor({
 
   return (
     <div data-testid="rich-text-editor-panel" className={panel}>
-      <Stack gap="6">
+      <Stack gap="6" flex="1" minHeight="0" overflow="hidden">
         {title !== undefined && (
           <div className={titleRow}>
             {editingTitle ? (
@@ -514,23 +581,28 @@ export function RichTextEditor({
           </Button>
         </HStack>
 
-        <div
-          data-testid="rich-text-editor-card"
-          ref={bodyRef}
-          role="textbox"
-          aria-label={ariaLabel ?? "Resumen"}
-          aria-multiline="true"
-          contentEditable={!readOnly}
-          suppressContentEditableWarning
-          className={cx(body, card)}
-          style={{ maxHeight: maxBodyHeight }}
-          onInput={handleInput}
-          onKeyDown={handleKeyDown}
+        <EditableRecoveryBoundary
+          key={bodyEpoch}
+          onRecover={() => setBodyEpoch((epoch) => epoch + 1)}
         >
-          {doc.paragraphs.map((paragraph) => (
-            <ParagraphView key={paragraph.id} paragraph={paragraph} />
-          ))}
-        </div>
+          <div
+            data-testid="rich-text-editor-card"
+            ref={bodyRef}
+            role="textbox"
+            aria-label={ariaLabel ?? "Resumen"}
+            aria-multiline="true"
+            contentEditable={!readOnly}
+            suppressContentEditableWarning
+            className={cx(body, card)}
+            style={{ maxHeight: maxBodyHeight }}
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+          >
+            {doc.paragraphs.map((paragraph) => (
+              <ParagraphView key={paragraph.id} paragraph={paragraph} />
+            ))}
+          </div>
+        </EditableRecoveryBoundary>
       </Stack>
     </div>
   );
