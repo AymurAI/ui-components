@@ -3,6 +3,7 @@ import {
   createParagraph,
   documentFromMarkdown,
   documentFromPlainText,
+  getActiveHighlightColor,
   mergeAdjacentRuns,
   paragraphPlainText,
   sameMark,
@@ -253,5 +254,41 @@ describe("documentFromMarkdown", () => {
         marks: [{ type: "italic" }, { type: "bold" }],
       },
     ]);
+  });
+});
+
+describe("getActiveHighlightColor", () => {
+  it("returns the color when the whole range has a uniform highlight", () => {
+    const p: RichTextParagraph = {
+      id: "p1",
+      runs: [
+        {
+          text: "hello",
+          marks: [{ type: "highlight", color: "category.blue" }],
+        },
+      ],
+    };
+    expect(getActiveHighlightColor(p, 0, 5)).toBe("category.blue");
+  });
+
+  it("returns undefined when the range has no highlight", () => {
+    const p = createParagraph("p1", "hello");
+    expect(getActiveHighlightColor(p, 0, 5)).toBeUndefined();
+  });
+
+  it("returns undefined when the range spans mixed highlight colors", () => {
+    const p: RichTextParagraph = {
+      id: "p1",
+      runs: [
+        { text: "he", marks: [{ type: "highlight", color: "category.blue" }] },
+        { text: "llo", marks: [{ type: "highlight", color: "category.red" }] },
+      ],
+    };
+    expect(getActiveHighlightColor(p, 0, 5)).toBeUndefined();
+  });
+
+  it("returns undefined for a collapsed (zero-length) range", () => {
+    const p = createParagraph("p1", "hello");
+    expect(getActiveHighlightColor(p, 2, 2)).toBeUndefined();
   });
 });

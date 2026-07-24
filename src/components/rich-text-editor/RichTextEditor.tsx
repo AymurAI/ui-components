@@ -21,6 +21,7 @@ import { css, cx } from "@/styled/css";
 import { HStack, Stack } from "@/styled/jsx";
 import {
   createParagraph,
+  getActiveHighlightColor,
   mergeAdjacentRuns,
   paragraphPlainText,
   serializeToPlainText,
@@ -159,13 +160,13 @@ function elementOf(node: Node | null): Element | null {
   return node instanceof Element ? node : node.parentElement;
 }
 
-const swatch = (color: string) =>
+const swatch = (color: string, active: boolean) =>
   css({
     w: "6",
     h: "6",
     rounded: "full",
     bg: color as never,
-    border: "primary",
+    border: active ? "primary-alt" : "none",
     cursor: "pointer",
   });
 
@@ -294,6 +295,9 @@ export function RichTextEditor({
   const [bodyEpoch, setBodyEpoch] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const activeSelectionRef = useRef<ActiveSelection | null>(null);
+  const [activeHighlightColor, setActiveHighlightColor] = useState<
+    string | null
+  >(null);
 
   const commitTitle = () => {
     setEditingTitle(false);
@@ -330,7 +334,14 @@ export function RichTextEditor({
         : (startParagraphEl.textContent?.length ?? start);
 
     activeSelectionRef.current = { paragraphId, start, end: clampedEnd };
-  }, []);
+
+    const paragraph = findParagraph(doc, paragraphId);
+    setActiveHighlightColor(
+      paragraph
+        ? (getActiveHighlightColor(paragraph, start, clampedEnd) ?? null)
+        : null,
+    );
+  }, [doc]);
 
   // Selection tracking is wired via native listeners rather than React's
   // `onSelect` prop: React only synthesizes `onSelect` from a fixed list of
@@ -524,9 +535,17 @@ export function RichTextEditor({
                         key={color}
                         type="button"
                         aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
-                        className={swatch(color)}
+                        className={swatch(
+                          color,
+                          color === activeHighlightColor,
+                        )}
                         onMouseDown={(e) => e.preventDefault()}
-                        onClick={() => applyMark({ type: "highlight", color })}
+                        onClick={() => {
+                          applyMark({ type: "highlight", color });
+                          setActiveHighlightColor((prev) =>
+                            prev === color ? null : color,
+                          );
+                        }}
                       />
                     ))}
                   </div>

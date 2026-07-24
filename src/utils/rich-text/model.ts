@@ -234,6 +234,37 @@ export function toggleMark(
   return { ...paragraph, runs: mergeAdjacentRuns(nextRuns) };
 }
 
+export function getActiveHighlightColor(
+  paragraph: RichTextParagraph,
+  startOffset: number,
+  endOffset: number,
+): string | undefined {
+  if (startOffset === endOffset) return undefined;
+  const from = Math.min(startOffset, endOffset);
+  const to = Math.max(startOffset, endOffset);
+  const splitRuns = splitRunsAtOffsets(paragraph.runs, [from, to]);
+
+  let pos = 0;
+  const runsInRange = splitRuns.filter((run) => {
+    const runStart = pos;
+    pos += run.text.length;
+    return runStart >= from && pos <= to && pos > runStart;
+  });
+
+  if (runsInRange.length === 0) return undefined;
+
+  const firstColor = runsInRange[0].marks.find(
+    (m) => m.type === "highlight",
+  )?.color;
+  if (!firstColor) return undefined;
+
+  const allSameColor = runsInRange.every((run) =>
+    run.marks.some((m) => m.type === "highlight" && m.color === firstColor),
+  );
+
+  return allSameColor ? firstColor : undefined;
+}
+
 export type { MarkType } from "./types";
 // Re-export types for convenience
 export type { RichTextDocument, RichTextParagraph, TextMark, TextRun };

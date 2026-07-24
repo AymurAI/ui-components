@@ -276,6 +276,73 @@ describe("RichTextEditor — highlight + copy", () => {
     expect(writeText).toHaveBeenCalledWith("hola mundo");
   });
 
+  it("shows a border only on the swatch matching the current selection's highlight, and none by default", () => {
+    const onChange = vi.fn();
+    const highlightDoc: RichTextDocument = {
+      paragraphs: [
+        {
+          id: "p1",
+          runs: [
+            {
+              text: "hola",
+              marks: [{ type: "highlight", color: "category.blue" }],
+            },
+          ],
+        },
+      ],
+    };
+    render(<RichTextEditor document={highlightDoc} onChange={onChange} />);
+
+    const paragraphEl = screen.getByText("hola").closest("p")!;
+    const range = document.createRange();
+    range.selectNodeContents(paragraphEl);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    fireEvent.select(paragraphEl);
+
+    fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
+    const blueSwatch = screen.getByRole("button", { name: /^azul$/i });
+    const greenSwatch = screen.getByRole("button", { name: /^verde$/i });
+
+    // jsdom's computed-style engine can't resolve a `border` shorthand whose
+    // value is a CSS custom property (our design tokens compile to
+    // `border: var(--aym-borders-primary-alt)`), so `toHaveStyle` always
+    // reports "none" here regardless of which class is applied — a jsdom/
+    // cssstyle limitation, not a real bug. Asserting on the generated
+    // utility class name is the reliable way to check which swatch got the
+    // active border class within this test environment.
+    expect(blueSwatch.className).toMatch(/(?:^|\s)aym-bd_primary-alt(?:\s|$)/);
+    expect(greenSwatch.className).not.toMatch(
+      /(?:^|\s)aym-bd_primary-alt(?:\s|$)/,
+    );
+  });
+
+  it("clicking the already-active swatch again removes the highlight and its border", () => {
+    const onChange = vi.fn();
+    const plainDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "hola", marks: [] }] }],
+    };
+    render(<RichTextEditor document={plainDoc} onChange={onChange} />);
+
+    const paragraphEl = screen.getByText("hola").closest("p")!;
+    const range = document.createRange();
+    range.selectNodeContents(paragraphEl);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    fireEvent.select(paragraphEl);
+
+    fireEvent.click(screen.getByRole("button", { name: /resaltar/i }));
+    const blueSwatch = screen.getByRole("button", { name: /^azul$/i });
+
+    fireEvent.click(blueSwatch);
+    expect(blueSwatch.className).toMatch(/(?:^|\s)aym-bd_primary-alt(?:\s|$)/);
+
+    fireEvent.click(blueSwatch);
+    expect(blueSwatch.className).not.toMatch(
+      /(?:^|\s)aym-bd_primary-alt(?:\s|$)/,
+    );
+  });
+
   it("copies to the clipboard in readOnly mode", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });
