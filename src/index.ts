@@ -10,6 +10,7 @@
  * so there are no default-export collisions.)
  */
 
+export type { JSONContent } from "@tiptap/core";
 export * from "./components/app-footer";
 export * from "./components/app-header";
 // Archives
@@ -59,7 +60,7 @@ export * from "./components/tooltip";
 export * from "./components/transcript-block";
 export * from "./components/tutorial";
 export * from "./components/workflow-step-layout";
+export * from "./utils/rich-text/markdown";
 // Utils
-export * from "./utils/rich-text/model";
-export * from "./utils/rich-text/types";
+export * from "./utils/rich-text/tiptap-text";
 export * from "./utils/timestamp";
