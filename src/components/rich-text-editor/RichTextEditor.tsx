@@ -267,13 +267,19 @@ export function RichTextEditor({
   // The incoming `document` prop can also change from outside (e.g. loading
   // a different summary). Only push it into the editor when it actually
   // differs from the editor's own current content, so we don't clobber the
-  // user's in-progress typing on every render.
+  // user's in-progress typing on every render. `emitUpdate: false` is
+  // required here for the same reason the `editable`-sync effect above
+  // guards its own call — without it, `setContent` fires a synthetic
+  // "update" event and this externally-driven sync would immediately call
+  // `onChange` back with the very content it was just given, which can loop
+  // in a controlled-component usage (e.g. autosave wiring that writes
+  // `document` on every `onChange`).
   useEffect(() => {
     if (!editor) return;
     const current = JSON.stringify(editor.getJSON());
     const next = JSON.stringify(doc);
     if (current !== next) {
-      editor.commands.setContent(doc);
+      editor.commands.setContent(doc, { emitUpdate: false });
     }
   }, [editor, doc]);
 

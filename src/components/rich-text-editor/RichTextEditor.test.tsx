@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it, vi } from "vitest";
 import { RichTextEditor } from "./RichTextEditor";
@@ -127,6 +127,34 @@ describe("RichTextEditor", () => {
     // the caret can still be hosted there, on whichever <p> is empty.
     const paragraphEl = container.querySelector("p");
     expect(paragraphEl?.querySelector("br")).toBeTruthy();
+  });
+
+  it("does not call onChange when the document prop changes externally (not from user typing)", async () => {
+    const onChange = vi.fn();
+    const { rerender } = render(
+      <RichTextEditor document={doc} onChange={onChange} />,
+    );
+    expect(screen.getByText("mundo")).toBeInTheDocument();
+
+    const nextDoc: JSONContent = {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [{ type: "text", text: "otro resumen cargado externo" }],
+        },
+      ],
+    };
+    rerender(<RichTextEditor document={nextDoc} onChange={onChange} />);
+
+    // The external content sync is applied via a `useEffect`, so wait for it
+    // to flush before asserting.
+    await waitFor(() =>
+      expect(
+        screen.getByText("otro resumen cargado externo"),
+      ).toBeInTheDocument(),
+    );
+    expect(onChange).not.toHaveBeenCalled();
   });
 });
 
