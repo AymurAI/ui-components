@@ -92,6 +92,9 @@ const formatButton = css({
   "&[data-state='open']": {
     bg: "bg.primary-alternative",
   },
+  "&[data-state='on']": {
+    bg: "bg.primary-alternative",
+  },
 });
 
 // Figma (node 40002573:62458): the title-edit pencil is action/alt-default
@@ -226,6 +229,7 @@ export function RichTextEditor({
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title ?? "");
   const [bodyEpoch, setBodyEpoch] = useState(0);
+  const [, forceToolbarUpdate] = useState(0);
 
   const commitTitle = () => {
     setEditingTitle(false);
@@ -283,6 +287,22 @@ export function RichTextEditor({
     }
   }, [editor, doc]);
 
+  // `editor.isActive(...)` reflects live editor state but isn't itself
+  // reactive React state, so the toolbar (which reads it during render via
+  // `editor?.isActive("bold")` etc.) won't re-render on its own when the
+  // selection moves into/out of a mark. Force a re-render on the events that
+  // can change that state.
+  useEffect(() => {
+    if (!editor) return;
+    const rerender = () => forceToolbarUpdate((n) => n + 1);
+    editor.on("selectionUpdate", rerender);
+    editor.on("transaction", rerender);
+    return () => {
+      editor.off("selectionUpdate", rerender);
+      editor.off("transaction", rerender);
+    };
+  }, [editor]);
+
   return (
     <div data-testid="rich-text-editor-panel" className={panel}>
       <Stack gap="6" flex="1" minHeight="0" overflow="hidden">
@@ -302,9 +322,9 @@ export function RichTextEditor({
                 size="icon-sm"
                 className={formatButton}
                 aria-label="Negrita"
+                data-state={editor?.isActive("bold") ? "on" : "off"}
                 onMouseDown={(e) => e.preventDefault()}
-                // TODO(Task 4): wire to editor?.chain().focus().toggleBold().run()
-                onClick={() => {}}
+                onClick={() => editor?.chain().focus().toggleBold().run()}
               >
                 <TextB size={20} />
               </Button>
@@ -313,9 +333,9 @@ export function RichTextEditor({
                 size="icon-sm"
                 className={formatButton}
                 aria-label="Cursiva"
+                data-state={editor?.isActive("italic") ? "on" : "off"}
                 onMouseDown={(e) => e.preventDefault()}
-                // TODO(Task 4): wire to editor?.chain().focus().toggleItalic().run()
-                onClick={() => {}}
+                onClick={() => editor?.chain().focus().toggleItalic().run()}
               >
                 <TextItalic size={20} />
               </Button>
@@ -324,9 +344,9 @@ export function RichTextEditor({
                 size="icon-sm"
                 className={formatButton}
                 aria-label="Subrayado"
+                data-state={editor?.isActive("underline") ? "on" : "off"}
                 onMouseDown={(e) => e.preventDefault()}
-                // TODO(Task 4): wire to editor?.chain().focus().toggleUnderline().run()
-                onClick={() => {}}
+                onClick={() => editor?.chain().focus().toggleUnderline().run()}
               >
                 <TextUnderline size={20} />
               </Button>

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it, vi } from "vitest";
 import { RichTextEditor } from "./RichTextEditor";
@@ -230,7 +231,7 @@ describe("RichTextEditor — toolbar", () => {
     expect(toolbarIndex).toBeLessThan(titleIndex);
   });
 
-  it("toggles bold on the current selection and calls onChange", () => {
+  it("toggles bold on the current selection and calls onChange", async () => {
     const onChange = vi.fn();
     const singleRunDoc: JSONContent = {
       type: "doc",
@@ -246,10 +247,20 @@ describe("RichTextEditor — toolbar", () => {
     const paragraphEl = screen.getByText("hola mundo").closest("p")!;
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
+    // The Tiptap/ProseMirror view only reacts to a "selectionchange" event
+    // when its contentEditable root is the focused element (see
+    // prosemirror-view's `hasFocusAndSelection`) — a plain DOM Range/
+    // Selection without focus is invisible to it. jsdom also dispatches
+    // "selectionchange" as a queued (async) task, so a microtask tick is
+    // needed before the editor's internal selection reflects it.
+    (screen.getByRole("textbox") as HTMLElement).focus();
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);
     fireEvent.select(paragraphEl);
+    await waitFor(() => {
+      expect(window.getSelection()?.isCollapsed).toBe(false);
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /negrita/i }));
 
@@ -264,6 +275,101 @@ describe("RichTextEditor — toolbar", () => {
         },
       ],
     });
+  });
+
+  it("toggles bold via the toolbar and reflects active state", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const doc = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Hello" }] },
+      ],
+    };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    // Select "Hello" via a native selection so the toolbar acts on it. The
+    // contentEditable must be focused first — ProseMirror's view only reacts
+    // to a "selectionchange" event when its own DOM root has focus.
+    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    (screen.getByRole("textbox") as HTMLElement).focus();
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    await user.click(screen.getByRole("button", { name: "Negrita" }));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].content[0].marks).toEqual([{ type: "bold" }]);
+    expect(screen.getByRole("button", { name: "Negrita" })).toHaveAttribute(
+      "data-state",
+      "on",
+    );
+  });
+
+  it("toggles italic via the toolbar and reflects active state", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const doc = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Hello" }] },
+      ],
+    };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    (screen.getByRole("textbox") as HTMLElement).focus();
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    await user.click(screen.getByRole("button", { name: "Cursiva" }));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].content[0].marks).toEqual([{ type: "italic" }]);
+    expect(screen.getByRole("button", { name: "Cursiva" })).toHaveAttribute(
+      "data-state",
+      "on",
+    );
+  });
+
+  it("toggles underline via the toolbar and reflects active state", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const doc = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Hello" }] },
+      ],
+    };
+    render(<RichTextEditor document={doc} onChange={handleChange} />);
+
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    (screen.getByRole("textbox") as HTMLElement).focus();
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    await user.click(screen.getByRole("button", { name: "Subrayado" }));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = handleChange.mock.calls.at(-1)![0];
+    expect(lastCall.content[0].content[0].marks).toEqual([
+      { type: "underline" },
+    ]);
+    expect(screen.getByRole("button", { name: "Subrayado" })).toHaveAttribute(
+      "data-state",
+      "on",
+    );
   });
 });
 
