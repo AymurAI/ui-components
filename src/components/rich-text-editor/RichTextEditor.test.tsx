@@ -148,27 +148,38 @@ describe("RichTextEditor — toolbar", () => {
     expect(screen.getByRole("button", { name: /copiar/i })).toBeInTheDocument();
   });
 
-  it("renders formatting buttons in Figma order (Underline, Italic, Bold, Highlight) with a divider before Copy", () => {
+  it("renders formatting buttons in Bold/Italic/Underline/Highlight order, with a divider before Copy, right-aligned above the title", () => {
     render(
       <RichTextEditor
         document={{
           paragraphs: [{ id: "p1", runs: [{ text: "x", marks: [] }] }],
         }}
+        title="Resumen"
       />,
     );
     const buttons = screen.getAllByRole("button", {
       name: /subrayado|cursiva|negrita|resaltar|copiar/i,
     });
     expect(buttons.map((b) => b.getAttribute("aria-label"))).toEqual([
-      "Subrayado",
-      "Cursiva",
       "Negrita",
+      "Cursiva",
+      "Subrayado",
       "Resaltar",
       "Copiar",
     ]);
     expect(
       screen.getByTestId("rich-text-editor-toolbar-divider"),
     ).toBeInTheDocument();
+
+    const panel = screen.getByTestId("rich-text-editor-panel");
+    const toolbar = screen.getByTestId("rich-text-editor-toolbar");
+    const titleRow = screen
+      .getByText("Resumen")
+      .closest('[data-testid="rich-text-editor-title-row"]')!;
+    const allChildren = Array.from(panel.querySelectorAll("[data-testid]"));
+    const toolbarIndex = allChildren.indexOf(toolbar);
+    const titleIndex = allChildren.indexOf(titleRow as Element);
+    expect(toolbarIndex).toBeLessThan(titleIndex);
   });
 
   it("reconciles typed text back into the model on input", () => {

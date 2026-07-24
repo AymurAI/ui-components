@@ -1,8 +1,8 @@
 import {
   Copy as CopyIcon,
-  HighlighterCircle,
+  Highlighter,
   PencilSimpleLine,
-  TextBolderIcon as TextBolder,
+  TextB,
   TextItalic,
   TextUnderline,
 } from "@phosphor-icons/react";
@@ -98,7 +98,7 @@ const card = css({
   },
 });
 
-const toolbar = css({ borderBottom: "primary", pb: "3" });
+const toolbar = css({ justifyContent: "flex-end", pb: "3" });
 
 const divider = css({
   w: "[1px]",
@@ -468,54 +468,25 @@ export function RichTextEditor({
   return (
     <div data-testid="rich-text-editor-panel" className={panel}>
       <Stack gap="6" flex="1" minHeight="0" overflow="hidden">
-        {title !== undefined && (
-          <div className={titleRow}>
-            {editingTitle ? (
-              <input
-                className={titleInput}
-                value={draftTitle}
-                onChange={(e) => setDraftTitle(e.target.value)}
-                onBlur={commitTitle}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") commitTitle();
-                }}
-                // biome-ignore lint/a11y/noAutofocus: replaces an inline click-to-edit label, not a dialog
-                autoFocus
-              />
-            ) : (
-              <span className={titleText}>{title}</span>
-            )}
-            {!readOnly && !editingTitle && (
-              <Button
-                variant="none"
-                size="icon-sm"
-                aria-label="Editar título"
-                onClick={() => {
-                  setDraftTitle(title ?? "");
-                  setEditingTitle(true);
-                }}
-              >
-                <PencilSimpleLine size={16} />
-              </Button>
-            )}
-          </div>
-        )}
-
         {/* Copy stays available in both modes — the readOnly export preview
             (Finalización) treats copy-to-clipboard as a core action. The
             formatting controls below are editing affordances and stay hidden
             when readOnly. */}
-        <HStack gap="2" className={toolbar}>
+        <HStack
+          gap="2"
+          className={toolbar}
+          data-testid="rich-text-editor-toolbar"
+        >
           {!readOnly && (
             <>
               <Button
                 variant="none"
                 size="icon-sm"
-                aria-label="Subrayado"
+                aria-label="Negrita"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => applyMark({ type: "underline" })}
+                onClick={() => applyMark({ type: "bold" })}
               >
-                <TextUnderline size={20} />
+                <TextB size={20} />
               </Button>
               <Button
                 variant="none"
@@ -529,11 +500,11 @@ export function RichTextEditor({
               <Button
                 variant="none"
                 size="icon-sm"
-                aria-label="Negrita"
+                aria-label="Subrayado"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => applyMark({ type: "bold" })}
+                onClick={() => applyMark({ type: "underline" })}
               >
-                <TextBolder size={20} />
+                <TextUnderline size={20} />
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
@@ -543,7 +514,7 @@ export function RichTextEditor({
                     aria-label="Resaltar"
                     onMouseDown={(e) => e.preventDefault()}
                   >
-                    <HighlighterCircle size={20} />
+                    <Highlighter size={20} />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
@@ -580,6 +551,39 @@ export function RichTextEditor({
             <CopyIcon size={20} />
           </Button>
         </HStack>
+
+        {title !== undefined && (
+          <div data-testid="rich-text-editor-title-row" className={titleRow}>
+            {editingTitle ? (
+              <input
+                className={titleInput}
+                value={draftTitle}
+                onChange={(e) => setDraftTitle(e.target.value)}
+                onBlur={commitTitle}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitTitle();
+                }}
+                // biome-ignore lint/a11y/noAutofocus: replaces an inline click-to-edit label, not a dialog
+                autoFocus
+              />
+            ) : (
+              <span className={titleText}>{title}</span>
+            )}
+            {!readOnly && !editingTitle && (
+              <Button
+                variant="none"
+                size="icon-sm"
+                aria-label="Editar título"
+                onClick={() => {
+                  setDraftTitle(title ?? "");
+                  setEditingTitle(true);
+                }}
+              >
+                <PencilSimpleLine size={16} />
+              </Button>
+            )}
+          </div>
+        )}
 
         <EditableRecoveryBoundary
           key={bodyEpoch}
