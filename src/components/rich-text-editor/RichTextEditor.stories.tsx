@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import type { JSONContent } from "@tiptap/core";
 import { useState } from "react";
+import { documentFromMarkdown } from "@/utils/rich-text/markdown";
 import { RichTextEditor } from "./RichTextEditor";
 
 const sampleDoc: JSONContent = {
@@ -101,67 +102,20 @@ export const Lists: Story = {
   },
 };
 
-// TODO(later task): re-derive this from real markdown once a JSONContent-
-// producing markdown parser exists (Task 2 only added plain-text helpers).
+const SAMPLE_MARKDOWN = `## Resumen del documento
+
+El presente caso tramita ante el **Juzgado en lo Penal, Contravencional y de Faltas N.º 10**.
+
+- Hecho relevante uno
+- Hecho relevante dos
+
+Se dispusieron *medidas de protección* urgentes.`;
+
 export const FromMarkdown: Story = {
   render: () => {
-    const [doc, setDoc] = useState<JSONContent>({
-      type: "doc",
-      content: [
-        {
-          type: "heading",
-          attrs: { level: 2 },
-          content: [{ type: "text", text: "Resumen del documento" }],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "El presente caso tramita ante el " },
-            {
-              type: "text",
-              text: "Juzgado en lo Penal, Contravencional y de Faltas N.º 10",
-              marks: [{ type: "bold" }],
-            },
-            { type: "text", text: "." },
-          ],
-        },
-        {
-          type: "bulletList",
-          content: [
-            {
-              type: "listItem",
-              content: [
-                {
-                  type: "paragraph",
-                  content: [{ type: "text", text: "Hecho relevante uno" }],
-                },
-              ],
-            },
-            {
-              type: "listItem",
-              content: [
-                {
-                  type: "paragraph",
-                  content: [{ type: "text", text: "Hecho relevante dos" }],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          type: "paragraph",
-          content: [
-            { type: "text", text: "Se dispusieron " },
-            {
-              type: "text",
-              text: "medidas de protección",
-              marks: [{ type: "italic" }],
-            },
-            { type: "text", text: " urgentes." },
-          ],
-        },
-      ],
-    });
+    const [doc, setDoc] = useState<JSONContent>(() =>
+      documentFromMarkdown(SAMPLE_MARKDOWN),
+    );
     return (
       <RichTextEditor
         document={doc}
