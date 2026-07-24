@@ -1,4 +1,4 @@
-import { Plus, Trash } from "@phosphor-icons/react";
+import { ArrowsMergeIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
 import { css, cva, cx } from "@/styled/css";
@@ -16,7 +16,6 @@ import {
 } from "../dialog";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
-import { ArrowsMerge } from "./ArrowsMergeIcon";
 
 /**
  * SidePanel — "Side Panel Voz a texto" (speech-to-text turn editor).
@@ -34,8 +33,7 @@ import { ArrowsMerge } from "./ArrowsMergeIcon";
  * turn card, suggested people, timestamp, and turn actions (merge
  * previous/next, add below, delete).
  *
- * Merge actions use the Phosphor "ArrowsMerge" glyph (vendored in
- * ./ArrowsMergeIcon as phosphor-react@1.4.1 predates it): base points down
+ * Merge actions use the Phosphor "ArrowsMergeIcon" glyph: base points down
  * ("siguiente"), rotated 180° points up ("anterior").
  *
  * Consumers need a `TooltipProvider` somewhere up the tree for the Acciones
@@ -435,7 +433,7 @@ export function SidePanel({
             );
           })}
           <Button variant="tertiary" size="sm" onClick={onNewPerson}>
-            <Plus size={16} />
+            <PlusIcon size={16} />
             Nuevo
           </Button>
         </div>
@@ -478,25 +476,28 @@ export function SidePanel({
             tooltip="Combina este turno con el anterior"
             onClick={handleMergePrevious}
           >
-            <ArrowsMerge size={16} style={{ transform: "rotate(180deg)" }} />
+            <ArrowsMergeIcon
+              size={16}
+              style={{ transform: "rotate(180deg)" }}
+            />
             Unir con el anterior
           </ActionButton>
           <ActionButton
             tooltip="Combina este turno con el siguiente"
             onClick={handleMergeNext}
           >
-            <ArrowsMerge size={16} />
+            <ArrowsMergeIcon size={16} />
             Unir con el siguiente
           </ActionButton>
           <ActionButton
             tooltip="Agrega un turno nuevo debajo de este"
             onClick={onAddBelow}
           >
-            <Plus size={16} />
+            <PlusIcon size={16} />
             Agregar debajo
           </ActionButton>
           <ActionButton tooltip="Elimina este turno" onClick={onDelete}>
-            <Trash size={16} />
+            <TrashIcon size={16} />
             Eliminar
           </ActionButton>
         </div>

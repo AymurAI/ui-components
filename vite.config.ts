@@ -8,7 +8,7 @@ const EXTERNAL = [
   /^react($|\/)/,
   /^react-dom($|\/)/,
   /^@radix-ui\//,
-  "phosphor-react",
+  "@phosphor-icons/react",
   "react-hot-toast",
 ];
 
