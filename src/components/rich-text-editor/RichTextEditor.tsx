@@ -65,20 +65,22 @@ const body = css({
   "& p + p": { marginTop: "4" },
 });
 
+// Figma (node 40002572:59897, "Main-Content"): pt:42px, px:48px, pb:32px —
+// asymmetric, not the uniform p:8 (32px) this used to be. The extra
+// horizontal padding is what keeps the card from stretching edge-to-edge.
 const panel = css({
   display: "flex",
   flexDirection: "column",
   gap: "10",
   bg: "bg.primary",
-  p: "8",
+  pt: "[42px]",
+  px: "12",
+  pb: "8",
   height: "full",
   minHeight: "[0]",
   overflow: "hidden",
 });
 
-// Matches the thumb styling of the app's own ScrollArea (Radix) so both
-// panes of the validation screen share one visual scrollbar language, even
-// though this contentEditable card can't use the Radix primitive directly.
 const card = css({
   bg: "bg.secondary",
   border: "card",
@@ -88,17 +90,6 @@ const card = css({
   overflowY: "auto",
   flex: "[1]",
   minHeight: "[0]",
-  _scrollbar: {
-    width: "[10px]",
-  },
-  _scrollbarThumb: {
-    bg: "[#576171]",
-    opacity: "[0.24]",
-    rounded: "full",
-  },
-  _scrollbarTrack: {
-    bg: "[transparent]",
-  },
 });
 
 const toolbar = css({ justifyContent: "flex-end", pb: "3" });
@@ -107,6 +98,29 @@ const divider = css({
   w: "[1px]",
   h: "6",
   bg: "[#BCBAB8]",
+});
+
+// Figma (node 40002573:72715): hover/active/pressed-open state for the
+// format toggle buttons is a light-purple fill, not the default Button
+// variants (which "none" deliberately opts out of) — bg.primary-alternative
+// = #E5E8FF.
+const formatButton = css({
+  rounded: "[4px]",
+  "&:hover:enabled": {
+    bg: "bg.primary-alternative",
+  },
+  "&:active:enabled": {
+    bg: "bg.primary-alternative",
+  },
+  "&[data-state='open']": {
+    bg: "bg.primary-alternative",
+  },
+});
+
+// Figma (node 40002573:62458): the title-edit pencil is action/alt-default
+// (#3F479D), not the button's default onbutton-default color.
+const editTitleButton = css({
+  color: "action.alt-default",
 });
 
 // 6 hues x 2 shades (light + solid), matching Figma's swatch popover exactly
@@ -586,6 +600,7 @@ export function RichTextEditor({
               <Button
                 variant="none"
                 size="icon-sm"
+                className={formatButton}
                 aria-label="Negrita"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => applyMark({ type: "bold" })}
@@ -595,6 +610,7 @@ export function RichTextEditor({
               <Button
                 variant="none"
                 size="icon-sm"
+                className={formatButton}
                 aria-label="Cursiva"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => applyMark({ type: "italic" })}
@@ -604,6 +620,7 @@ export function RichTextEditor({
               <Button
                 variant="none"
                 size="icon-sm"
+                className={formatButton}
                 aria-label="Subrayado"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => applyMark({ type: "underline" })}
@@ -615,6 +632,7 @@ export function RichTextEditor({
                   <Button
                     variant="none"
                     size="icon-sm"
+                    className={formatButton}
                     aria-label="Resaltar"
                     onMouseDown={(e) => e.preventDefault()}
                   >
@@ -686,6 +704,7 @@ export function RichTextEditor({
               <Button
                 variant="none"
                 size="icon-sm"
+                className={editTitleButton}
                 aria-label="Editar título"
                 onClick={() => {
                   setDraftTitle(title ?? "");
