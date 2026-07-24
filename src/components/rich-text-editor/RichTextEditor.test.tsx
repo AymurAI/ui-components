@@ -456,6 +456,62 @@ describe("RichTextEditor — structural editing", () => {
     ]);
   });
 
+  it("restores the caret to the start of the new paragraph after pressing Enter", () => {
+    const onChange = vi.fn();
+    const singleRunDoc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "hello world", marks: [] }] }],
+    };
+    const { rerender, container } = render(
+      <RichTextEditor document={singleRunDoc} onChange={onChange} />,
+    );
+
+    const paragraphEl = screen.getByText("hello world").closest("p")!;
+    placeCaret(paragraphEl, 5);
+
+    fireEvent.keyDown(paragraphEl, { key: "Enter" });
+
+    const nextDoc = onChange.mock.calls[0][0] as RichTextDocument;
+    rerender(<RichTextEditor document={nextDoc} onChange={onChange} />);
+
+    const selection = window.getSelection();
+    expect(selection?.rangeCount).toBeGreaterThan(0);
+    const caretRange = selection!.getRangeAt(0);
+    const paragraphEls = container.querySelectorAll("p");
+    expect(paragraphEls).toHaveLength(2);
+    const secondParagraphEl = paragraphEls[1];
+    expect(secondParagraphEl.contains(caretRange.startContainer)).toBe(true);
+    expect(caretRange.startOffset).toBe(0);
+  });
+
+  it("restores the caret to the merge point after Backspace merges two paragraphs", () => {
+    const onChange = vi.fn();
+    const twoParaDoc: RichTextDocument = {
+      paragraphs: [
+        { id: "p1", runs: [{ text: "hello", marks: [] }] },
+        { id: "p2", runs: [{ text: "world", marks: [] }] },
+      ],
+    };
+    const { rerender } = render(
+      <RichTextEditor document={twoParaDoc} onChange={onChange} />,
+    );
+
+    const secondParagraphEl = screen.getByText("world").closest("p")!;
+    placeCaret(secondParagraphEl, 0);
+
+    fireEvent.keyDown(secondParagraphEl, { key: "Backspace" });
+
+    const nextDoc = onChange.mock.calls[0][0] as RichTextDocument;
+    rerender(<RichTextEditor document={nextDoc} onChange={onChange} />);
+
+    const selection = window.getSelection();
+    const caretRange = selection!.getRangeAt(0);
+    const mergedParagraphEl = screen
+      .getByText("helloworld", { exact: false })
+      .closest("p")!;
+    expect(mergedParagraphEl.contains(caretRange.startContainer)).toBe(true);
+    expect(caretRange.startOffset).toBe(5); // end of the original "hello"
+  });
+
   it("does not merge on Backspace at the start of the first paragraph", () => {
     const onChange = vi.fn();
     const twoParaDoc: RichTextDocument = {

@@ -12,6 +12,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -29,7 +30,7 @@ import {
   toggleMark,
 } from "@/utils/rich-text/model";
 import { reconcileParagraphText } from "@/utils/rich-text/reconcile";
-import { getRangeOffsets } from "@/utils/rich-text/selection";
+import { getRangeOffsets, setCaretOffset } from "@/utils/rich-text/selection";
 import type {
   RichTextDocument,
   RichTextParagraph,
@@ -295,6 +296,10 @@ export function RichTextEditor({
   const [bodyEpoch, setBodyEpoch] = useState(0);
   const bodyRef = useRef<HTMLDivElement>(null);
   const activeSelectionRef = useRef<ActiveSelection | null>(null);
+  const pendingCaretRef = useRef<{
+    paragraphId: string;
+    offset: number;
+  } | null>(null);
   const [activeHighlightColor, setActiveHighlightColor] = useState<
     string | null
   >(null);
@@ -370,6 +375,26 @@ export function RichTextEditor({
     };
   }, [readOnly, captureSelection]);
 
+  // After a structural edit (Enter split, Backspace merge) swaps the
+  // paragraph subtree for a new one, the browser's own caret tracking is
+  // lost — the old Range's anchor/focus nodes no longer exist. Once the DOM
+  // has been updated to reflect the new `doc`, explicitly restore the caret
+  // to wherever handleKeyDown recorded as the expected landing spot.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: doc isn't read in the body, but re-running after each doc update is the signal the DOM has repainted
+  useLayoutEffect(() => {
+    const pending = pendingCaretRef.current;
+    const root = bodyRef.current;
+    if (!pending || !root) return;
+    const paragraphEl = root.querySelector(
+      `[data-paragraph-id="${pending.paragraphId}"]`,
+    );
+    if (paragraphEl instanceof HTMLElement) {
+      root.focus();
+      setCaretOffset(paragraphEl, pending.offset);
+    }
+    pendingCaretRef.current = null;
+  }, [doc]);
+
   const applyMark = (mark: TextMark) => {
     const selection = activeSelectionRef.current;
     if (!selection) return;
@@ -413,8 +438,9 @@ export function RichTextEditor({
 
   // Structural edits contentEditable can't express through plain-text
   // reconciliation: Enter splits a paragraph, Backspace-at-start merges into
-  // the previous one. Caret restoration after these edits is a known
-  // limitation (out of scope) — only the document model is kept correct here.
+  // the previous one. Each branch records where the caret should land after
+  // the resulting re-render in `pendingCaretRef`, which the `useLayoutEffect`
+  // above applies once the new `doc` has been painted.
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (readOnly) return;
 
@@ -453,6 +479,7 @@ export function RichTextEditor({
       };
       const nextParagraphs = [...doc.paragraphs];
       nextParagraphs.splice(index, 1, first, second);
+      pendingCaretRef.current = { paragraphId: second.id, offset: 0 };
       onChange?.({ paragraphs: nextParagraphs });
       return;
     }
@@ -472,6 +499,10 @@ export function RichTextEditor({
       };
       const nextParagraphs = [...doc.paragraphs];
       nextParagraphs.splice(index - 1, 2, merged);
+      pendingCaretRef.current = {
+        paragraphId: prev.id,
+        offset: paragraphPlainText(prev).length,
+      };
       onChange?.({ paragraphs: nextParagraphs });
     }
   };
