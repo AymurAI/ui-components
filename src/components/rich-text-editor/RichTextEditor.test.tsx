@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import type { RichTextDocument } from "@/utils/rich-text/types";
-import { RichTextEditor } from "./RichTextEditor";
+import { paragraphPlainText, RichTextEditor } from "./RichTextEditor";
 
 const doc: RichTextDocument = {
   paragraphs: [
@@ -594,5 +594,90 @@ describe("RichTextEditor — structural editing", () => {
       { text: "hola", marks: [{ type: "bold" }] },
     ]);
     expect(next.paragraphs[1].runs).toEqual([{ text: "mundo", marks: [] }]);
+  });
+});
+
+describe("RichTextEditor — lists", () => {
+  it("converts a typed '- ' prefix into a bullet marker as the user types", () => {
+    const onChange = vi.fn();
+    const doc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "", marks: [] }] }],
+    };
+    render(<RichTextEditor document={doc} onChange={onChange} />);
+    const paragraphEl = document.querySelector(
+      '[data-paragraph-id="p1"]',
+    ) as HTMLElement;
+    paragraphEl.textContent = "- hola";
+    fireEvent.input(paragraphEl);
+
+    expect(onChange).toHaveBeenCalledWith({
+      paragraphs: [{ id: "p1", runs: [{ text: "• hola", marks: [] }] }],
+    });
+  });
+
+  it("continues a bullet list item when pressing Enter at the end of it", () => {
+    const onChange = vi.fn();
+    const doc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "• Primero", marks: [] }] }],
+    };
+    render(<RichTextEditor document={doc} onChange={onChange} />);
+    const paragraphEl = document.querySelector(
+      '[data-paragraph-id="p1"]',
+    ) as HTMLElement;
+    const range = document.createRange();
+    range.setStart(paragraphEl.firstChild as Text, 9);
+    range.collapse(true);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    fireEvent.keyDown(paragraphEl, { key: "Enter" });
+
+    const next = onChange.mock.calls[0][0] as RichTextDocument;
+    expect(next.paragraphs).toHaveLength(2);
+    expect(paragraphPlainText(next.paragraphs[0])).toBe("• Primero");
+    expect(paragraphPlainText(next.paragraphs[1])).toBe("• ");
+  });
+
+  it("continues a numbered list item, incrementing the number", () => {
+    const onChange = vi.fn();
+    const doc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "1. Primero", marks: [] }] }],
+    };
+    render(<RichTextEditor document={doc} onChange={onChange} />);
+    const paragraphEl = document.querySelector(
+      '[data-paragraph-id="p1"]',
+    ) as HTMLElement;
+    const range = document.createRange();
+    range.setStart(paragraphEl.firstChild as Text, 10);
+    range.collapse(true);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    fireEvent.keyDown(paragraphEl, { key: "Enter" });
+
+    const next = onChange.mock.calls[0][0] as RichTextDocument;
+    expect(paragraphPlainText(next.paragraphs[1])).toBe("2. ");
+  });
+
+  it("exits the list when pressing Enter on an empty bullet item", () => {
+    const onChange = vi.fn();
+    const doc: RichTextDocument = {
+      paragraphs: [{ id: "p1", runs: [{ text: "• ", marks: [] }] }],
+    };
+    render(<RichTextEditor document={doc} onChange={onChange} />);
+    const paragraphEl = document.querySelector(
+      '[data-paragraph-id="p1"]',
+    ) as HTMLElement;
+    const range = document.createRange();
+    range.setStart(paragraphEl.firstChild as Text, 2);
+    range.collapse(true);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+
+    fireEvent.keyDown(paragraphEl, { key: "Enter" });
+
+    const next = onChange.mock.calls[0][0] as RichTextDocument;
+    expect(next.paragraphs).toHaveLength(1);
+    expect(paragraphPlainText(next.paragraphs[0])).toBe("");
   });
 });

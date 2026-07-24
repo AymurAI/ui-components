@@ -25,6 +25,7 @@ import {
   getActiveHighlightColor,
   mergeAdjacentRuns,
   paragraphPlainText,
+  parseListMarker,
   serializeToPlainText,
   splitRunsAtOffsets,
   toggleMark,
@@ -281,6 +282,22 @@ class EditableRecoveryBoundary extends Component<
   }
 }
 
+function splitParagraphRuns(
+  paragraph: RichTextParagraph,
+  offset: number,
+): { before: TextRun[]; after: TextRun[] } {
+  const splitRuns = splitRunsAtOffsets(paragraph.runs, [offset]);
+  const before: TextRun[] = [];
+  const after: TextRun[] = [];
+  let pos = 0;
+  for (const run of splitRuns) {
+    if (pos < offset) before.push(run);
+    else after.push(run);
+    pos += run.text.length;
+  }
+  return { before, after };
+}
+
 export function RichTextEditor({
   document: doc,
   onChange,
@@ -428,10 +445,15 @@ export function RichTextEditor({
       return;
     }
 
+    const LIST_TRIGGER_RE = /^[-*] /;
     const nextParagraphs = doc.paragraphs.map((paragraph) => {
       const el = root.querySelector(`[data-paragraph-id="${paragraph.id}"]`);
       if (!el) return paragraph;
-      return reconcileParagraphText(paragraph, el.textContent ?? "");
+      let text = el.textContent ?? "";
+      if (LIST_TRIGGER_RE.test(text) && !text.startsWith("• ")) {
+        text = `• ${text.slice(2)}`;
+      }
+      return reconcileParagraphText(paragraph, text);
     });
     onChange?.({ paragraphs: nextParagraphs });
   };
@@ -460,22 +482,53 @@ export function RichTextEditor({
 
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      const splitRuns = splitRunsAtOffsets(paragraph.runs, [start]);
-      const beforeRuns: TextRun[] = [];
-      const afterRuns: TextRun[] = [];
-      let pos = 0;
-      for (const run of splitRuns) {
-        if (pos < start) beforeRuns.push(run);
-        else afterRuns.push(run);
-        pos += run.text.length;
+      const fullText = paragraphPlainText(paragraph);
+      const listInfo = parseListMarker(fullText);
+
+      if (listInfo && start >= listInfo.marker.length) {
+        const contentAfterMarker = fullText.slice(listInfo.marker.length);
+        if (contentAfterMarker.trim().length === 0) {
+          // Empty list item — exit the list rather than continuing it.
+          const emptyParagraph: RichTextParagraph = { ...paragraph, runs: [] };
+          const nextParagraphs = [...doc.paragraphs];
+          nextParagraphs.splice(index, 1, emptyParagraph);
+          pendingCaretRef.current = { paragraphId: paragraph.id, offset: 0 };
+          onChange?.({ paragraphs: nextParagraphs });
+          return;
+        }
+
+        const { before, after } = splitParagraphRuns(paragraph, start);
+        const nextMarker = listInfo.ordered
+          ? `${(listInfo.number ?? 0) + 1}${
+              listInfo.marker.trimEnd().endsWith(")") ? ")" : "."
+            } `
+          : listInfo.marker;
+        const first: RichTextParagraph = {
+          ...paragraph,
+          runs: mergeAdjacentRuns(before),
+        };
+        const second: RichTextParagraph = {
+          id: nextParagraphId(),
+          runs: mergeAdjacentRuns([{ text: nextMarker, marks: [] }, ...after]),
+        };
+        const nextParagraphs = [...doc.paragraphs];
+        nextParagraphs.splice(index, 1, first, second);
+        pendingCaretRef.current = {
+          paragraphId: second.id,
+          offset: nextMarker.length,
+        };
+        onChange?.({ paragraphs: nextParagraphs });
+        return;
       }
+
+      const { before, after } = splitParagraphRuns(paragraph, start);
       const first: RichTextParagraph = {
         ...paragraph,
-        runs: mergeAdjacentRuns(beforeRuns),
+        runs: mergeAdjacentRuns(before),
       };
       const second: RichTextParagraph = {
         id: nextParagraphId(),
-        runs: mergeAdjacentRuns(afterRuns),
+        runs: mergeAdjacentRuns(after),
       };
       const nextParagraphs = [...doc.paragraphs];
       nextParagraphs.splice(index, 1, first, second);

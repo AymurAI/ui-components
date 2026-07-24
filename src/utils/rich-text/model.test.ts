@@ -6,6 +6,7 @@ import {
   getActiveHighlightColor,
   mergeAdjacentRuns,
   paragraphPlainText,
+  parseListMarker,
   sameMark,
   serializeToPlainText,
   splitRunsAtOffsets,
@@ -290,5 +291,34 @@ describe("getActiveHighlightColor", () => {
   it("returns undefined for a collapsed (zero-length) range", () => {
     const p = createParagraph("p1", "hello");
     expect(getActiveHighlightColor(p, 2, 2)).toBeUndefined();
+  });
+});
+
+describe("parseListMarker", () => {
+  it("recognizes a bullet marker", () => {
+    expect(parseListMarker("• Hello")).toEqual({
+      marker: "• ",
+      ordered: false,
+    });
+  });
+
+  it("recognizes a numbered marker with a period", () => {
+    expect(parseListMarker("2. Hello")).toEqual({
+      marker: "2. ",
+      ordered: true,
+      number: 2,
+    });
+  });
+
+  it("recognizes a numbered marker with a closing parenthesis", () => {
+    expect(parseListMarker("3) Hello")).toEqual({
+      marker: "3) ",
+      ordered: true,
+      number: 3,
+    });
+  });
+
+  it("returns null for plain text with no marker", () => {
+    expect(parseListMarker("Hello world")).toBeNull();
   });
 });

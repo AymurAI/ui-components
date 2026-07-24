@@ -265,6 +265,30 @@ export function getActiveHighlightColor(
   return allSameColor ? firstColor : undefined;
 }
 
+export interface ListMarkerInfo {
+  marker: string;
+  ordered: boolean;
+  number?: number;
+}
+
+const BULLET_MARKER = "• ";
+const ORDERED_MARKER_RE = /^(\d+)([.)]) /;
+
+export function parseListMarker(text: string): ListMarkerInfo | null {
+  if (text.startsWith(BULLET_MARKER)) {
+    return { marker: BULLET_MARKER, ordered: false };
+  }
+  const match = text.match(ORDERED_MARKER_RE);
+  if (match) {
+    return {
+      marker: `${match[1]}${match[2]} `,
+      ordered: true,
+      number: Number(match[1]),
+    };
+  }
+  return null;
+}
+
 export type { MarkType } from "./types";
 // Re-export types for convenience
 export type { RichTextDocument, RichTextParagraph, TextMark, TextRun };
