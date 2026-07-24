@@ -451,7 +451,10 @@ describe("RichTextEditor — highlight + copy", () => {
 
   it("copies the serialized plain text to the clipboard", async () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
 
     render(
       <RichTextEditor
@@ -555,7 +558,10 @@ describe("RichTextEditor — highlight + copy", () => {
 
   it("copies to the clipboard in readOnly mode", () => {
     const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
 
     render(
       <RichTextEditor

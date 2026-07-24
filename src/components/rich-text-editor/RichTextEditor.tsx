@@ -402,8 +402,12 @@ export function RichTextEditor({
             variant="none"
             size="icon-sm"
             aria-label="Copiar"
-            // TODO(Task 6): wire to serializeDocumentToPlainText(editor?.getJSON())
-            onClick={() => {}}
+            onClick={() => {
+              if (!editor) return;
+              navigator.clipboard
+                ?.writeText(editor.getText({ blockSeparator: "\n\n" }))
+                .catch(() => {});
+            }}
           >
             <CopyIcon size={20} />
           </Button>
