@@ -4,6 +4,12 @@ import type { JSONContent } from "@tiptap/core";
 import { describe, expect, it, vi } from "vitest";
 import { RichTextEditor } from "./RichTextEditor";
 
+/** Narrows a possibly-null/undefined test lookup without a non-null assertion. */
+function mustExist<T>(value: T | null | undefined, what: string): T {
+  if (value == null) throw new Error(`expected ${what} to exist`);
+  return value;
+}
+
 const doc: JSONContent = {
   type: "doc",
   content: [
@@ -234,9 +240,12 @@ describe("RichTextEditor — toolbar", () => {
 
     const panel = screen.getByTestId("rich-text-editor-panel");
     const toolbar = screen.getByTestId("rich-text-editor-toolbar");
-    const titleRow = screen
-      .getByText("Resumen")
-      .closest('[data-testid="rich-text-editor-title-row"]')!;
+    const titleRow = mustExist(
+      screen
+        .getByText("Resumen")
+        .closest('[data-testid="rich-text-editor-title-row"]'),
+      "title row",
+    );
     const allChildren = Array.from(panel.querySelectorAll("[data-testid]"));
     const toolbarIndex = allChildren.indexOf(toolbar);
     const titleIndex = allChildren.indexOf(titleRow as Element);
@@ -256,7 +265,10 @@ describe("RichTextEditor — toolbar", () => {
     };
     render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
 
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
+    const paragraphEl = mustExist(
+      screen.getByText("hola mundo").closest("p"),
+      "paragraph element",
+    );
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
     // The Tiptap/ProseMirror view only reacts to a "selectionchange" event
@@ -304,7 +316,10 @@ describe("RichTextEditor — toolbar", () => {
     // Select "Hello" via a native selection so the toolbar acts on it. The
     // contentEditable must be focused first — ProseMirror's view only reacts
     // to a "selectionchange" event when its own DOM root has focus.
-    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const textNode = mustExist(
+      mustExist(editorEl.querySelector("p"), "paragraph element").firstChild,
+      "paragraph text node",
+    );
     const range = document.createRange();
     range.selectNodeContents(textNode);
     (screen.getByRole("textbox") as HTMLElement).focus();
@@ -314,7 +329,10 @@ describe("RichTextEditor — toolbar", () => {
     await user.click(screen.getByRole("button", { name: "Negrita" }));
 
     expect(handleChange).toHaveBeenCalled();
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].content[0].marks).toEqual([{ type: "bold" }]);
     expect(screen.getByRole("button", { name: "Negrita" })).toHaveAttribute(
       "data-state",
@@ -334,7 +352,10 @@ describe("RichTextEditor — toolbar", () => {
     render(<RichTextEditor document={doc} onChange={handleChange} />);
 
     const editorEl = screen.getByTestId("rich-text-editor-card");
-    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const textNode = mustExist(
+      mustExist(editorEl.querySelector("p"), "paragraph element").firstChild,
+      "paragraph text node",
+    );
     const range = document.createRange();
     range.selectNodeContents(textNode);
     (screen.getByRole("textbox") as HTMLElement).focus();
@@ -344,7 +365,10 @@ describe("RichTextEditor — toolbar", () => {
     await user.click(screen.getByRole("button", { name: "Cursiva" }));
 
     expect(handleChange).toHaveBeenCalled();
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].content[0].marks).toEqual([{ type: "italic" }]);
     expect(screen.getByRole("button", { name: "Cursiva" })).toHaveAttribute(
       "data-state",
@@ -364,7 +388,10 @@ describe("RichTextEditor — toolbar", () => {
     render(<RichTextEditor document={doc} onChange={handleChange} />);
 
     const editorEl = screen.getByTestId("rich-text-editor-card");
-    const textNode = editorEl.querySelector("p")!.firstChild!;
+    const textNode = mustExist(
+      mustExist(editorEl.querySelector("p"), "paragraph element").firstChild,
+      "paragraph text node",
+    );
     const range = document.createRange();
     range.selectNodeContents(textNode);
     (screen.getByRole("textbox") as HTMLElement).focus();
@@ -374,7 +401,10 @@ describe("RichTextEditor — toolbar", () => {
     await user.click(screen.getByRole("button", { name: "Subrayado" }));
 
     expect(handleChange).toHaveBeenCalled();
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].content[0].marks).toEqual([
       { type: "underline" },
     ]);
@@ -427,7 +457,10 @@ describe("RichTextEditor — highlight + copy", () => {
     };
     render(<RichTextEditor document={singleRunDoc} onChange={onChange} />);
 
-    const paragraphEl = screen.getByText("hola mundo").closest("p")!;
+    const paragraphEl = mustExist(
+      screen.getByText("hola mundo").closest("p"),
+      "paragraph element",
+    );
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
     // The contentEditable must be focused first — ProseMirror's view only
@@ -505,7 +538,10 @@ describe("RichTextEditor — highlight + copy", () => {
     };
     render(<RichTextEditor document={highlightDoc} onChange={onChange} />);
 
-    const paragraphEl = screen.getByText("hola").closest("p")!;
+    const paragraphEl = mustExist(
+      screen.getByText("hola").closest("p"),
+      "paragraph element",
+    );
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
     window.getSelection()?.removeAllRanges();
@@ -542,7 +578,10 @@ describe("RichTextEditor — highlight + copy", () => {
     };
     render(<RichTextEditor document={plainDoc} onChange={onChange} />);
 
-    const paragraphEl = screen.getByText("hola").closest("p")!;
+    const paragraphEl = mustExist(
+      screen.getByText("hola").closest("p"),
+      "paragraph element",
+    );
     const range = document.createRange();
     range.selectNodeContents(paragraphEl);
     // The contentEditable must be focused first — ProseMirror's view only
@@ -652,7 +691,10 @@ describe("RichTextEditor — lists", () => {
     await user.click(editable);
     await user.type(editable, "- Primer punto");
 
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].type).toBe("bulletList");
     expect(lastCall.content[0].content[0].type).toBe("listItem");
     expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
@@ -669,7 +711,10 @@ describe("RichTextEditor — lists", () => {
     await user.click(editable);
     await user.type(editable, "1. Paso uno");
 
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].type).toBe("orderedList");
     expect(lastCall.content[0].content[0].type).toBe("listItem");
     expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
@@ -686,7 +731,10 @@ describe("RichTextEditor — lists", () => {
     await user.click(editable);
     await user.type(editable, "1. Paso uno{Enter}Paso dos");
 
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     const items = lastCall.content[0].content;
     expect(lastCall.content[0].type).toBe("orderedList");
     expect(items).toHaveLength(2);
@@ -706,7 +754,10 @@ describe("RichTextEditor — lists", () => {
     // on that now-empty item, exits the list instead of adding another one.
     await user.type(editable, "- Primer punto{Enter}{Enter}");
 
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     expect(lastCall.content[0].type).toBe("bulletList");
     expect(lastCall.content[0].content).toHaveLength(1);
     expect(lastCall.content[0].content[0].content[0].content[0].text).toBe(
@@ -724,7 +775,10 @@ describe("RichTextEditor — lists", () => {
     await user.click(editable);
     await user.type(editable, "- Primer punto{Enter}{Enter}texto");
 
-    const lastCall = handleChange.mock.calls.at(-1)![0];
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
     // The bulletList item's own text must be untouched — this is exactly
     // the failure mode from the pre-Tiptap bug, where the typed text was
     // misrouted into the previous (list) paragraph instead of the new one.
@@ -799,7 +853,10 @@ describe("RichTextEditor — EditableRecoveryBoundary stress test", () => {
 
     const proseMirrorRoot = screen.getByRole("textbox");
     expect(proseMirrorRoot.className).toMatch(/ProseMirror/);
-    const paragraphEl = proseMirrorRoot.querySelector("p")!;
+    const paragraphEl = mustExist(
+      proseMirrorRoot.querySelector("p"),
+      "paragraph element",
+    );
 
     // This is exactly the class of native DOM mutation the boundary's
     // comment describes: ripping out the exact text node the (in the old
