@@ -34,6 +34,18 @@ describe("RichTextEditor", () => {
     expect(screen.getByText("segundo párrafo").tagName).toBe("EM");
   });
 
+  it("variant=embedded renders the formatted content without the panel/toolbar chrome", () => {
+    render(<RichTextEditor document={doc} readOnly variant="embedded" />);
+    expect(screen.getByText("mundo").tagName).toBe("STRONG");
+    expect(
+      screen.queryByTestId("rich-text-editor-panel"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("rich-text-editor-toolbar"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
   it("renders underline and highlight runs with <u> and <mark>", () => {
     const marksDoc: JSONContent = {
       type: "doc",
@@ -441,7 +453,7 @@ describe("RichTextEditor — highlight + copy", () => {
             {
               type: "text",
               text: "hola mundo",
-              marks: [{ type: "highlight", attrs: { color: "category.blue" } }],
+              marks: [{ type: "highlight", attrs: { color: "#A2E2F9" } }],
             },
           ],
         },
@@ -485,7 +497,7 @@ describe("RichTextEditor — highlight + copy", () => {
             {
               type: "text",
               text: "hola",
-              marks: [{ type: "highlight", attrs: { color: "category.blue" } }],
+              marks: [{ type: "highlight", attrs: { color: "#A2E2F9" } }],
             },
           ],
         },

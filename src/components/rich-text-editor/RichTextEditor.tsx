@@ -8,6 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import type { JSONContent } from "@tiptap/core";
 import Highlight from "@tiptap/extension-highlight";
+import { TableKit } from "@tiptap/extension-table";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Component, type ReactNode, useEffect, useState } from "react";
@@ -38,14 +39,64 @@ const body = css({
   textStyle: "paragraph.md.default",
   color: "text.default",
   outline: "none",
+  // `EditorContent`'s own className only reaches the wrapper div it renders
+  // — the actual contentEditable element is the nested `.ProseMirror` div
+  // ProseMirror creates itself, which browsers give a default focus outline
+  // (shows as a black ring while editing) unless targeted directly.
+  "& .ProseMirror": { outline: "none" },
   "& p": { margin: "0" },
-  "& p + p": { marginTop: "4" },
-  // Real <ul>/<ol> nodes didn't exist before this migration (lists used to
-  // be plain marker-prefixed paragraphs) — 1.25rem is a reasonable default
-  // indent, not a re-verified Figma measurement; re-check against the Figma
-  // lists reference if pixel-exact spacing is needed later.
-  "& ul, & ol": { paddingLeft: "[1.25rem]", margin: "0" },
+  // Panda's preflight resets every heading to `font-size/font-weight:
+  // inherit` and every `ul`/`ol`/`menu` to `list-style: none` (so apps style
+  // typography explicitly instead of relying on UA defaults) — without
+  // overriding both here, markdown-parsed `# Heading`/`- item`/`1. item`
+  // text rendered visually identical to a plain paragraph, with no numbers
+  // or bullets at all. Sizes/markers are a reasonable default scale, not a
+  // re-verified Figma measurement.
+  "& h1, & h2, & h3, & h4, & h5, & h6": {
+    fontWeight: "[700]",
+    marginBottom: "2",
+  },
+  "& h1": { fontSize: "[28px]" },
+  "& h2": { fontSize: "[24px]" },
+  "& h3": { fontSize: "[20px]" },
+  "& h4, & h5, & h6": { fontSize: "[16px]" },
+  "& ul": { listStyle: "[disc]", paddingLeft: "[1.25rem]", margin: "0" },
+  "& ol": { listStyle: "[decimal]", paddingLeft: "[1.25rem]", margin: "0" },
   "& li + li": { marginTop: "4" },
+  // Nested lists (an `- item` under a `1. item`) sit inside a parent <li> —
+  // the parent's own bottom margin (from the general sibling-spacing rule
+  // below) already separates it from the next top-level block, so it
+  // doesn't need one of its own before its first line of content.
+  "& li > ul, & li > ol": { marginTop: "1" },
+  // General breathing room between any two top-level blocks (paragraph,
+  // heading, list, blockquote, table, hr) — not just "paragraph after
+  // paragraph" — so a heading or `---` isn't flush against whatever
+  // follows it. Headings get a bit more space above since they start a new
+  // section; the first block never gets a leading gap.
+  "& .ProseMirror > * + *": { marginTop: "4" },
+  "& .ProseMirror > h1, & .ProseMirror > h2, & .ProseMirror > h3, & .ProseMirror > h4, & .ProseMirror > h5, & .ProseMirror > h6":
+    { marginTop: "8" },
+  "& .ProseMirror > :first-child": { marginTop: "[0px]" },
+  "& blockquote": {
+    borderLeft: "primary",
+    paddingLeft: "4",
+    color: "text.lighter",
+    fontStyle: "italic",
+  },
+  "& hr": { marginY: "2" },
+  "& table": {
+    width: "full",
+  },
+  "& th, & td": {
+    border: "primary",
+    px: "3",
+    py: "2",
+    textAlign: "left",
+  },
+  "& th": {
+    fontWeight: "[700]",
+    bg: "bg.secondary",
+  },
 });
 
 // Figma (node 40002572:59897, "Main-Content"): pt:42px, px:48px, pb:32px —
@@ -76,6 +127,17 @@ const card = css({
 });
 
 const toolbar = css({ justifyContent: "flex-end", pb: "3" });
+
+// `variant="embedded"` skips the panel/toolbar/title chrome above entirely —
+// the consumer supplies its own frame (border, shadow, fixed height) and
+// just wants the formatted content inside it, scrollable within whatever
+// height that frame gives it. Padding lives here (not on the consumer's
+// frame) so it scrolls along with the content, like margins on a page.
+const embeddedBody = css({
+  height: "full",
+  overflowY: "auto",
+  p: "6",
+});
 
 const divider = css({
   w: "[1px]",
@@ -115,45 +177,57 @@ const editTitleButton = css({
 // blue/green/orange/pink/red/yellow order — a stable default; the Figma
 // screenshot's exact on-screen grid order could not be pixel-verified at the
 // available render resolution.
+// Real hex values, not `category.*` design-token paths — Tiptap's Highlight
+// mark (multicolor mode) writes `attrs.color` straight into an inline
+// `style="background-color: ..."` on the rendered `<mark>` (see
+// @tiptap/extension-highlight's `renderHTML`), so it has to already be a
+// value the browser can parse as a CSS color. A token path like
+// "category.yellow-light" is invalid CSS — the browser silently drops it
+// and every highlight fell back to the `<mark>` UA-stylesheet default
+// (plain yellow) regardless of which swatch was picked. Values mirror
+// `theme.semanticTokens.colors.category` in src/preset.ts.
 export const RICH_TEXT_HIGHLIGHT_COLORS = [
-  "category.blue-light",
-  "category.blue",
-  "category.green-light",
-  "category.green",
-  "category.orange-light",
-  "category.orange",
-  "category.pink-light",
-  "category.pink",
-  "category.red-light",
-  "category.red",
-  "category.yellow-light",
-  "category.yellow",
+  "#CBF1FF", // blue-light
+  "#A2E2F9", // blue
+  "#D1F4E2", // green-light
+  "#94FFC8", // green
+  "#FFE2C4", // orange-light
+  "#F7C693", // orange
+  "#FFD6FA", // pink-light
+  "#F8AEEF", // pink
+  "#FFE2D9", // red-light
+  "#F69FA6", // red
+  "#FFF2C6", // yellow-light
+  "#FDE27B", // yellow
 ];
 
 // Human-readable Spanish names for the highlight swatches, so screen readers
-// announce "Azul claro" instead of reading the raw token path "category dot
-// blue dash light".
+// announce "Azul claro" instead of reading a raw hex value.
 const HIGHLIGHT_COLOR_LABELS: Record<string, string> = {
-  "category.blue-light": "Azul claro",
-  "category.blue": "Azul",
-  "category.green-light": "Verde claro",
-  "category.green": "Verde",
-  "category.orange-light": "Naranja claro",
-  "category.orange": "Naranja",
-  "category.pink-light": "Rosa claro",
-  "category.pink": "Rosa",
-  "category.red-light": "Rojo claro",
-  "category.red": "Rojo",
-  "category.yellow-light": "Amarillo claro",
-  "category.yellow": "Amarillo",
+  "#CBF1FF": "Azul claro",
+  "#A2E2F9": "Azul",
+  "#D1F4E2": "Verde claro",
+  "#94FFC8": "Verde",
+  "#FFE2C4": "Naranja claro",
+  "#F7C693": "Naranja",
+  "#FFD6FA": "Rosa claro",
+  "#F8AEEF": "Rosa",
+  "#FFE2D9": "Rojo claro",
+  "#F69FA6": "Rojo",
+  "#FFF2C6": "Amarillo claro",
+  "#FDE27B": "Amarillo",
 };
 
-const swatch = (color: string, active: boolean) =>
+// `bg` is deliberately not set via Panda's css() here: Panda's bracket
+// escape (`[value]`) is resolved by static analysis at build time, so it
+// can't express a value that's only known at runtime (one of 12 possible
+// swatch colors, picked dynamically). The background is applied as a plain
+// inline style instead — see the `style` prop where this is used.
+const swatch = (active: boolean) =>
   css({
     w: "6",
     h: "6",
     rounded: "full",
-    bg: color as never,
     border: active ? "primary-alt" : "none",
     cursor: "pointer",
   });
@@ -184,6 +258,18 @@ export interface RichTextEditorProps {
    * consumer's layout gives this editor a real, non-static height to fill.
    */
   maxBodyHeight?: string;
+  /**
+   * "panel" (default) — the full Validación screen chrome: toolbar
+   * (formatting controls + copy), optional title row, and the
+   * padded/bordered/shadowed card.
+   *
+   * "embedded" — just the formatted content, no toolbar, no title row, no
+   * card border/shadow of its own. For consumers that already have their own
+   * frame (e.g. the Resumen finish screen's preview panel) and only want the
+   * document's real formatting (headings, bold, lists…) inside it, instead
+   * of building a second, separate read-only renderer.
+   */
+  variant?: "panel" | "embedded";
 }
 
 interface EditableRecoveryBoundaryProps {
@@ -242,6 +328,7 @@ export function RichTextEditor({
   highlightColors = RICH_TEXT_HIGHLIGHT_COLORS,
   "aria-label": ariaLabel,
   maxBodyHeight = "532px",
+  variant = "panel",
 }: RichTextEditorProps) {
   const [editingTitle, setEditingTitle] = useState(false);
   const [draftTitle, setDraftTitle] = useState(title ?? "");
@@ -257,6 +344,7 @@ export function RichTextEditor({
     extensions: [
       StarterKit.configure({ link: false }),
       Highlight.configure({ multicolor: true }),
+      TableKit.configure({ table: { resizable: false } }),
     ],
     content: doc,
     editable: !readOnly,
@@ -319,6 +407,21 @@ export function RichTextEditor({
       editor.off("transaction", rerender);
     };
   }, [editor]);
+
+  if (variant === "embedded") {
+    return (
+      <EditableRecoveryBoundary
+        key={bodyEpoch}
+        onRecover={() => setBodyEpoch((epoch) => epoch + 1)}
+      >
+        <EditorContent
+          editor={editor}
+          data-testid="rich-text-editor-embedded"
+          className={cx(body, embeddedBody)}
+        />
+      </EditableRecoveryBoundary>
+    );
+  }
 
   return (
     <div data-testid="rich-text-editor-panel" className={panel}>
@@ -389,7 +492,8 @@ export function RichTextEditor({
                           key={color}
                           type="button"
                           aria-label={HIGHLIGHT_COLOR_LABELS[color] ?? color}
-                          className={swatch(color, active)}
+                          className={swatch(active)}
+                          style={{ backgroundColor: color }}
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
                             if (!editor || editor.state.selection.empty) return;

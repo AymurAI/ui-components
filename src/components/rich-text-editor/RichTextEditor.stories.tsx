@@ -28,9 +28,7 @@ const sampleDoc: JSONContent = {
         {
           type: "text",
           text: "Se dispusieron medidas de protección urgentes.",
-          marks: [
-            { type: "highlight", attrs: { color: "category.yellow-light" } },
-          ],
+          marks: [{ type: "highlight", attrs: { color: "#FFF2C6" } }],
         },
       ],
     },
@@ -106,10 +104,20 @@ const SAMPLE_MARKDOWN = `## Resumen del documento
 
 El presente caso tramita ante el **Juzgado en lo Penal, Contravencional y de Faltas N.º 10**.
 
-- Hecho relevante uno
-- Hecho relevante dos
+1. **Hechos relevantes**
+   - Hecho relevante uno
+   - Hecho relevante dos
+2. **Decisión adoptada**
+   - Se dispusieron *medidas de protección* urgentes.
 
-Se dispusieron *medidas de protección* urgentes.`;
+---
+
+## Entidades relevantes
+
+| Medida | Plazo |
+| --- | --- |
+| Exclusión del hogar | Inmediato |
+| Prohibición de acercamiento | 180 días |`;
 
 export const FromMarkdown: Story = {
   render: () => {
