@@ -954,6 +954,10 @@ function HeaderComposition({ locale }: { locale: Locale }) {
               label={t("Voz a Texto")}
             />
             <FeaturesMenuItem
+              icon={<Article size={24} />}
+              label={t("Resumen")}
+            />
+            <FeaturesMenuItem
               icon={<Gear size={24} />}
               label={t("Configuración")}
               fullWidth
@@ -1059,7 +1063,11 @@ function ShowcasePage({ locale }: { locale: Locale }) {
                 <FeaturesMenuItem
                   icon={<Article size={24} />}
                   label={t("Resumen")}
-                  disabled
+                />
+                <FeaturesMenuItem
+                  icon={<Gear size={24} />}
+                  label="Configuración"
+                  fullWidth
                 />
               </FeaturesMenu>
             </DemoCard>

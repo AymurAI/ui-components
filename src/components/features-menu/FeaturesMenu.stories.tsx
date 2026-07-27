@@ -1,9 +1,9 @@
 import {
-  Article,
-  Database,
-  Detective,
-  FileAudio,
-  Gear,
+  ArticleIcon,
+  DatabaseIcon,
+  DetectiveIcon,
+  FileAudioIcon,
+  GearIcon,
 } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Popover, PopoverContent, PopoverTrigger } from "../popover";
@@ -24,10 +24,19 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <FeaturesMenu>
-      <FeaturesMenuItem icon={<Database size={24} />} label="Set de Datos" />
-      <FeaturesMenuItem icon={<Detective size={24} />} label="Anonimizador" />
-      <FeaturesMenuItem icon={<FileAudio size={24} />} label="Voz a Texto" />
-      <FeaturesMenuItem icon={<Article size={24} />} label="Resumen" disabled />
+      <FeaturesMenuItem
+        icon={<DatabaseIcon size={24} />}
+        label="Set de Datos"
+      />
+      <FeaturesMenuItem
+        icon={<DetectiveIcon size={24} />}
+        label="Anonimizador"
+      />
+      <FeaturesMenuItem
+        icon={<FileAudioIcon size={24} />}
+        label="Voz a Texto"
+      />
+      <FeaturesMenuItem icon={<ArticleIcon size={24} />} label="Resumen" />
     </FeaturesMenu>
   ),
 };
@@ -39,11 +48,21 @@ export const Default: Story = {
 export const WithSettings: Story = {
   render: () => (
     <FeaturesMenu>
-      <FeaturesMenuItem icon={<Database size={24} />} label="Set de Datos" />
-      <FeaturesMenuItem icon={<Detective size={24} />} label="Anonimizador" />
-      <FeaturesMenuItem icon={<FileAudio size={24} />} label="Voz a Texto" />
       <FeaturesMenuItem
-        icon={<Gear size={24} />}
+        icon={<DatabaseIcon size={24} />}
+        label="Set de Datos"
+      />
+      <FeaturesMenuItem
+        icon={<DetectiveIcon size={24} />}
+        label="Anonimizador"
+      />
+      <FeaturesMenuItem
+        icon={<FileAudioIcon size={24} />}
+        label="Voz a Texto"
+      />
+      <FeaturesMenuItem icon={<ArticleIcon size={24} />} label="Resumen" />
+      <FeaturesMenuItem
+        icon={<GearIcon size={24} />}
         label="Configuración"
         fullWidth
       />
@@ -67,19 +86,20 @@ export const InsidePopover: Story = {
       >
         <FeaturesMenu>
           <FeaturesMenuItem
-            icon={<Database size={24} />}
+            icon={<DatabaseIcon size={24} />}
             label="Set de Datos"
           />
           <FeaturesMenuItem
-            icon={<Detective size={24} />}
+            icon={<DetectiveIcon size={24} />}
             label="Anonimizador"
           />
           <FeaturesMenuItem
-            icon={<FileAudio size={24} />}
+            icon={<FileAudioIcon size={24} />}
             label="Voz a Texto"
           />
+          <FeaturesMenuItem icon={<ArticleIcon size={24} />} label="Resumen" />
           <FeaturesMenuItem
-            icon={<Gear size={24} />}
+            icon={<GearIcon size={24} />}
             label="Configuración"
             fullWidth
           />
