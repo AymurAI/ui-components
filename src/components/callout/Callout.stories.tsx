@@ -1,8 +1,8 @@
 import {
-  CheckCircle,
-  Info as InfoIcon,
-  WarningCircle,
-  Warning as WarningIcon,
+  CheckCircleIcon,
+  InfoIcon,
+  WarningCircleIcon,
+  WarningIcon,
 } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Callout } from "./Callout";
@@ -20,7 +20,7 @@ export const Info: Story = { args: { variant: "info" } };
 export const Success: Story = {
   args: {
     variant: "success",
-    icon: CheckCircle,
+    icon: CheckCircleIcon,
     message: "Operation completed successfully.",
   },
 };
@@ -34,7 +34,7 @@ export const Warning: Story = {
 export const ErrorState: Story = {
   args: {
     variant: "error",
-    icon: WarningCircle,
+    icon: WarningCircleIcon,
     message: "An error occurred.",
   },
 };
@@ -63,7 +63,7 @@ export const Matrix: Story = {
       <Callout variant="info" message="Info: review your settings." />
       <Callout
         variant="success"
-        icon={CheckCircle}
+        icon={CheckCircleIcon}
         message="Success: changes saved."
       />
       <Callout
@@ -73,7 +73,7 @@ export const Matrix: Story = {
       />
       <Callout
         variant="error"
-        icon={WarningCircle}
+        icon={WarningCircleIcon}
         message="Error: could not save changes."
       />
       <Callout

@@ -1,4 +1,4 @@
-import { CaretDown } from "@phosphor-icons/react";
+import { CaretDownIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./Button";
 
@@ -48,7 +48,7 @@ export const Matrix: Story = {
             Disabled
           </Button>
           <Button variant={variant} size="icon-md">
-            <CaretDown />
+            <CaretDownIcon />
           </Button>
         </div>
       ))}

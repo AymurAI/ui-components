@@ -1,8 +1,8 @@
 import {
-  CheckCircle,
-  Info,
-  Warning,
-  WarningCircle,
+  CheckCircleIcon,
+  InfoIcon,
+  WarningCircleIcon,
+  WarningIcon,
 } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { toast as hotToast, Toaster } from "react-hot-toast";
@@ -40,7 +40,7 @@ export const InfoVariant: Story = {
               t={t}
               message="This is an informational message."
               variant="info"
-              icon={Info}
+              icon={InfoIcon}
             />
           ))
         }
@@ -62,7 +62,7 @@ export const SuccessVariant: Story = {
               t={t}
               message="Operation completed successfully."
               variant="success"
-              icon={CheckCircle}
+              icon={CheckCircleIcon}
             />
           ))
         }
@@ -84,7 +84,7 @@ export const WarningVariant: Story = {
               t={t}
               message="Please review before continuing."
               variant="warning"
-              icon={Warning}
+              icon={WarningIcon}
             />
           ))
         }
@@ -106,7 +106,7 @@ export const ErrorVariant: Story = {
               t={t}
               message="An error occurred. Please try again."
               variant="error"
-              icon={WarningCircle}
+              icon={WarningCircleIcon}
             />
           ))
         }

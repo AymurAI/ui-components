@@ -1,16 +1,16 @@
 import {
-  ArrowLeft,
-  ArrowsClockwise,
-  Article,
-  Database,
-  Detective,
-  File,
-  FileAudio,
-  Gear,
-  Info as InfoIcon,
-  Play,
-  Plus,
-  Trash,
+  ArrowLeftIcon,
+  ArrowsClockwiseIcon,
+  ArticleIcon,
+  DatabaseIcon,
+  DetectiveIcon,
+  FileAudioIcon,
+  FileIcon,
+  GearIcon,
+  InfoIcon,
+  PlayIcon,
+  PlusIcon,
+  TrashIcon,
 } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import type { JSONContent } from "@tiptap/core";
@@ -852,7 +852,7 @@ function TrashButton({ locale }: { locale: Locale }) {
       size="icon-sm"
       aria-label={translate(locale, "Eliminar archivo")}
     >
-      <Trash size={24} />
+      <TrashIcon size={24} />
     </Button>
   );
 }
@@ -942,23 +942,23 @@ function HeaderComposition({ locale }: { locale: Locale }) {
         >
           <FeaturesMenu>
             <FeaturesMenuItem
-              icon={<Database size={24} />}
+              icon={<DatabaseIcon size={24} />}
               label={t("Set de Datos")}
             />
             <FeaturesMenuItem
-              icon={<Detective size={24} />}
+              icon={<DetectiveIcon size={24} />}
               label={t("Anonimizador")}
             />
             <FeaturesMenuItem
-              icon={<FileAudio size={24} />}
+              icon={<FileAudioIcon size={24} />}
               label={t("Voz a Texto")}
             />
             <FeaturesMenuItem
-              icon={<Article size={24} />}
+              icon={<ArticleIcon size={24} />}
               label={t("Resumen")}
             />
             <FeaturesMenuItem
-              icon={<Gear size={24} />}
+              icon={<GearIcon size={24} />}
               label={t("Configuración")}
               fullWidth
             />
@@ -1049,23 +1049,23 @@ function ShowcasePage({ locale }: { locale: Locale }) {
             <DemoCard title="FeaturesMenu" align="center">
               <FeaturesMenu>
                 <FeaturesMenuItem
-                  icon={<Database size={24} />}
+                  icon={<DatabaseIcon size={24} />}
                   label={t("Set de Datos")}
                 />
                 <FeaturesMenuItem
-                  icon={<Detective size={24} />}
+                  icon={<DetectiveIcon size={24} />}
                   label={t("Anonimizador")}
                 />
                 <FeaturesMenuItem
-                  icon={<FileAudio size={24} />}
+                  icon={<FileAudioIcon size={24} />}
                   label={t("Voz a Texto")}
                 />
                 <FeaturesMenuItem
-                  icon={<Article size={24} />}
+                  icon={<ArticleIcon size={24} />}
                   label={t("Resumen")}
                 />
                 <FeaturesMenuItem
-                  icon={<Gear size={24} />}
+                  icon={<GearIcon size={24} />}
                   label="Configuración"
                   fullWidth
                 />
@@ -1158,13 +1158,13 @@ function ShowcasePage({ locale }: { locale: Locale }) {
             <DemoCard title="BigIconButton">
               <div className={wrap}>
                 <BigIconButton variant="primary" aria-label={t("Agregar")}>
-                  <Plus />
+                  <PlusIcon />
                 </BigIconButton>
                 <BigIconButton variant="secondary" aria-label={t("Actualizar")}>
-                  <ArrowsClockwise />
+                  <ArrowsClockwiseIcon />
                 </BigIconButton>
                 <BigIconButton variant="tertiary" aria-label={t("Eliminar")}>
-                  <Trash />
+                  <TrashIcon />
                 </BigIconButton>
               </div>
             </DemoCard>
@@ -1528,13 +1528,13 @@ function ShowcasePage({ locale }: { locale: Locale }) {
             <DemoCard title="CardTool" span="wide">
               <div className={twoColumnGrid}>
                 <CardTool
-                  icon={<Article />}
+                  icon={<ArticleIcon />}
                   title={t("Resumen de documentos")}
                   description={t("Resumen automático de documentos")}
                   interactive
                 />
                 <CardTool
-                  icon={<Article />}
+                  icon={<ArticleIcon />}
                   title={t("Próximamente")}
                   description={t("Herramienta todavía no disponible")}
                   disabled
@@ -1545,14 +1545,14 @@ function ShowcasePage({ locale }: { locale: Locale }) {
             <DemoCard title={t("FileDropZone · estados")} span="full">
               <div className={threeColumnGrid}>
                 <FileDropZone
-                  icon={<FileAudio size={42} />}
+                  icon={<FileAudioIcon size={42} />}
                   title={t(
                     "Seleccioná o arrastrá el archivo para\ntranscribir",
                   )}
                   description={t("Formatos válidos: .mp3, .wav, .m4a")}
                 />
                 <FileDropZone
-                  icon={<FileAudio size={42} />}
+                  icon={<FileAudioIcon size={42} />}
                   title={t("Soltá el archivo para cargarlo")}
                   description={t(
                     "El estado dragging puede controlarse externamente",
@@ -1560,7 +1560,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
                   dragging
                 />
                 <FileDropZone
-                  icon={<FileAudio size={42} />}
+                  icon={<FileAudioIcon size={42} />}
                   title={t("Carga no disponible")}
                   description={t("La superficie también contempla disabled")}
                   disabled
@@ -1623,7 +1623,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
               <div className={stack}>
                 <div className={archiveRowWidth}>
                   <ArchiveRow
-                    icon={<File size={24} />}
+                    icon={<FileIcon size={24} />}
                     title="demanda-con-un-nombre-largo.docx"
                     description={t("11 pág. · 21,5 MB")}
                     trailingAction={<TrashButton locale={locale} />}
@@ -1640,7 +1640,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
                         size="icon-sm"
                         aria-label={t("Reproducir")}
                       >
-                        <Play size={24} />
+                        <PlayIcon size={24} />
                       </Button>
                     }
                     trailingAction={<TrashButton locale={locale} />}
@@ -1678,7 +1678,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
               <div className={largeArchiveComposition}>
                 <ArchiveView type="preview" size="lg" selectable={false} />
                 <ArchiveRow
-                  icon={<File size={24} />}
+                  icon={<FileIcon size={24} />}
                   title="documento-para-procesar.docx"
                   description={t("11 pág. · 21,5 MB")}
                   trailingAction={<TrashButton locale={locale} />}
@@ -1831,7 +1831,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
                       size="icon-sm"
                       aria-label={t("Volver")}
                     >
-                      <ArrowLeft size={32} />
+                      <ArrowLeftIcon size={32} />
                     </Button>
                   }
                   footer={
@@ -1842,7 +1842,7 @@ function ShowcasePage({ locale }: { locale: Locale }) {
                   }
                 >
                   <FileDropZone
-                    icon={<File size={42} />}
+                    icon={<FileIcon size={42} />}
                     title={t(
                       "Seleccioná o arrastrá el documento para anonimizar",
                     )}

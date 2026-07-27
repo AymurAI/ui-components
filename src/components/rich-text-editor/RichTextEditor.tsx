@@ -1,10 +1,10 @@
 import {
-  Copy as CopyIcon,
-  Highlighter,
-  PencilSimpleLine,
-  TextB,
-  TextItalic,
-  TextUnderline,
+  CopyIcon,
+  HighlighterIcon,
+  PencilSimpleLineIcon,
+  TextBIcon,
+  TextItalicIcon,
+  TextUnderlineIcon,
 } from "@phosphor-icons/react";
 import type { JSONContent } from "@tiptap/core";
 import Highlight from "@tiptap/extension-highlight";
@@ -446,7 +446,7 @@ export function RichTextEditor({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => editor?.chain().focus().toggleBold().run()}
               >
-                <TextB size={20} />
+                <TextBIcon size={20} />
               </Button>
               <Button
                 variant="none"
@@ -457,7 +457,7 @@ export function RichTextEditor({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => editor?.chain().focus().toggleItalic().run()}
               >
-                <TextItalic size={20} />
+                <TextItalicIcon size={20} />
               </Button>
               <Button
                 variant="none"
@@ -468,7 +468,7 @@ export function RichTextEditor({
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => editor?.chain().focus().toggleUnderline().run()}
               >
-                <TextUnderline size={20} />
+                <TextUnderlineIcon size={20} />
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
@@ -479,7 +479,7 @@ export function RichTextEditor({
                     aria-label="Resaltar"
                     onMouseDown={(e) => e.preventDefault()}
                   >
-                    <Highlighter size={20} />
+                    <HighlighterIcon size={20} />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
@@ -562,7 +562,7 @@ export function RichTextEditor({
                   setEditingTitle(true);
                 }}
               >
-                <PencilSimpleLine size={16} />
+                <PencilSimpleLineIcon size={16} />
               </Button>
             )}
           </div>

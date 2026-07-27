@@ -1,4 +1,4 @@
-import { ArrowLeft } from "@phosphor-icons/react";
+import { ArrowLeftIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { css } from "@/styled/css";
 import { AppFooter } from "../app-footer";
@@ -33,7 +33,7 @@ const footer = (
 
 const backButton = (
   <Button variant="tertiary" size="icon-sm" aria-label="Volver">
-    <ArrowLeft size={32} />
+    <ArrowLeftIcon size={32} />
   </Button>
 );
 

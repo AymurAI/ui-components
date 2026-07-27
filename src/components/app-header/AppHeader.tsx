@@ -1,4 +1,4 @@
-import { DotsNine, Question } from "@phosphor-icons/react";
+import { DotsNineIcon, QuestionIcon } from "@phosphor-icons/react";
 import type { ReactElement, ReactNode } from "react";
 import { css, cx } from "@/styled/css";
 import { BigIconButton } from "../big-icon-button";
@@ -150,7 +150,7 @@ export function AppHeader({
       onClick={onHelp}
       style={{ padding: 2, borderRadius: 4 }}
     >
-      <Question size={32} className={helpIcon} />
+      <QuestionIcon size={32} className={helpIcon} />
     </Button>
   );
   const defaultApps = (
@@ -161,7 +161,7 @@ export function AppHeader({
       onClick={onOpenApps}
       style={{ padding: 2, borderRadius: 4 }}
     >
-      <DotsNine size={32} />
+      <DotsNineIcon size={32} />
     </BigIconButton>
   );
 

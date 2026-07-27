@@ -1,4 +1,4 @@
-import { WarningCircle } from "@phosphor-icons/react";
+import { WarningCircleIcon } from "@phosphor-icons/react";
 import { useId } from "react";
 
 import { Suggestion } from "@/components/suggestion/Suggestion";
@@ -273,7 +273,7 @@ export function TextField({
       {helper && !error && <p className={classes.helper}>{helper}</p>}
       {error && (
         <p id={errorMessageId} role="alert" className={classes.errorMessage}>
-          <WarningCircle size={12} />
+          <WarningCircleIcon size={12} />
           {error}
         </p>
       )}

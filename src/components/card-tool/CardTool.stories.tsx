@@ -1,4 +1,4 @@
-import { Article } from "@phosphor-icons/react";
+import { ArticleIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CardTool } from "./CardTool";
 
@@ -6,7 +6,7 @@ const meta = {
   title: "Components/CardTool",
   component: CardTool,
   args: {
-    icon: <Article />,
+    icon: <ArticleIcon />,
     title: "Resumen de documentos",
     description: "Resumen automático de documentos",
     interactive: true,

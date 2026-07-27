@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle } from "@phosphor-icons/react";
+import { CheckCircleIcon, XCircleIcon } from "@phosphor-icons/react";
 import { css, cva, cx } from "@/styled/css";
 import { Spinner } from "../spinner";
 
@@ -183,9 +183,9 @@ export function ArchiveView({
             })}
           >
             {isError ? (
-              <XCircle size={48} weight="fill" />
+              <XCircleIcon size={48} weight="fill" />
             ) : (
-              <CheckCircle size={48} weight="fill" />
+              <CheckCircleIcon size={48} weight="fill" />
             )}
           </div>
         )}

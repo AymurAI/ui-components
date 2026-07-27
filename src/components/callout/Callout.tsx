@@ -1,5 +1,5 @@
 import type { Icon } from "@phosphor-icons/react";
-import { Bell, X } from "@phosphor-icons/react";
+import { BellIcon, XIcon } from "@phosphor-icons/react";
 import type { HTMLAttributes } from "react";
 import { cva, cx } from "@/styled/css";
 import { styled } from "@/styled/jsx";
@@ -116,7 +116,7 @@ export function Callout({
   size = "normal",
   noBorder = false,
   onDismiss,
-  icon: IconComponent = Bell,
+  icon: IconComponent = BellIcon,
   className,
   ...props
 }: CalloutProps) {
@@ -146,7 +146,7 @@ export function Callout({
           lineHeight="[0]"
           className={accent}
         >
-          <X size={24} aria-hidden="true" />
+          <XIcon size={24} aria-hidden="true" />
         </styled.button>
       )}
     </div>

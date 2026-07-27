@@ -1,4 +1,4 @@
-import { X } from "@phosphor-icons/react";
+import { XIcon } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { css } from "@/styled/css";
 import {
@@ -59,7 +59,7 @@ export function TutorialDialog({
         <DialogHeader>
           <DialogTitle className={titleStyle}>{title}</DialogTitle>
           <DialogClose className={closeButton} aria-label={closeLabel}>
-            <X size={32} />
+            <XIcon size={32} />
           </DialogClose>
         </DialogHeader>
         <TutorialGrid steps={steps} />

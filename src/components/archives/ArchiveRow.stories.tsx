@@ -1,4 +1,4 @@
-import { File, Play, Trash } from "@phosphor-icons/react";
+import { FileIcon, PlayIcon, TrashIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { css } from "@/styled/css";
 import { Button } from "../button";
@@ -23,7 +23,7 @@ function TrashButton() {
       aria-label="Eliminar archivo"
       style={{ padding: 4 }}
     >
-      <Trash size={24} />
+      <TrashIcon size={24} />
     </Button>
   );
 }
@@ -31,7 +31,7 @@ function TrashButton() {
 /** Single-document preview file row (Figma node 40002579:88220) — no leading action. */
 export const Default: Story = {
   args: {
-    icon: <File size={24} />,
+    icon: <FileIcon size={24} />,
     title: "Archivonombrelargolarguisimo.doc",
     description: "11 pag. - 21.5 mb",
     trailingAction: <TrashButton />,
@@ -56,7 +56,7 @@ export const WithLeadingAction: Story = {
         aria-label="Reproducir"
         style={{ padding: 4 }}
       >
-        <Play size={24} />
+        <PlayIcon size={24} />
       </Button>
     ),
     trailingAction: <TrashButton />,
@@ -71,7 +71,7 @@ export const WithLeadingAction: Story = {
 /** Long filenames ellipsize instead of pushing the trailing action out. */
 export const LongTitle: Story = {
   args: {
-    icon: <File size={24} />,
+    icon: <FileIcon size={24} />,
     title: "Un-nombre-de-archivo-extremadamente-largo-que-no-entra.docx",
     description: "34 pag. - 8.1 mb",
     trailingAction: <TrashButton />,
@@ -100,7 +100,7 @@ export const DocumentPreviewComposition: Story = {
     >
       <ArchiveView type="preview" size="lg" selectable={false} />
       <ArchiveRow
-        icon={<File size={24} />}
+        icon={<FileIcon size={24} />}
         title="Archivonombrelargolarguisimo.doc"
         description="11 pag. - 21.5 mb"
         trailingAction={<TrashButton />}

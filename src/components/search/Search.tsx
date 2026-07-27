@@ -1,4 +1,9 @@
-import { CaretDown, CaretUp, MagnifyingGlass, X } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  MagnifyingGlassIcon,
+  XIcon,
+} from "@phosphor-icons/react";
 import type { InputHTMLAttributes } from "react";
 import { css, cx, sva } from "@/styled/css";
 
@@ -167,7 +172,7 @@ export function Search({
             hasValue && css({ color: "text.default" }),
           )}
         >
-          <MagnifyingGlass size={24} />
+          <MagnifyingGlassIcon size={24} />
         </span>
 
         <div
@@ -256,7 +261,7 @@ export function Search({
                   "&:hover": { color: "text.default" },
                 })}
               >
-                <X size={24} />
+                <XIcon size={24} />
               </button>
             )}
             {resultCount && (
@@ -299,7 +304,7 @@ export function Search({
                     "&:disabled": { cursor: "not-allowed", opacity: "0.5" },
                   })}
                 >
-                  <CaretUp size={24} />
+                  <CaretUpIcon size={24} />
                 </button>
                 <button
                   type="button"
@@ -322,7 +327,7 @@ export function Search({
                     "&:disabled": { cursor: "not-allowed", opacity: "0.5" },
                   })}
                 >
-                  <CaretDown size={24} />
+                  <CaretDownIcon size={24} />
                 </button>
               </div>
             )}

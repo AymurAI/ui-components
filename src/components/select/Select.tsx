@@ -1,4 +1,9 @@
-import { CaretDown, CaretUp, Check, XCircle } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  CheckIcon,
+  XCircleIcon,
+} from "@phosphor-icons/react";
 import * as RadixSelect from "@radix-ui/react-select";
 import {
   type Ref,
@@ -110,7 +115,7 @@ function SelectItem({
       }
     >
       <RadixSelect.ItemIndicator className={itemIndicatorClassName}>
-        <Check size={14} weight="bold" />
+        <CheckIcon size={14} weight="bold" />
       </RadixSelect.ItemIndicator>
       <RadixSelect.ItemText>{text}</RadixSelect.ItemText>
     </RadixSelect.Item>
@@ -391,13 +396,13 @@ export function Select({
                   setSelectedValue("");
                 }}
               >
-                <XCircle size={16} />
+                <XCircleIcon size={16} />
               </button>
             )}
 
             {/* Caret sits at the trailing edge — matches Figma layout */}
             <RadixSelect.Icon asChild>
-              <CaretDown
+              <CaretDownIcon
                 size={16}
                 className={classes.caret}
                 aria-hidden="true"
@@ -413,7 +418,7 @@ export function Select({
             sideOffset={4}
           >
             <RadixSelect.ScrollUpButton className={classes.scrollButton}>
-              <CaretUp size={12} />
+              <CaretUpIcon size={12} />
             </RadixSelect.ScrollUpButton>
             <RadixSelect.Viewport className={classes.viewport}>
               {orderedOptions.map(({ id, text, description }) => (
@@ -428,7 +433,7 @@ export function Select({
               ))}
             </RadixSelect.Viewport>
             <RadixSelect.ScrollDownButton className={classes.scrollButton}>
-              <CaretDown size={12} />
+              <CaretDownIcon size={12} />
             </RadixSelect.ScrollDownButton>
           </RadixSelect.Content>
         </RadixSelect.Portal>

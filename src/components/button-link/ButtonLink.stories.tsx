@@ -1,4 +1,4 @@
-import { ArrowLeft, CaretDown } from "@phosphor-icons/react";
+import { ArrowLeftIcon, CaretDownIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ButtonLink } from "./ButtonLink";
 
@@ -27,8 +27,8 @@ export const SizeMDefault: Story = {
     size: "M",
     type: "Default",
     children: "call to action",
-    iconLeft: <ArrowLeft size={16} />,
-    iconRight: <CaretDown size={16} />,
+    iconLeft: <ArrowLeftIcon size={16} />,
+    iconRight: <CaretDownIcon size={16} />,
   },
 };
 
@@ -38,8 +38,8 @@ export const SizeMAlternative: Story = {
     size: "M",
     type: "Alternative",
     children: "call to action",
-    iconLeft: <ArrowLeft size={16} />,
-    iconRight: <CaretDown size={16} />,
+    iconLeft: <ArrowLeftIcon size={16} />,
+    iconRight: <CaretDownIcon size={16} />,
   },
   parameters: { backgrounds: { default: "dark" } },
 };
@@ -51,7 +51,7 @@ export const SizeSDefault: Story = {
     size: "S",
     type: "Default",
     children: "call to action",
-    iconLeft: <ArrowLeft size={16} />,
+    iconLeft: <ArrowLeftIcon size={16} />,
   },
 };
 
@@ -62,7 +62,7 @@ export const SizeSAlternative: Story = {
     size: "S",
     type: "Alternative",
     children: "call to action",
-    iconLeft: <ArrowLeft size={16} />,
+    iconLeft: <ArrowLeftIcon size={16} />,
   },
   parameters: { backgrounds: { default: "dark" } },
 };
@@ -82,8 +82,8 @@ export const Matrix: Story = {
       <ButtonLink
         size="M"
         type="Default"
-        iconLeft={<ArrowLeft size={16} />}
-        iconRight={<CaretDown size={16} />}
+        iconLeft={<ArrowLeftIcon size={16} />}
+        iconRight={<CaretDownIcon size={16} />}
       >
         Size M / Default
       </ButtonLink>
@@ -93,14 +93,18 @@ export const Matrix: Story = {
         <ButtonLink
           size="M"
           type="Alternative"
-          iconLeft={<ArrowLeft size={16} />}
-          iconRight={<CaretDown size={16} />}
+          iconLeft={<ArrowLeftIcon size={16} />}
+          iconRight={<CaretDownIcon size={16} />}
         >
           Size M / Alternative
         </ButtonLink>
       </div>
       {/* Size=S: built-in CaretDown replaces iconRight */}
-      <ButtonLink size="S" type="Default" iconLeft={<ArrowLeft size={16} />}>
+      <ButtonLink
+        size="S"
+        type="Default"
+        iconLeft={<ArrowLeftIcon size={16} />}
+      >
         Size S / Default
       </ButtonLink>
       <div
@@ -109,7 +113,7 @@ export const Matrix: Story = {
         <ButtonLink
           size="S"
           type="Alternative"
-          iconLeft={<ArrowLeft size={16} />}
+          iconLeft={<ArrowLeftIcon size={16} />}
         >
           Size S / Alternative
         </ButtonLink>

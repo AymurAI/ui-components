@@ -1,4 +1,8 @@
-import { Repeat, TagSimple, TrashSimple } from "@phosphor-icons/react";
+import {
+  RepeatIcon,
+  TagSimpleIcon,
+  TrashSimpleIcon,
+} from "@phosphor-icons/react";
 import type { ButtonHTMLAttributes } from "react";
 import { css, cva, cx } from "@/styled/css";
 
@@ -119,34 +123,34 @@ function ActionIcon({ action }: { action: ToolButtonAction }) {
 
   switch (action) {
     case "reemplazar":
-      return <Repeat size={size} />;
+      return <RepeatIcon size={size} />;
 
     case "reemplazar-todo":
       return (
         <div className={iconWrapperStyle}>
-          <Repeat size={size} />
+          <RepeatIcon size={size} />
           <span className={allBadgeStyle}>ALL</span>
         </div>
       );
 
     case "eliminar":
-      return <TrashSimple size={size} />;
+      return <TrashSimpleIcon size={size} />;
 
     case "eliminar-todo":
       return (
         <div className={iconWrapperStyle}>
-          <TrashSimple size={size} />
+          <TrashSimpleIcon size={size} />
           <span className={allBadgeStyle}>ALL</span>
         </div>
       );
 
     case "agregar-etiqueta":
-      return <TagSimple size={size} />;
+      return <TagSimpleIcon size={size} />;
 
     case "agregar-todas":
       return (
         <div className={iconWrapperStyle}>
-          <TagSimple size={size} />
+          <TagSimpleIcon size={size} />
           <span className={allBadgeStyle}>ALL</span>
         </div>
       );

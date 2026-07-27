@@ -1,4 +1,4 @@
-import { FileAudio } from "@phosphor-icons/react";
+import { FileAudioIcon } from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { FileDropZone } from "./FileDropZone";
 
@@ -6,7 +6,7 @@ const meta = {
   title: "Components/FileDropZone",
   component: FileDropZone,
   args: {
-    icon: <FileAudio size={42} />,
+    icon: <FileAudioIcon size={42} />,
     title: "Selecciona o arrastra el archivo para\ntranscribir",
     description: "Formatos válidos: .mp3, .wav, .m4a, .webm, .ogg o .flac",
   },

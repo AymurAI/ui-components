@@ -1,4 +1,8 @@
-import { ArrowsClockwise, CheckCircle, Stop } from "@phosphor-icons/react";
+import {
+  ArrowsClockwiseIcon,
+  CheckCircleIcon,
+  StopIcon,
+} from "@phosphor-icons/react";
 import { Button } from "@/components/button/Button";
 import { css, cx } from "@/styled/css";
 
@@ -168,7 +172,7 @@ function ProgressLabel({
           color: "brand.primary",
         })}
       >
-        <CheckCircle size={19} />
+        <CheckCircleIcon size={19} />
         <span
           className={css({
             textStyle: "label.md.default",
@@ -311,7 +315,7 @@ export function ArchiveProgress({
               className={css({ px: "4", py: "2", gap: "1" })}
               style={{ height: 41, width: 141 }}
             >
-              <Stop size={16} />
+              <StopIcon size={16} />
               Detener
             </Button>
           )}
@@ -323,7 +327,7 @@ export function ArchiveProgress({
               className={css({ px: "4", py: "2", gap: "1" })}
               style={{ height: 41 }}
             >
-              <ArrowsClockwise size={16} />
+              <ArrowsClockwiseIcon size={16} />
               Reemplazar
             </Button>
           )}
