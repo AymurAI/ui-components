@@ -79,4 +79,122 @@ describe("serializeDocumentToPlainText", () => {
     };
     expect(serializeDocumentToPlainText(doc)).toBe("A.\n\n\n\nB.");
   });
+
+  it("renders each list item as its own line, not an empty line (bulletList/orderedList)", () => {
+    const doc = {
+      type: "doc",
+      content: [
+        {
+          type: "bulletList",
+          content: [
+            {
+              type: "listItem",
+              content: [
+                { type: "paragraph", content: [{ type: "text", text: "Uno" }] },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                { type: "paragraph", content: [{ type: "text", text: "Dos" }] },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    expect(serializeDocumentToPlainText(doc)).toBe("Uno\n\nDos");
+  });
+
+  it("renders a table as a pipe-separated header/separator/body block, not an empty gap", () => {
+    const doc = {
+      type: "doc",
+      content: [
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableHeader",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Medida" }],
+                    },
+                  ],
+                },
+                {
+                  type: "tableHeader",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Plazo" }],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Exclusión" }],
+                    },
+                  ],
+                },
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "Inmediato" }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    expect(serializeDocumentToPlainText(doc)).toBe(
+      "Medida | Plazo\n--- | ---\nExclusión | Inmediato",
+    );
+  });
+
+  it("surrounds a table with blank-line-separated paragraphs like any other block", () => {
+    const doc = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Antes." }] },
+        {
+          type: "table",
+          content: [
+            {
+              type: "tableRow",
+              content: [
+                {
+                  type: "tableCell",
+                  content: [
+                    {
+                      type: "paragraph",
+                      content: [{ type: "text", text: "A" }],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        { type: "paragraph", content: [{ type: "text", text: "Después." }] },
+      ],
+    };
+    expect(serializeDocumentToPlainText(doc)).toBe("Antes.\n\nA\n\nDespués.");
+  });
 });

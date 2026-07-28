@@ -413,6 +413,54 @@ describe("RichTextEditor — toolbar", () => {
       "on",
     );
   });
+
+  it("toggles a bullet list via the toolbar", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const listDoc: JSONContent = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Item" }] },
+      ],
+    };
+    render(<RichTextEditor document={listDoc} onChange={handleChange} />);
+
+    await user.click(screen.getByRole("button", { name: "Lista con viñetas" }));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
+    expect(lastCall.content[0].type).toBe("bulletList");
+    expect(
+      screen.getByRole("button", { name: "Lista con viñetas" }),
+    ).toHaveAttribute("data-state", "on");
+  });
+
+  it("toggles an ordered list via the toolbar", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    const listDoc: JSONContent = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Item" }] },
+      ],
+    };
+    render(<RichTextEditor document={listDoc} onChange={handleChange} />);
+
+    await user.click(screen.getByRole("button", { name: "Lista numerada" }));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
+    expect(lastCall.content[0].type).toBe("orderedList");
+    expect(
+      screen.getByRole("button", { name: "Lista numerada" }),
+    ).toHaveAttribute("data-state", "on");
+  });
 });
 
 describe("RichTextEditor — highlight + copy", () => {
@@ -887,5 +935,153 @@ describe("RichTextEditor — EditableRecoveryBoundary stress test", () => {
     expect(removeChildErrors).toHaveLength(0);
 
     consoleError.mockRestore();
+  });
+});
+
+describe("RichTextEditor — table context menu", () => {
+  const tableDoc: JSONContent = {
+    type: "doc",
+    content: [
+      {
+        type: "table",
+        content: [
+          {
+            type: "tableRow",
+            content: [
+              {
+                type: "tableHeader",
+                content: [
+                  { type: "paragraph", content: [{ type: "text", text: "A" }] },
+                ],
+              },
+              {
+                type: "tableHeader",
+                content: [
+                  { type: "paragraph", content: [{ type: "text", text: "B" }] },
+                ],
+              },
+            ],
+          },
+          {
+            type: "tableRow",
+            content: [
+              {
+                type: "tableCell",
+                content: [
+                  { type: "paragraph", content: [{ type: "text", text: "1" }] },
+                ],
+              },
+              {
+                type: "tableCell",
+                content: [
+                  { type: "paragraph", content: [{ type: "text", text: "2" }] },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  /** Finds the <td>/<th> with the given text and puts the editor's real
+   * selection inside it — the same DOM-Range-based technique the bold/
+   * italic toolbar tests already rely on to drive ProseMirror's own
+   * selection from a test. */
+  function selectCell(editorEl: HTMLElement, cellText: string): HTMLElement {
+    const cell = mustExist(
+      Array.from(editorEl.querySelectorAll("td, th")).find(
+        (candidate) => candidate.textContent === cellText,
+      ) as HTMLElement | undefined,
+      `cell "${cellText}"`,
+    );
+    const textNode = mustExist(
+      mustExist(cell.querySelector("p"), "cell paragraph").firstChild,
+      `cell "${cellText}" text node`,
+    );
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    (screen.getByRole("textbox") as HTMLElement).focus();
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(range);
+    return cell;
+  }
+
+  it("shows row/column/table controls when right-clicking inside a table cell", async () => {
+    render(<RichTextEditor document={tableDoc} />);
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    const cell = selectCell(editorEl, "1");
+
+    fireEvent.contextMenu(cell);
+
+    expect(await screen.findByText("Eliminar fila")).toBeInTheDocument();
+    expect(screen.getByText("Agregar fila arriba")).toBeInTheDocument();
+    expect(screen.getByText("Agregar fila abajo")).toBeInTheDocument();
+    expect(
+      screen.getByText("Agregar columna a la izquierda"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Agregar columna a la derecha"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Eliminar columna")).toBeInTheDocument();
+    expect(screen.getByText("Eliminar tabla")).toBeInTheDocument();
+  });
+
+  it("does not show table controls when right-clicking outside a table", () => {
+    const plainDoc: JSONContent = {
+      type: "doc",
+      content: [
+        { type: "paragraph", content: [{ type: "text", text: "Hola" }] },
+      ],
+    };
+    render(<RichTextEditor document={plainDoc} />);
+    fireEvent.contextMenu(screen.getByTestId("rich-text-editor-card"));
+    expect(screen.queryByText("Eliminar fila")).not.toBeInTheDocument();
+  });
+
+  it("does not show table controls in readOnly mode", () => {
+    render(<RichTextEditor document={tableDoc} readOnly />);
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    fireEvent.contextMenu(mustExist(editorEl.querySelector("td"), "cell"));
+    expect(screen.queryByText("Eliminar fila")).not.toBeInTheDocument();
+  });
+
+  it("deletes the current row via 'Eliminar fila'", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(<RichTextEditor document={tableDoc} onChange={handleChange} />);
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    const cell = selectCell(editorEl, "1");
+    fireEvent.contextMenu(cell);
+
+    await user.click(await screen.findByText("Eliminar fila"));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
+    // Only the header row is left.
+    expect(lastCall.content[0].content).toHaveLength(1);
+  });
+
+  it("deletes the whole table via 'Eliminar tabla'", async () => {
+    const user = userEvent.setup();
+    const handleChange = vi.fn();
+    render(<RichTextEditor document={tableDoc} onChange={handleChange} />);
+    const editorEl = screen.getByTestId("rich-text-editor-card");
+    const cell = selectCell(editorEl, "1");
+    fireEvent.contextMenu(cell);
+
+    await user.click(await screen.findByText("Eliminar tabla"));
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastCall = mustExist(
+      handleChange.mock.calls.at(-1),
+      "onChange call",
+    )[0];
+    expect(
+      lastCall.content.some((node: JSONContent) => node.type === "table"),
+    ).toBe(false);
   });
 });

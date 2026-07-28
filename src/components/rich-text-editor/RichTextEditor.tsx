@@ -1,6 +1,8 @@
 import {
   CopyIcon,
   HighlighterIcon,
+  ListBulletsIcon,
+  ListNumbersIcon,
   PencilSimpleLineIcon,
   TextBIcon,
   TextItalicIcon,
@@ -11,8 +13,21 @@ import Highlight from "@tiptap/extension-highlight";
 import { TableKit } from "@tiptap/extension-table";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Component, type ReactNode, useEffect, useState } from "react";
+import {
+  Component,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useState,
+} from "react";
 import { Button } from "@/components/button";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from "@/components/context-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/popover";
 import { css, cx } from "@/styled/css";
 import { HStack, Stack } from "@/styled/jsx";
@@ -144,6 +159,14 @@ const divider = css({
   h: "6",
   bg: "[#BCBAB8]",
 });
+
+// `ContextMenuTrigger asChild` needs a real DOM element to clone its own
+// props (onContextMenu, ref) onto — EditorContent's rendered div already
+// carries load-bearing classes/style/testid of its own (asserted on
+// directly by existing tests), so it's wrapped in this element instead of
+// being the trigger itself. `display: contents` keeps the wrapper invisible
+// to layout, so it doesn't disturb EditorContent's own flex/sizing.
+const tableMenuWrapper = css({ display: "contents" });
 
 // Figma (node 40002573:72715): hover/active/pressed-open state for the
 // format toggle buttons is a light-purple fill, not the default Button
@@ -408,17 +431,72 @@ export function RichTextEditor({
     };
   }, [editor]);
 
+  // Right-click table controls, editable mode only — read-only previews
+  // (the Resumen finish screen, "embedded" variant) never mutate content, so
+  // the browser's native context menu is left alone there.
+  function withTableContextMenu(children: ReactElement) {
+    if (readOnly) return children;
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild disabled={!editor?.isActive("table")}>
+          <div className={tableMenuWrapper}>{children}</div>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().addRowBefore().run()}
+          >
+            Agregar fila arriba
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().addRowAfter().run()}
+          >
+            Agregar fila abajo
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().deleteRow().run()}
+          >
+            Eliminar fila
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().addColumnBefore().run()}
+          >
+            Agregar columna a la izquierda
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().addColumnAfter().run()}
+          >
+            Agregar columna a la derecha
+          </ContextMenuItem>
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().deleteColumn().run()}
+          >
+            Eliminar columna
+          </ContextMenuItem>
+          <ContextMenuSeparator />
+          <ContextMenuItem
+            onSelect={() => editor?.chain().focus().deleteTable().run()}
+          >
+            Eliminar tabla
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+
   if (variant === "embedded") {
     return (
       <EditableRecoveryBoundary
         key={bodyEpoch}
         onRecover={() => setBodyEpoch((epoch) => epoch + 1)}
       >
-        <EditorContent
-          editor={editor}
-          data-testid="rich-text-editor-embedded"
-          className={cx(body, embeddedBody)}
-        />
+        {withTableContextMenu(
+          <EditorContent
+            editor={editor}
+            data-testid="rich-text-editor-embedded"
+            className={cx(body, embeddedBody)}
+          />,
+        )}
       </EditableRecoveryBoundary>
     );
   }
@@ -469,6 +547,30 @@ export function RichTextEditor({
                 onClick={() => editor?.chain().focus().toggleUnderline().run()}
               >
                 <TextUnderlineIcon size={20} />
+              </Button>
+              <Button
+                variant="none"
+                size="icon-sm"
+                className={formatButton}
+                aria-label="Lista con viñetas"
+                data-state={editor?.isActive("bulletList") ? "on" : "off"}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor?.chain().focus().toggleBulletList().run()}
+              >
+                <ListBulletsIcon size={20} />
+              </Button>
+              <Button
+                variant="none"
+                size="icon-sm"
+                className={formatButton}
+                aria-label="Lista numerada"
+                data-state={editor?.isActive("orderedList") ? "on" : "off"}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() =>
+                  editor?.chain().focus().toggleOrderedList().run()
+                }
+              >
+                <ListNumbersIcon size={20} />
               </Button>
               <Popover>
                 <PopoverTrigger asChild>
@@ -572,12 +674,14 @@ export function RichTextEditor({
           key={bodyEpoch}
           onRecover={() => setBodyEpoch((epoch) => epoch + 1)}
         >
-          <EditorContent
-            editor={editor}
-            data-testid="rich-text-editor-card"
-            className={cx(body, card)}
-            style={{ maxHeight: maxBodyHeight }}
-          />
+          {withTableContextMenu(
+            <EditorContent
+              editor={editor}
+              data-testid="rich-text-editor-card"
+              className={cx(body, card)}
+              style={{ maxHeight: maxBodyHeight }}
+            />,
+          )}
         </EditableRecoveryBoundary>
       </Stack>
     </div>
