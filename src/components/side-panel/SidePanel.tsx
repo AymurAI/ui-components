@@ -1,7 +1,7 @@
-import { Plus, Trash } from "phosphor-react";
+import { ArrowsMergeIcon, PlusIcon, TrashIcon } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { useState } from "react";
-import { css } from "@/styled/css";
+import { css, cva, cx } from "@/styled/css";
 import { stack } from "@/styled/patterns";
 import { isValidTimestamp } from "@/utils/timestamp";
 import type { AvatarColor } from "../avatar";
@@ -16,19 +16,24 @@ import {
 } from "../dialog";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
-import { ArrowsMerge } from "./ArrowsMergeIcon";
 
 /**
  * SidePanel — "Side Panel Voz a texto" (speech-to-text turn editor).
- * AymurAI UI Library node 40002322:53113.
+ * AymurAI UI Library node 40002322:53113 — the only width Figma documents
+ * (479px); there's no sm/md/lg variant in Figma. `size="lg"` (default)
+ * matches that reference exactly. `size="sm"` (360px) and `size="md"`
+ * (400px) formalize desktop-app's own real widths instead: the fixed
+ * wrapper around this component in the Voz a Texto turn editor, and the
+ * fully-custom (not yet using this component) entities panel in
+ * Anonimizador, respectively — both currently impose width themselves
+ * because this component had none of its own.
  *
  * Composite assembled from {@link AvatarPill}, {@link TextField},
  * {@link Button}, {@link Dialog} and {@link Tooltip}. Sections: selected
  * turn card, suggested people, timestamp, and turn actions (merge
  * previous/next, add below, delete).
  *
- * Merge actions use the Phosphor "ArrowsMerge" glyph (vendored in
- * ./ArrowsMergeIcon as phosphor-react@1.4.1 predates it): base points down
+ * Merge actions use the Phosphor "ArrowsMergeIcon" glyph: base points down
  * ("siguiente"), rotated 180° points up ("anterior").
  *
  * Consumers need a `TooltipProvider` somewhere up the tree for the Acciones
@@ -89,18 +94,32 @@ export type SidePanelProps = {
   nextTurnName?: string;
   onAddBelow?: () => void;
   onDelete?: () => void;
+  /** Intrinsic width: Voz a Texto wrapper (360px) · entities panel (400px) · Figma reference (479px, default) */
+  size?: SidePanelSize;
   className?: string;
 };
 
-const root = css({
-  display: "flex",
-  flexDirection: "column",
-  gap: "6", // 24px
-  pt: "[42px]",
-  px: "8", // 32px
-  pb: "8",
-  bg: "bg.primary",
-  w: "full",
+export type SidePanelSize = "sm" | "md" | "lg";
+
+const root = cva({
+  base: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "6", // 24px
+    pt: "[42px]",
+    px: "8", // 32px
+    pb: "8",
+    bg: "bg.primary",
+    maxW: "full",
+  },
+  variants: {
+    size: {
+      sm: { w: "[360px]" },
+      md: { w: "[400px]" },
+      lg: { w: "[479px]" },
+    },
+  },
+  defaultVariants: { size: "lg" },
 });
 
 const card = css({
@@ -113,6 +132,7 @@ const card = css({
 });
 
 const cardTitle = css({
+  margin: "0", // no preflight — <p> keeps the UA default margin otherwise
   textStyle: "subtitle.sm.default",
   color: "text.default",
 });
@@ -129,6 +149,7 @@ const turnTime = css({
 });
 
 const sectionHeading = css({
+  margin: "0",
   textStyle: "subtitle.md.strong", // Archivo SemiBold 20px
   color: "text.default",
 });
@@ -150,10 +171,12 @@ const divider = css({
 // Confirm modal (Figma "Conflicto Nombre etiqueta", node 40002384:38487):
 // title + description + Combinar/Cancelar, centered over a full-screen overlay.
 const confirmTitle = css({
+  margin: "0",
   textStyle: "subtitle.md.strong",
   color: "text.default",
 });
 const confirmDescription = css({
+  margin: "0",
   textStyle: "subtitle.sm.default",
   color: "text.default",
 });
@@ -263,6 +286,7 @@ export function SidePanel({
   nextTurnName,
   onAddBelow,
   onDelete,
+  size = "lg",
   className,
 }: SidePanelProps) {
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
@@ -358,7 +382,7 @@ export function SidePanel({
   }
 
   return (
-    <div className={className ? `${root} ${className}` : root}>
+    <div className={cx(root({ size }), className)}>
       {/* Selected turn */}
       <div className={card}>
         <p className={cardTitle}>Turno seleccionado</p>
@@ -409,7 +433,7 @@ export function SidePanel({
             );
           })}
           <Button variant="tertiary" size="sm" onClick={onNewPerson}>
-            <Plus size={16} />
+            <PlusIcon size={16} />
             Nuevo
           </Button>
         </div>
@@ -452,25 +476,28 @@ export function SidePanel({
             tooltip="Combina este turno con el anterior"
             onClick={handleMergePrevious}
           >
-            <ArrowsMerge size={16} style={{ transform: "rotate(180deg)" }} />
+            <ArrowsMergeIcon
+              size={16}
+              style={{ transform: "rotate(180deg)" }}
+            />
             Unir con el anterior
           </ActionButton>
           <ActionButton
             tooltip="Combina este turno con el siguiente"
             onClick={handleMergeNext}
           >
-            <ArrowsMerge size={16} />
+            <ArrowsMergeIcon size={16} />
             Unir con el siguiente
           </ActionButton>
           <ActionButton
             tooltip="Agrega un turno nuevo debajo de este"
             onClick={onAddBelow}
           >
-            <Plus size={16} />
+            <PlusIcon size={16} />
             Agregar debajo
           </ActionButton>
           <ActionButton tooltip="Elimina este turno" onClick={onDelete}>
-            <Trash size={16} />
+            <TrashIcon size={16} />
             Eliminar
           </ActionButton>
         </div>

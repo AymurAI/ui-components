@@ -1,5 +1,5 @@
-import type { Icon } from "phosphor-react";
-import { Bell, X } from "phosphor-react";
+import type { Icon } from "@phosphor-icons/react";
+import { BellIcon, XIcon } from "@phosphor-icons/react";
 import type { HTMLAttributes } from "react";
 import { cva, cx } from "@/styled/css";
 import { styled } from "@/styled/jsx";
@@ -10,6 +10,10 @@ import { hstack } from "@/styled/patterns";
  * Ported from desktop-app/src/renderer/src/components/ui/callout.tsx
  *
  * Figma: Toast family node 1994:30384 — Error / Warning / Success / Info.
+ * `size="compact"` has no dedicated Figma frame; it formalizes the
+ * hand-rolled "Transcribiendo audio…" notice from desktop-app's Voz a Texto
+ * flow (16px padding, 8px gap and 24px icon already match `size="normal"` —
+ * only the radius and text style shrink).
  */
 
 /**
@@ -61,10 +65,18 @@ const calloutRecipe = cva({
         borderWidth: "0",
       },
     },
+    size: {
+      normal: {},
+      compact: {
+        rounded: "xs", // Figma-scale radius token: 2px
+        textStyle: "subtitle.sm.strong", // 14px/600
+      },
+    },
   },
   defaultVariants: {
     variant: "info",
     noBorder: false,
+    size: "normal",
   },
 });
 
@@ -87,10 +99,12 @@ const accentRecipe = cva({
 });
 
 export type CalloutVariant = "error" | "warning" | "success" | "info";
+export type CalloutSize = "normal" | "compact";
 
 export interface CalloutProps extends HTMLAttributes<HTMLDivElement> {
   message: string;
   variant?: CalloutVariant;
+  size?: CalloutSize;
   noBorder?: boolean;
   onDismiss?: () => void;
   icon?: Icon;
@@ -99,16 +113,17 @@ export interface CalloutProps extends HTMLAttributes<HTMLDivElement> {
 export function Callout({
   message,
   variant = "info",
+  size = "normal",
   noBorder = false,
   onDismiss,
-  icon: IconComponent = Bell,
+  icon: IconComponent = BellIcon,
   className,
   ...props
 }: CalloutProps) {
   const accent = accentRecipe({ variant });
   return (
     <div
-      className={cx(calloutRecipe({ variant, noBorder }), className)}
+      className={cx(calloutRecipe({ variant, size, noBorder }), className)}
       {...props}
     >
       <styled.span className={accent} flexShrink="0" lineHeight="[0]">
@@ -131,7 +146,7 @@ export function Callout({
           lineHeight="[0]"
           className={accent}
         >
-          <X size={24} aria-hidden="true" />
+          <XIcon size={24} aria-hidden="true" />
         </styled.button>
       )}
     </div>

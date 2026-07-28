@@ -1,9 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/react";
 import {
-  CheckCircle,
-  WarningCircle,
-  Warning as WarningIcon,
-} from "phosphor-react";
+  CheckCircleIcon,
+  InfoIcon,
+  WarningCircleIcon,
+  WarningIcon,
+} from "@phosphor-icons/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import { Callout } from "./Callout";
 
 const meta = {
@@ -19,7 +20,7 @@ export const Info: Story = { args: { variant: "info" } };
 export const Success: Story = {
   args: {
     variant: "success",
-    icon: CheckCircle,
+    icon: CheckCircleIcon,
     message: "Operation completed successfully.",
   },
 };
@@ -33,7 +34,7 @@ export const Warning: Story = {
 export const ErrorState: Story = {
   args: {
     variant: "error",
-    icon: WarningCircle,
+    icon: WarningCircleIcon,
     message: "An error occurred.",
   },
 };
@@ -44,6 +45,17 @@ export const NoBorder: Story = {
   args: { variant: "success", noBorder: true },
 };
 
+/** Voz a Texto processing notice — formalizes the local hand-rolled version. */
+export const Compact: Story = {
+  args: {
+    size: "compact",
+    variant: "info",
+    icon: InfoIcon,
+    noBorder: true,
+    message: "Transcribiendo audio…",
+  },
+};
+
 /** Full variant matrix */
 export const Matrix: Story = {
   render: () => (
@@ -51,7 +63,7 @@ export const Matrix: Story = {
       <Callout variant="info" message="Info: review your settings." />
       <Callout
         variant="success"
-        icon={CheckCircle}
+        icon={CheckCircleIcon}
         message="Success: changes saved."
       />
       <Callout
@@ -61,7 +73,7 @@ export const Matrix: Story = {
       />
       <Callout
         variant="error"
-        icon={WarningCircle}
+        icon={WarningCircleIcon}
         message="Error: could not save changes."
       />
       <Callout

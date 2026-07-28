@@ -46,6 +46,8 @@ export const Matrix: Story = {
             "reemplazar-todo",
             "eliminar",
             "eliminar-todo",
+            "agregar-etiqueta",
+            "agregar-todas",
           ] as const
         ).map((action) => (
           <ToolButton key={action} action={action} disabled />

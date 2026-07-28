@@ -1,5 +1,9 @@
+import {
+  MagnifyingGlassIcon,
+  PencilIcon,
+  PlusCircleIcon,
+} from "@phosphor-icons/react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { MagnifyingGlass, Pencil, PlusCircle } from "phosphor-react";
 import { BigIconButton } from "./BigIconButton";
 
 const meta = {
@@ -30,7 +34,7 @@ export const PrimaryBig: Story = {
   args: {
     variant: "primary",
     size: "big",
-    children: <PlusCircle size={24} />,
+    children: <PlusCircleIcon size={24} />,
   },
 };
 
@@ -39,7 +43,7 @@ export const PrimarySmall: Story = {
   args: {
     variant: "primary",
     size: "small",
-    children: <PlusCircle size={20} />,
+    children: <PlusCircleIcon size={20} />,
   },
 };
 
@@ -48,7 +52,7 @@ export const SecondaryBig: Story = {
   args: {
     variant: "secondary",
     size: "big",
-    children: <Pencil size={24} />,
+    children: <PencilIcon size={24} />,
   },
 };
 
@@ -57,7 +61,7 @@ export const SecondarySmall: Story = {
   args: {
     variant: "secondary",
     size: "small",
-    children: <Pencil size={20} />,
+    children: <PencilIcon size={20} />,
   },
 };
 
@@ -66,7 +70,7 @@ export const TertiaryBig: Story = {
   args: {
     variant: "tertiary",
     size: "big",
-    children: <MagnifyingGlass size={24} />,
+    children: <MagnifyingGlassIcon size={24} />,
   },
 };
 
@@ -75,7 +79,7 @@ export const TertiarySmall: Story = {
   args: {
     variant: "tertiary",
     size: "small",
-    children: <MagnifyingGlass size={20} />,
+    children: <MagnifyingGlassIcon size={20} />,
   },
 };
 
@@ -102,7 +106,7 @@ export const DisabledBig: Story = {
     variant: "primary",
     size: "big",
     disabled: true,
-    children: <PlusCircle size={24} />,
+    children: <PlusCircleIcon size={24} />,
   },
 };
 
@@ -118,34 +122,34 @@ export const Matrix: Story = {
       }}
     >
       <BigIconButton variant="primary" size="big">
-        <PlusCircle size={24} />
+        <PlusCircleIcon size={24} />
       </BigIconButton>
       <BigIconButton variant="secondary" size="big">
-        <Pencil size={24} />
+        <PencilIcon size={24} />
       </BigIconButton>
       <BigIconButton variant="tertiary" size="big">
-        <MagnifyingGlass size={24} />
+        <MagnifyingGlassIcon size={24} />
       </BigIconButton>
       <BigIconButton variant="primary" size="small">
-        <PlusCircle size={20} />
+        <PlusCircleIcon size={20} />
       </BigIconButton>
       <BigIconButton variant="secondary" size="small">
-        <Pencil size={20} />
+        <PencilIcon size={20} />
       </BigIconButton>
       <BigIconButton variant="tertiary" size="small">
-        <MagnifyingGlass size={20} />
+        <MagnifyingGlassIcon size={20} />
       </BigIconButton>
       <BigIconButton variant="primary" size="big" isLoading />
       <BigIconButton variant="secondary" size="big" isLoading />
       <BigIconButton variant="tertiary" size="big" isLoading />
       <BigIconButton variant="primary" size="big" disabled>
-        <PlusCircle size={24} />
+        <PlusCircleIcon size={24} />
       </BigIconButton>
       <BigIconButton variant="secondary" size="big" disabled>
-        <Pencil size={24} />
+        <PencilIcon size={24} />
       </BigIconButton>
       <BigIconButton variant="tertiary" size="big" disabled>
-        <MagnifyingGlass size={24} />
+        <MagnifyingGlassIcon size={24} />
       </BigIconButton>
     </div>
   ),

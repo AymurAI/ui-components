@@ -1,4 +1,4 @@
-import type { HTMLAttributes } from "react";
+import type { HTMLAttributes, ReactElement, ReactNode } from "react";
 import { css, cx } from "@/styled/css";
 
 /**
@@ -128,14 +128,21 @@ export interface LogoProps extends HTMLAttributes<HTMLDivElement> {
    * Falls back to "Aymurai" when omitted.
    */
   featureName?: string;
+  /** Wrap only the iso mark, leaving the wordmark/divider/feature label outside. */
+  markSlot?: (defaultMark: ReactElement) => ReactNode;
 }
 
 export function Logo({
   variant = "logo",
   featureName = "Anonimizador",
+  markSlot,
   className,
   ...props
 }: LogoProps) {
+  const mark = markSlot ? markSlot(<IsoMark />) : <IsoMark />;
+  const logoA11yProps = (label: string) =>
+    markSlot ? {} : { role: "img", "aria-label": label };
+
   if (variant === "iso") {
     return (
       <div
@@ -148,10 +155,9 @@ export function Logo({
           }),
           className,
         )}
-        role="img"
-        aria-label="AymurAI"
+        {...logoA11yProps("AymurAI")}
       >
-        <IsoMark />
+        {mark}
       </div>
     );
   }
@@ -170,10 +176,9 @@ export function Logo({
           }),
           className,
         )}
-        role="img"
-        aria-label={`AymurAI ${featureName}`}
+        {...logoA11yProps(`AymurAI ${featureName}`)}
       >
-        <IsoMark />
+        {mark}
         {/* Vertical divider */}
         <div
           className={css({
@@ -211,10 +216,9 @@ export function Logo({
         }),
         className,
       )}
-      role="img"
-      aria-label="AymurAI"
+      {...logoA11yProps("AymurAI")}
     >
-      <IsoMark />
+      {mark}
       <Wordmark />
     </div>
   );

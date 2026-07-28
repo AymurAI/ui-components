@@ -1,4 +1,4 @@
-import { Check } from "phosphor-react";
+import { CheckIcon } from "@phosphor-icons/react";
 import type { InputHTMLAttributes, ReactNode } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 
@@ -180,7 +180,7 @@ export function Checkbox({
           disabled,
         })}
       >
-        {(checked || defaultChecked) && <Check size={16} weight="bold" />}
+        {(checked || defaultChecked) && <CheckIcon size={16} weight="bold" />}
       </span>
       {children}
     </label>

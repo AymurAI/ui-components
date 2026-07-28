@@ -91,6 +91,187 @@ export const Default: Story = {
   ),
 };
 
+function sizeTrigger(label: string) {
+  return (
+    <DialogTrigger asChild>
+      <button
+        type="button"
+        className={css({
+          px: "4",
+          py: "2",
+          bg: "action.default",
+          rounded: "sm",
+          cursor: "pointer",
+          textStyle: "cta.md.strong",
+        })}
+      >
+        {label}
+      </button>
+    </DialogTrigger>
+  );
+}
+
+/** Confirmations — e.g. "¿Eliminar esta etiqueta?" */
+export const SizeSm: Story = {
+  render: () => (
+    <Dialog>
+      {sizeTrigger("Open sm")}
+      <DialogContent size="sm">
+        <DialogHeader>
+          <DialogTitle className={css({ textStyle: "subtitle.md.strong" })}>
+            ¿Eliminar esta etiqueta?
+          </DialogTitle>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <button
+              type="button"
+              className={css({ cursor: "pointer", px: "4", py: "2" })}
+            >
+              Cancelar
+            </button>
+          </DialogClose>
+          <button
+            type="button"
+            className={css({
+              px: "4",
+              py: "2",
+              bg: "system.error",
+              color: "text.onbutton-alternative",
+              rounded: "sm",
+              cursor: "pointer",
+            })}
+          >
+            Eliminar
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+};
+
+/** Forms — e.g. entity/label resolution */
+export const SizeMd: Story = {
+  render: () => (
+    <Dialog>
+      {sizeTrigger("Open md")}
+      <DialogContent size="md">
+        <DialogHeader>
+          <DialogTitle className={css({ textStyle: "subtitle.md.strong" })}>
+            Resolver entidad
+          </DialogTitle>
+        </DialogHeader>
+        <DialogDescription
+          className={css({
+            textStyle: "paragraph.sm.default",
+            color: "text.lighter",
+          })}
+        >
+          Elegí la entidad correcta para el término seleccionado.
+        </DialogDescription>
+        <DialogFooter>
+          <DialogClose asChild>
+            <button
+              type="button"
+              className={css({ cursor: "pointer", px: "4", py: "2" })}
+            >
+              Cancelar
+            </button>
+          </DialogClose>
+          <button
+            type="button"
+            className={css({
+              px: "4",
+              py: "2",
+              bg: "action.default",
+              rounded: "sm",
+              cursor: "pointer",
+              textStyle: "cta.md.strong",
+            })}
+          >
+            Confirmar
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  ),
+};
+
+/** Tutorials — the 2×2 "¿Cómo funciona?" step grid */
+export const SizeLg: Story = {
+  render: () => (
+    <Dialog>
+      {sizeTrigger("Open lg")}
+      <DialogContent size="lg">
+        <DialogHeader>
+          <DialogTitle className={css({ textStyle: "subtitle.md.strong" })}>
+            ¿Cómo funciona?
+          </DialogTitle>
+          <DialogClose asChild>
+            <button type="button" className={css({ cursor: "pointer" })}>
+              ✕
+            </button>
+          </DialogClose>
+        </DialogHeader>
+        <div
+          className={css({
+            display: "grid",
+            gridTemplateColumns: "repeat(2, 1fr)",
+            gap: "6",
+          })}
+        >
+          {[1, 2, 3, 4].map((step) => (
+            <div
+              key={step}
+              className={css({
+                display: "flex",
+                flexDir: "column",
+                gap: "2",
+              })}
+            >
+              <div
+                className={css({
+                  bg: "bg.primary",
+                  rounded: "sm",
+                  h: "[130px]",
+                })}
+              />
+              <span className={css({ textStyle: "label.md.default" })}>
+                Paso {step}
+              </span>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  ),
+};
+
+/** Complex screens that need real vertical room */
+export const SizeFull: Story = {
+  render: () => (
+    <Dialog>
+      {sizeTrigger("Open full")}
+      <DialogContent size="full">
+        <DialogHeader>
+          <DialogTitle className={css({ textStyle: "subtitle.md.strong" })}>
+            Pantalla completa
+          </DialogTitle>
+          <DialogClose asChild>
+            <button type="button" className={css({ cursor: "pointer" })}>
+              ✕
+            </button>
+          </DialogClose>
+        </DialogHeader>
+        <p className={css({ textStyle: "paragraph.sm.default" })}>
+          Ocupa el alto disponible (90vh) en vez de ajustarse al contenido —
+          para flujos complejos con su propio scroll interno.
+        </p>
+      </DialogContent>
+    </Dialog>
+  ),
+};
+
 export const WithLongContent: Story = {
   render: () => (
     <Dialog>

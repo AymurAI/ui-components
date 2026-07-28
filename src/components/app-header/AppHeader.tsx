@@ -1,4 +1,4 @@
-import { DotsNine, Question } from "phosphor-react";
+import { DotsNineIcon, QuestionIcon } from "@phosphor-icons/react";
 import type { ReactElement, ReactNode } from "react";
 import { css, cx } from "@/styled/css";
 import { BigIconButton } from "../big-icon-button";
@@ -23,8 +23,10 @@ import { Stepper } from "../stepper";
  * default logo/buttons without recreating their styles or focus behaviour.
  *
  * The top-bar variant is 1440×96px with 48px horizontal padding. Its three
- * layout regions are 203px (logo), 332px (stepper), and 203px (actions), so
- * the stepper remains centered even when the logo content changes width.
+ * layout regions are min 203px (logo — grows for a long `featureName`,
+ * e.g. "Resumen de Documento"), 332px (stepper), and 203px (actions), so the
+ * stepper stays centered for the Figma-sized case and only shifts if a
+ * longer feature name pushes past 203px.
  */
 const root = css({
   display: "flex",
@@ -37,18 +39,31 @@ const root = css({
   borderBottomWidth: "[1px]",
   borderBottomStyle: "solid",
   borderBottomColor: "[#BCBAB8]", // border.primary colour, no bare token
+  flexShrink: "0",
+  w: "full",
+  // Anchor for stepperWrap, which centers on the header itself rather than
+  // on the (variable-width) space between logo and actions.
+  position: "relative",
 });
 
 const logoWrap = css({
   display: "flex",
   alignItems: "center",
-  w: "[203px]",
+  minW: "[203px]",
   flexShrink: "0",
 });
 
 const stepperWrap = css({
+  // Absolutely centered on `root` so a long featureName growing logoWrap
+  // past 203px can't push the stepper off-center — space-between would
+  // otherwise shift it toward whichever side has more room.
+  position: "absolute",
+  left: "[50%]",
+  top: "[50%]",
+  transform: "[translate(-50%, -50%)]",
   display: "flex",
   alignItems: "center",
+  justifyContent: "center",
   w: "[332px]",
   h: "[52px]",
   flexShrink: "0",
@@ -66,7 +81,7 @@ const actionsWrap = css({
 const helpIcon = css({ color: "text.lighter" });
 
 export interface AppHeaderSlots {
-  /** Wrap or replace the default Logo while preserving the header layout. */
+  /** Wrap only the iso mark; wordmark/divider/feature name remain non-interactive. */
   logo?: (defaultElement: ReactElement) => ReactNode;
   /** Wrap or replace the default help Button (for example with PopoverTrigger). */
   help?: (defaultElement: ReactElement) => ReactNode;
@@ -77,6 +92,8 @@ export interface AppHeaderSlots {
 interface AppHeaderBaseProps {
   /** Feature name shown next to the logo (e.g. "Voz a Texto"). Omit for the bare iso mark. */
   featureName?: string;
+  /** Brand shown when featureName is omitted. Defaults to the bare iso mark. */
+  logoVariant?: "logo" | "iso";
   onHelp?: () => void;
   onOpenApps?: () => void;
   helpLabel?: string;
@@ -103,6 +120,7 @@ export type AppHeaderProps = AppHeaderBaseProps & AppHeaderProgressProps;
 
 export function AppHeader({
   featureName,
+  logoVariant = "iso",
   steps,
   current,
   onHelp,
@@ -117,10 +135,12 @@ export function AppHeader({
     ? steps.map((label, i) => ({ label: i === current ? label : "" }))
     : [];
 
-  const defaultLogo = featureName ? (
-    <Logo variant="logo-feature" featureName={featureName} />
-  ) : (
-    <Logo variant="iso" />
+  const defaultLogo = (
+    <Logo
+      variant={featureName ? "logo-feature" : logoVariant}
+      featureName={featureName}
+      markSlot={slots?.logo}
+    />
   );
   const defaultHelp = (
     <Button
@@ -130,7 +150,7 @@ export function AppHeader({
       onClick={onHelp}
       style={{ padding: 2, borderRadius: 4 }}
     >
-      <Question size={32} className={helpIcon} />
+      <QuestionIcon size={32} className={helpIcon} />
     </Button>
   );
   const defaultApps = (
@@ -141,15 +161,13 @@ export function AppHeader({
       onClick={onOpenApps}
       style={{ padding: 2, borderRadius: 4 }}
     >
-      <DotsNine size={32} />
+      <DotsNineIcon size={32} />
     </BigIconButton>
   );
 
   return (
     <div className={cx(root, className)}>
-      <div className={logoWrap}>
-        {slots?.logo ? slots.logo(defaultLogo) : defaultLogo}
-      </div>
+      <div className={logoWrap}>{defaultLogo}</div>
 
       {hasProgress && (
         <div className={stepperWrap}>

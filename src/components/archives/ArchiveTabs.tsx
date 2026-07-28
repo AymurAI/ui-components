@@ -1,4 +1,4 @@
-import { CheckCircle } from "phosphor-react";
+import { CheckCircleIcon } from "@phosphor-icons/react";
 import { cva, cx } from "@/styled/css";
 
 /**
@@ -85,7 +85,7 @@ export function ArchiveTabs({
       className={cx(archiveTab({ status }), className)}
     >
       <span>{label}</span>
-      {status === "completed" && <CheckCircle size={23} />}
+      {status === "completed" && <CheckCircleIcon size={23} />}
     </button>
   );
 }

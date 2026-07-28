@@ -1,4 +1,4 @@
-import { XCircle } from "phosphor-react";
+import { XCircleIcon } from "@phosphor-icons/react";
 import type { HTMLAttributes, MouseEventHandler } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 
@@ -80,7 +80,7 @@ export function Option({
         className={removeButton}
         onClick={onRemove}
       >
-        <XCircle size={16} />
+        <XCircleIcon size={16} />
       </button>
     </div>
   );

@@ -1,4 +1,4 @@
-import { WarningCircle } from "phosphor-react";
+import { WarningCircleIcon } from "@phosphor-icons/react";
 import { useId } from "react";
 
 import { Suggestion } from "@/components/suggestion/Suggestion";
@@ -61,11 +61,13 @@ const input = sva({
     },
     label: { textStyle: "label.sm.default", color: "text.lighter" },
     errorMessage: {
+      margin: "0", // no preflight — <p> keeps the UA default margin otherwise
       ...hstack.raw({ gap: "1" }),
       textStyle: "label.sm.default",
       color: "system.error",
     },
     helper: {
+      margin: "0",
       textStyle: "label.sm.default",
       color: "text.lighter",
     },
@@ -101,10 +103,12 @@ const input = sva({
       },
       false: {},
     },
-    // Typed: Figma uses border/secondary (#9F99A5) when a value is present
+    // Typed: Figma uses border/secondary (#9F99A5) when a value is present,
+    // and darkens the label to text.default.
     typed: {
       true: {
         inputBox: { border: "secondary" },
+        label: { color: "text.default" },
       },
       false: {},
     },
@@ -236,8 +240,6 @@ export function TextField({
           </div>
         )}
 
-        {suggestion && <Suggestion clickable>{suggestion}</Suggestion>}
-
         <input
           {...props}
           ref={ref}
@@ -253,6 +255,14 @@ export function TextField({
           aria-invalid={!!error}
         />
 
+        {/* Suggestion sits to the RIGHT of the value, behind the affix's
+            border separator (the "pipe"), matching the pre-v0.5 layout. */}
+        {suggestion && (
+          <div className={affix({ position: "suffix" })}>
+            <Suggestion clickable>{suggestion}</Suggestion>
+          </div>
+        )}
+
         {suffix && (
           <div className={affix({ position: "suffix" })}>
             <span>{suffix}</span>
@@ -263,7 +273,7 @@ export function TextField({
       {helper && !error && <p className={classes.helper}>{helper}</p>}
       {error && (
         <p id={errorMessageId} role="alert" className={classes.errorMessage}>
-          <WarningCircle size={12} />
+          <WarningCircleIcon size={12} />
           {error}
         </p>
       )}

@@ -1,4 +1,4 @@
-import { CaretDown } from "phosphor-react";
+import { CaretDownIcon } from "@phosphor-icons/react";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 import { cva, cx, type RecipeVariantProps } from "@/styled/css";
 
@@ -100,7 +100,7 @@ export function ButtonLink({
           as the exclusive right slot. For Size=M the caller controls iconRight. */}
       {size === "S" ? (
         <span aria-hidden="true">
-          <CaretDown size={16} />
+          <CaretDownIcon size={16} />
         </span>
       ) : (
         iconRight && <span aria-hidden="true">{iconRight}</span>

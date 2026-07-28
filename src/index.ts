@@ -10,6 +10,8 @@
  * so there are no default-export collisions.)
  */
 
+export type { JSONContent } from "@tiptap/core";
+export * from "./components/app-footer";
 export * from "./components/app-header";
 // Archives
 export * from "./components/archives";
@@ -24,16 +26,22 @@ export * from "./components/button-link";
 export * from "./components/callout";
 // Surfaces & overlays
 export * from "./components/card";
+export * from "./components/card-tool";
 export * from "./components/category-item";
 export * from "./components/check-circle";
 export * from "./components/checkbox";
+export * from "./components/context-menu";
 export * from "./components/dialog";
+export * from "./components/features-menu";
+export * from "./components/file-drop-zone";
 export * from "./components/logo";
 // Voz a texto (speech-to-text)
 export * from "./components/option";
+export * from "./components/page-title";
 export * from "./components/player";
 export * from "./components/popover";
 export * from "./components/radio";
+export * from "./components/rich-text-editor";
 export * from "./components/search";
 export * from "./components/select";
 export * from "./components/side-panel";
@@ -51,5 +59,9 @@ export * from "./components/tool-button";
 export * from "./components/toolbar";
 export * from "./components/tooltip";
 export * from "./components/transcript-block";
+export * from "./components/tutorial";
+export * from "./components/workflow-step-layout";
+export * from "./utils/rich-text/markdown";
 // Utils
+export * from "./utils/rich-text/tiptap-text";
 export * from "./utils/timestamp";

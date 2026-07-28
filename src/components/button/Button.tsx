@@ -1,4 +1,4 @@
-import { CircleNotch } from "phosphor-react";
+import { CircleNotchIcon } from "@phosphor-icons/react";
 import type { ButtonHTMLAttributes } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
 
@@ -153,7 +153,7 @@ export function Button({
       disabled={disabled || isLoading}
     >
       {isLoading ? (
-        <CircleNotch className={css({ animation: "spin" })} />
+        <CircleNotchIcon className={css({ animation: "spin" })} />
       ) : (
         children
       )}

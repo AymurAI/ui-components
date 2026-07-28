@@ -64,9 +64,13 @@ export const aymuraiPreset = definePreset({
           dropdown: { value: "0px 16px 16px rgba(0, 0, 0, 0.08)" },
           "card-hover": { value: "0px 0px 7.5px rgba(63, 71, 157, 0.4)" },
           tooltip: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
+          menu: { value: "0px 0px 7.5px rgba(0, 0, 0, 0.15)" },
           // Dialog/Popover have no Figma node yet — tokenised at current values.
           dialog: { value: "0px 4px 8px rgba(0, 0, 0, 0.1)" },
           popover: { value: "0px 0px 15px 0px #00000026" },
+          // Figma "Document-Card" drop shadow (RichTextEditor's body
+          // container) — get_design_context on node 40002572:59916/40002573:62459.
+          card: { value: "0px 4px 10px rgba(0, 0, 0, 0.05)" },
         },
       },
       textStyles: {
@@ -166,9 +170,12 @@ export const aymuraiPreset = definePreset({
         },
         borders: {
           primary: { value: "1px solid #BCBAB8" },
-          secondary: { value: "1px solid #EDF2F7" },
+          secondary: { value: "1px solid #9F99A5" },
           "primary-alt": { value: "1px solid #110041" },
           error: { value: "1px solid {colors.system.error}" },
+          // Figma "Document-Card" border (RichTextEditor's body container) —
+          // get_design_context on node 40002572:59916/40002573:62459.
+          card: { value: "1px solid #E0DFE8" },
         },
         gradients: {
           primary: {

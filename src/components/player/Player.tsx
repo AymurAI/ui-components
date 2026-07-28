@@ -1,9 +1,9 @@
 import {
-  ArrowClockwise,
-  ArrowCounterClockwise,
-  Pause,
-  Play,
-} from "phosphor-react";
+  ArrowClockwiseIcon,
+  ArrowCounterClockwiseIcon,
+  PauseIcon,
+  PlayIcon,
+} from "@phosphor-icons/react";
 import {
   type MouseEvent,
   type ReactNode,
@@ -295,7 +295,7 @@ export function Player({
             aria-label={t.rewind5s}
             onClick={rewind5s}
           >
-            <ArrowCounterClockwise size={20} />
+            <ArrowCounterClockwiseIcon size={20} />
             <span className={skipLabel}>5</span>
           </BigIconButton>
 
@@ -305,7 +305,7 @@ export function Player({
             aria-label={isPlaying ? t.pause : t.play}
             onClick={togglePlay}
           >
-            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+            {isPlaying ? <PauseIcon size={20} /> : <PlayIcon size={20} />}
           </BigIconButton>
 
           <BigIconButton
@@ -314,7 +314,7 @@ export function Player({
             aria-label={t.forward5s}
             onClick={forward5s}
           >
-            <ArrowClockwise size={20} />
+            <ArrowClockwiseIcon size={20} />
             <span className={skipLabel}>5</span>
           </BigIconButton>
 

@@ -45,6 +45,11 @@ export const WithoutProgress: Story = {
   args: { featureName: "Anonimizador" },
 };
 
+/** Home screens can show the full AymurAI wordmark without a feature name. */
+export const HomeWordmark: Story = {
+  args: { logoVariant: "logo" },
+};
+
 /**
  * Slots wrap the defaults without rebuilding their styles: an anchor for the
  * logo, a Radix PopoverTrigger for help, and a DialogTrigger for apps.

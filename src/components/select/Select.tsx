@@ -1,9 +1,26 @@
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  CheckIcon,
+  XCircleIcon,
+} from "@phosphor-icons/react";
 import * as RadixSelect from "@radix-ui/react-select";
-import { CaretDown, CaretUp, Check } from "phosphor-react";
-import { type Ref, useId, useImperativeHandle } from "react";
+import {
+  type Ref,
+  useEffect,
+  useId,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import { Suggestion } from "@/components/suggestion/Suggestion";
-import { sva } from "@/styled/css";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/tooltip/Tooltip";
+import { css, sva } from "@/styled/css";
 import { styled } from "@/styled/jsx";
 import { stack } from "@/styled/patterns";
 
@@ -21,7 +38,7 @@ const Affix = styled("span", {
   },
 });
 
-export type SelectOption = { id: string; text: string };
+export type SelectOption = { id: string; text: string; description?: string };
 export type SelectSuggestion = { id: string; text?: string };
 
 export interface SelectProps {
@@ -36,6 +53,8 @@ export interface SelectProps {
   placeholder?: string;
   disabled?: boolean;
   size?: "md" | "sm";
+  /** Show a clear (×) control once an option is selected. Default: true. */
+  clearable?: boolean;
   ref?: Ref<{ value: string | undefined }>;
 }
 
@@ -45,6 +64,71 @@ function orderByPriority(options: SelectOption[], priority: string[] = []) {
     .map((p) => options.find(({ id }) => p === id))
     .filter((o): o is SelectOption => !!o);
   return [...preferred, ...filtered];
+}
+
+// Matches Radix Tooltip's own default hover delay. Kept separate from focus:
+// Radix opens a tooltip instantly on focus (correct for keyboard users), but
+// Select auto-focuses the current value when the list opens, which would
+// otherwise pop its tooltip immediately with no hover involved. Driving
+// `open` ourselves from pointer events only (ignoring focus) avoids that.
+const OPTION_TOOLTIP_DELAY_MS = 700;
+
+function SelectItem({
+  id,
+  text,
+  description,
+  itemClassName,
+  itemIndicatorClassName,
+}: {
+  id: string;
+  text: string;
+  description?: string;
+  itemClassName?: string;
+  itemIndicatorClassName?: string;
+}) {
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+
+  const item = (
+    <RadixSelect.Item
+      value={id}
+      className={itemClassName}
+      onPointerEnter={
+        description
+          ? () => {
+              timeoutRef.current = setTimeout(
+                () => setTooltipOpen(true),
+                OPTION_TOOLTIP_DELAY_MS,
+              );
+            }
+          : undefined
+      }
+      onPointerLeave={
+        description
+          ? () => {
+              clearTimeout(timeoutRef.current);
+              setTooltipOpen(false);
+            }
+          : undefined
+      }
+    >
+      <RadixSelect.ItemIndicator className={itemIndicatorClassName}>
+        <CheckIcon size={14} weight="bold" />
+      </RadixSelect.ItemIndicator>
+      <RadixSelect.ItemText>{text}</RadixSelect.ItemText>
+    </RadixSelect.Item>
+  );
+
+  if (!description) return item;
+
+  return (
+    <Tooltip open={tooltipOpen} onOpenChange={() => {}}>
+      <TooltipTrigger asChild>{item}</TooltipTrigger>
+      <TooltipContent side="right">{description}</TooltipContent>
+    </Tooltip>
+  );
 }
 
 function secureSuggestion(
@@ -152,10 +236,10 @@ const select = sva({
       outline: "none",
       userSelect: "none",
 
+      // Only the hovered/keyboard-focused option is highlighted — the
+      // selected option is already marked by its check indicator, so it
+      // doesn't need to stay highlighted too once the list is open.
       "&[data-highlighted]": {
-        bg: "bg.primary-alternative",
-      },
-      "&[data-state='checked']": {
         bg: "bg.primary-alternative",
       },
       "&[data-disabled]": {
@@ -202,6 +286,7 @@ export function Select({
   placeholder = "",
   disabled = false,
   size = "md",
+  clearable = true,
   ref,
 }: SelectProps) {
   const triggerId = useId();
@@ -210,9 +295,28 @@ export function Select({
   const orderedOptions = orderByPriority(options, priorityOrder);
   const securedSuggestion = secureSuggestion(suggestion, options);
 
-  useImperativeHandle(ref, () => ({ value }), [value]);
+  // Self-managed selection. Works both ways:
+  //  - Controlled: parent passes `value` + `onChange` and re-renders (e.g. the
+  //    Voz a Texto export format select). The effect keeps us in sync.
+  //  - Uncontrolled/ref: consumers that only read the selection back through
+  //    `ref` and never re-render on change (the dataset validation forms'
+  //    register/useForm pattern). Here `value` is just the initial seed, so the
+  //    component must own the selection or picking an option would revert.
+  // Seed with "" (never undefined) so Radix stays controlled throughout and
+  // doesn't emit an uncontrolled→controlled warning on first selection.
+  const [selectedValue, setSelectedValue] = useState(value ?? "");
+
+  useEffect(() => {
+    setSelectedValue(value ?? "");
+  }, [value]);
+
+  // Expose the live selection (not the initial `value`) so ref-based consumers
+  // capture user changes — useImperativeHandle re-runs when it changes, which is
+  // what re-fires the forms' registration callback ref.
+  useImperativeHandle(ref, () => ({ value: selectedValue }), [selectedValue]);
 
   const handleChange = (id: string) => {
+    setSelectedValue(id);
     const option = options.find((o) => o.id === id);
     if (option) onChange?.(option);
   };
@@ -234,7 +338,7 @@ export function Select({
       {label && (
         <styled.label
           textStyle="label.sm.default"
-          color="text.lighter"
+          color={selectedValue ? "text.default" : "text.lighter"}
           htmlFor={triggerId}
         >
           {label}
@@ -242,7 +346,7 @@ export function Select({
       )}
 
       <RadixSelect.Root
-        value={value}
+        value={selectedValue}
         onValueChange={handleChange}
         disabled={disabled}
       >
@@ -252,7 +356,7 @@ export function Select({
             {prefix && <Affix aria-hidden="true">{prefix} |</Affix>}
 
             <span className={classes.value}>
-              {!value && securedSuggestion ? (
+              {!selectedValue && securedSuggestion ? (
                 <button
                   type="button"
                   onPointerDown={(e) => e.stopPropagation()}
@@ -268,9 +372,37 @@ export function Select({
 
             {suffix && <Affix aria-hidden="true">| {suffix}</Affix>}
 
+            {/* Clear control — resets the selection back to empty. Reads back
+                through `ref` as "" for the forms' register pattern. */}
+            {clearable && selectedValue && !disabled && (
+              <button
+                type="button"
+                aria-label="Limpiar selección"
+                className={css({
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: "0",
+                  p: "0",
+                  borderWidth: "0",
+                  bg: "[transparent]",
+                  cursor: "pointer",
+                  color: "text.lighter",
+                  "&:hover": { color: "text.default" },
+                })}
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedValue("");
+                }}
+              >
+                <XCircleIcon size={16} />
+              </button>
+            )}
+
             {/* Caret sits at the trailing edge — matches Figma layout */}
             <RadixSelect.Icon asChild>
-              <CaretDown
+              <CaretDownIcon
                 size={16}
                 className={classes.caret}
                 aria-hidden="true"
@@ -286,20 +418,22 @@ export function Select({
             sideOffset={4}
           >
             <RadixSelect.ScrollUpButton className={classes.scrollButton}>
-              <CaretUp size={12} />
+              <CaretUpIcon size={12} />
             </RadixSelect.ScrollUpButton>
             <RadixSelect.Viewport className={classes.viewport}>
-              {orderedOptions.map(({ id, text }) => (
-                <RadixSelect.Item key={id} value={id} className={classes.item}>
-                  <RadixSelect.ItemIndicator className={classes.itemIndicator}>
-                    <Check size={14} weight="bold" />
-                  </RadixSelect.ItemIndicator>
-                  <RadixSelect.ItemText>{text}</RadixSelect.ItemText>
-                </RadixSelect.Item>
+              {orderedOptions.map(({ id, text, description }) => (
+                <SelectItem
+                  key={id}
+                  id={id}
+                  text={text}
+                  description={description}
+                  itemClassName={classes.item}
+                  itemIndicatorClassName={classes.itemIndicator}
+                />
               ))}
             </RadixSelect.Viewport>
             <RadixSelect.ScrollDownButton className={classes.scrollButton}>
-              <CaretDown size={12} />
+              <CaretDownIcon size={12} />
             </RadixSelect.ScrollDownButton>
           </RadixSelect.Content>
         </RadixSelect.Portal>

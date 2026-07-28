@@ -103,6 +103,11 @@ export function Toolbar({
   //   search-switch — items: center, justify: space-between, pt: 42px, pb: 24px
   const isSetDeDatos = context === "set-de-datos";
   const isSearchSwitch = context === "search-switch";
+  const isAnonymizer = context === "anonimizador";
+  // anonimizador/search-switch wrap onto a second line below the design's
+  // 1440px reference width instead of overflowing or clipping their right-side
+  // content (switch+label / label fields + button).
+  const wraps = isAnonymizer || isSearchSwitch;
   const alignItems = isSearchSwitch ? "center" : "flex-end";
   return (
     <div
@@ -116,22 +121,24 @@ export function Toolbar({
           pb: "6",
           px: "12",
           w: "full",
-          gap: isSetDeDatos ? "6" : "0",
+          columnGap: isSetDeDatos || isAnonymizer ? "6" : "0",
+          rowGap: wraps ? "4" : "0",
+          flexWrap: wraps ? "wrap" : "nowrap",
         }),
         className,
       )}
     >
-      {/* Search zone. Fills available space in anonimizador/set-de-datos;
-          fixed at 711.5px in search-switch (Figma node 40001478:54722) so it
-          doesn't crowd the Switch+label on the right. */}
+      {/* Search zone. Fills available space and shrinks down to a 320px
+          floor in every context; search-switch caps its grown width at the
+          711.5px Figma reference (node 40001478:54722) instead of stretching
+          past it, so it doesn't crowd the Switch+label on the right. */}
       <div
         className={css({
           display: "flex",
           alignItems: "center",
           h: "12",
-          flex: isSearchSwitch ? undefined : "1",
-          minW: isSearchSwitch ? undefined : "[0px]",
-          flexShrink: isSearchSwitch ? "0" : undefined,
+          flex: "1",
+          minW: isSetDeDatos ? "[0px]" : "[min(100%,320px)]",
         })}
       >
         <Search
@@ -145,8 +152,8 @@ export function Toolbar({
           onNext={onSearchNext}
           onClear={onSearchClear}
           className={css({
-            flex: isSearchSwitch ? undefined : "1",
-            w: isSearchSwitch ? "[711.5px]" : undefined,
+            flex: "1",
+            maxW: isSearchSwitch ? "[711.5px]" : undefined,
           })}
         />
       </div>
@@ -179,18 +186,30 @@ export function Toolbar({
           them, not a vertical rule (unlike anonimizador/set-de-datos, which
           both explicitly call for one). */}
       {rightSlot && (
-        <>
+        <div
+          className={css({
+            display: "flex",
+            alignItems: "center",
+            gap: isAnonymizer ? "6" : "0",
+            flexShrink: "0",
+            minW: "0",
+            maxW: "full",
+            ml: wraps ? "auto" : undefined,
+          })}
+        >
           {!isSearchSwitch && <ToolbarDivider />}
           <div
             className={css({
               display: "flex",
               alignItems: "center",
               flexShrink: "0",
+              minW: "0",
+              maxW: "full",
             })}
           >
             {rightSlot}
           </div>
-        </>
+        </div>
       )}
 
       {/* Fully custom children override */}

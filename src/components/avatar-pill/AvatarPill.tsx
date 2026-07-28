@@ -1,4 +1,4 @@
-import { PencilSimple } from "phosphor-react";
+import { PencilSimpleIcon } from "@phosphor-icons/react";
 import type { HTMLAttributes } from "react";
 import { useEffect, useRef } from "react";
 import { css, cva, cx, type RecipeVariantProps } from "@/styled/css";
@@ -220,7 +220,7 @@ export function AvatarPill({
           aria-label={renameLabel}
           className={renameButton}
         >
-          <PencilSimple size={14} />
+          <PencilSimpleIcon size={14} />
         </button>
       )}
     </span>

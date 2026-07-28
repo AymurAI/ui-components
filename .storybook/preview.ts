@@ -5,6 +5,11 @@ import "./preview.css";
 
 const preview: Preview = {
   parameters: {
+    options: {
+      storySort: {
+        order: ["Overview", ["Showcase", "Showcase (EN)"], "Components"],
+      },
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
