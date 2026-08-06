@@ -264,5 +264,6 @@ export const WithoutNewPersonMenu: Story = {
     timestamp: "01:15",
     turn: { initials: "P1", name: "Persona 1", time: "01:15", color: "violet" },
     newPersonOptions: undefined,
+    onNewPerson: () => window.alert("onNewPerson"),
   },
 };

@@ -97,7 +97,7 @@ export function PersonMenu({
 }: PersonMenuProps) {
   const footer =
     footerSlot ??
-    (footerLabel ? (
+    (footerLabel && onFooterAction ? (
       <Button
         variant="tertiary"
         size="sm"
