@@ -30,7 +30,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
  *
  * Composite assembled from {@link AvatarPill}, {@link TextField},
  * {@link Button}, {@link Dialog} and {@link Tooltip}. Sections: selected
- * turn card, suggested people, timestamp, and turn actions (merge
+ * turn card, identified people, timestamp, and turn actions (merge
  * previous/next, add below, delete).
  *
  * Merge actions use the Phosphor "ArrowsMergeIcon" glyph: base points down
@@ -158,6 +158,13 @@ const pills = css({
   flexWrap: "wrap",
   alignItems: "center",
   gap: "2", // 8px
+  w: "full",
+});
+// Figma nodo 40002701:44839 ("Pills"): dos filas de 40px con 8px de gap —
+// las pills arriba (envolviendo si hace falta) y el botón "Nuevo" siempre
+// debajo, no pegado al final de la última fila de pills.
+const peopleGroup = css({
+  ...stack.raw({ gap: "2" }), // 8px
   w: "full",
 });
 const actions = css({ ...stack.raw({ gap: "4" }), w: "full" }); // 16px
@@ -393,49 +400,55 @@ export function SidePanel({
         </div>
       </div>
 
-      {/* Suggested people */}
-      <Section heading="Personas sugeridas">
-        <div className={pills}>
-          {people.map((person, index) => {
-            const isEditing = editingIndex === index;
-            const canRename =
-              person.renamable && onRenamePerson && onMergePeople;
+      {/* Identified people */}
+      <Section heading="Personas identificadas">
+        <div className={peopleGroup}>
+          <div className={pills}>
+            {people.map((person, index) => {
+              const isEditing = editingIndex === index;
+              const canRename =
+                person.renamable && onRenamePerson && onMergePeople;
 
-            return (
-              <span
-                key={person.id ?? `${person.initials}-${person.name}-${index}`}
-                className={css({ display: "inline-flex" })}
-              >
-                <AvatarPill
-                  initials={person.initials}
-                  name={person.name}
-                  color={person.color}
-                  state={
-                    isEditing
-                      ? "typing"
-                      : index === selectedIndex
-                        ? "selected"
-                        : "default"
+              return (
+                <span
+                  key={
+                    person.id ?? `${person.initials}-${person.name}-${index}`
                   }
-                  onClick={() => onSelectPerson?.(index)}
-                  onRename={canRename ? () => startEditing(index) : undefined}
-                  editValue={isEditing ? editValue : undefined}
-                  onEditValueChange={isEditing ? setEditValue : undefined}
-                  onEditCommit={
-                    isEditing
-                      ? (value) => handleRenameCommit(index, value)
-                      : undefined
-                  }
-                  onEditCancel={isEditing ? finishEditing : undefined}
-                  renameInputLabel={`Editar nombre de ${person.name}`}
-                />
-              </span>
-            );
-          })}
-          <Button variant="tertiary" size="sm" onClick={onNewPerson}>
-            <PlusIcon size={16} />
-            Nuevo
-          </Button>
+                  className={css({ display: "inline-flex" })}
+                >
+                  <AvatarPill
+                    initials={person.initials}
+                    name={person.name}
+                    color={person.color}
+                    state={
+                      isEditing
+                        ? "typing"
+                        : index === selectedIndex
+                          ? "selected"
+                          : "default"
+                    }
+                    onClick={() => onSelectPerson?.(index)}
+                    onRename={canRename ? () => startEditing(index) : undefined}
+                    editValue={isEditing ? editValue : undefined}
+                    onEditValueChange={isEditing ? setEditValue : undefined}
+                    onEditCommit={
+                      isEditing
+                        ? (value) => handleRenameCommit(index, value)
+                        : undefined
+                    }
+                    onEditCancel={isEditing ? finishEditing : undefined}
+                    renameInputLabel={`Editar nombre de ${person.name}`}
+                  />
+                </span>
+              );
+            })}
+          </div>
+          <div>
+            <Button variant="tertiary" size="sm" onClick={onNewPerson}>
+              <PlusIcon size={16} />
+              Nuevo
+            </Button>
+          </div>
         </div>
         <ConfirmDialog
           open={renameConflict !== null}
