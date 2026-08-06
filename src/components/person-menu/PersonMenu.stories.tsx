@@ -3,10 +3,11 @@ import { useState } from "react";
 import { PersonMenu, type PersonMenuOption } from "./PersonMenu";
 
 const ROLES: PersonMenuOption[] = [
-  { id: "r1", initials: "DE", name: "Defensor/a", color: "green-light" },
+  { id: "r1", initials: "JU", name: "Juez/a", color: "violet" },
   { id: "r2", initials: "FI", name: "Fiscal", color: "yellow" },
-  { id: "r3", initials: "QU", name: "Querella", color: "pink" },
-  { id: "r4", initials: "AC", name: "Acusado/a", color: "orange" },
+  { id: "r3", initials: "DE", name: "Defensor/a", color: "green-light" },
+  { id: "r4", initials: "DN", name: "Denunciante", color: "blue" },
+  { id: "r5", initials: "AC", name: "Acusado/a", color: "orange" },
 ];
 
 const meta = {
@@ -29,30 +30,30 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Réplica del nodo 40002701:44844. */
+/** Replica of node 40002701:44844. */
 export const Default: Story = {};
 
 export const WithSelection: Story = { args: { selectedIndex: 1 } };
 
-/** Todos los roles ya usados: sólo queda la acción al pie. */
+/** All roles already used: only the footer action remains. */
 export const Empty: Story = { args: { options: [] } };
 
-/** La etiqueta más larga del set real, para verificar el ancho hug. */
+/** The longest label in the real set, to check the hug width doesn't break. */
 export const LongNames: Story = {
   args: {
     options: [
       ...ROLES,
       {
-        id: "r5",
+        id: "r6",
         initials: "NA",
         name: "Niño/a - Adolescente",
-        color: "violet",
+        color: "red",
       },
     ],
   },
 };
 
-/** Como lo usa el SpeakerPicker de desktop-app: input de nombre libre al pie. */
+/** As desktop-app's SpeakerPicker uses it: a free-text name input in the footer. */
 export const WithFooterSlot: Story = {
   render: (args) => {
     const [name, setName] = useState("");

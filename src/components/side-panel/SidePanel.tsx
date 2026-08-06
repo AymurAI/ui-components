@@ -87,11 +87,11 @@ export type SidePanelProps = {
    */
   onNewPerson?: () => void;
   /**
-   * Opciones del desplegable de "Nuevo" (p. ej. roles sugeridos). Vacío u
-   * omitido → "Nuevo" llama a `onNewPerson` directo, como antes.
+   * Options for the "Nuevo" dropdown (e.g. suggested roles). Empty or
+   * omitted → "Nuevo" calls `onNewPerson` directly, as before.
    */
   newPersonOptions?: SidePanelPerson[];
-  /** Recibe el índice en `newPersonOptions` de la opción elegida. */
+  /** Receives the index in `newPersonOptions` of the chosen option. */
   onSelectNewPersonOption?: (index: number) => void;
   /** Persists a non-conflicting speaker rename. Set with `onMergePeople` to enable editing. */
   onRenamePerson?: (index: number, nextName: string) => void;
@@ -174,15 +174,15 @@ const pills = css({
   gap: "2", // 8px
   w: "full",
 });
-// Figma nodo 40002701:44839 ("Pills"): dos filas de 40px con 8px de gap —
-// las pills arriba (envolviendo si hace falta) y el botón "Nuevo" siempre
-// debajo, no pegado al final de la última fila de pills.
+// Figma node 40002701:44839 ("Pills"): two 40px rows with 8px gap — pills
+// on top (wrapping if needed), the "Nuevo" button always below, never
+// stuck to the end of the last pill row.
 const peopleGroup = css({
   ...stack.raw({ gap: "2" }), // 8px
   w: "full",
 });
-// Figma nodo 40002701:45247 muestra el botón en 40px; Button no tiene ese
-// tamaño (sm=32, md=48).
+// Figma node 40002701:45247 shows the button at 40px; Button has no such
+// size (sm=32, md=48).
 const newButton = css({ h: "10" });
 const actions = css({ ...stack.raw({ gap: "4" }), w: "full" }); // 16px
 const fullWidthButton = css({ w: "full" });

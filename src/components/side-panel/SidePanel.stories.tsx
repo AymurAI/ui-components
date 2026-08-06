@@ -5,9 +5,10 @@ import { SidePanel, type SidePanelPerson } from "./SidePanel";
 
 const ROLE_OPTIONS: SidePanelPerson[] = [
   { id: "r1", initials: "JU", name: "Juez/a", color: "violet" },
-  { id: "r2", initials: "FI", name: "Fiscal", color: "green-light" },
-  { id: "r3", initials: "DE", name: "Defensor/a", color: "pink" },
-  { id: "r4", initials: "QU", name: "Querella", color: "yellow" },
+  { id: "r2", initials: "FI", name: "Fiscal", color: "yellow" },
+  { id: "r3", initials: "DE", name: "Defensor/a", color: "green-light" },
+  { id: "r4", initials: "DN", name: "Denunciante", color: "blue" },
+  { id: "r5", initials: "AC", name: "Acusado/a", color: "orange" },
 ];
 
 const meta = {
@@ -241,7 +242,7 @@ export const RenameAndCollision: Story = {
   },
 };
 
-/** Réplica del nodo 40002701:44829, con el desplegable de "Nuevo" disponible. */
+/** Replica of node 40002701:44829, with the "Nuevo" dropdown available. */
 export const WithNewPersonMenu: Story = {
   args: {
     people: [
@@ -257,7 +258,7 @@ export const WithNewPersonMenu: Story = {
   },
 };
 
-/** Sin `newPersonOptions`: "Nuevo" llama a onNewPerson directo (retrocompatible). */
+/** Without `newPersonOptions`: "Nuevo" calls onNewPerson directly (backwards-compatible). */
 export const WithoutNewPersonMenu: Story = {
   args: {
     people: [{ id: "s1", initials: "P1", name: "Persona 1", renamable: true }],

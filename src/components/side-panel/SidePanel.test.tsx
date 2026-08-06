@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "../tooltip";
 import { SidePanel, type SidePanelPerson } from "./SidePanel";
 
-// Radix mide sus superficies flotantes con ResizeObserver, que jsdom no trae.
+// Radix measures its floating surfaces with ResizeObserver, which jsdom lacks.
 beforeAll(() => {
   vi.stubGlobal(
     "ResizeObserver",

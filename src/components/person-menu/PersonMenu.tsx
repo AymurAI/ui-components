@@ -6,44 +6,46 @@ import { AvatarPill } from "../avatar-pill";
 import { Button } from "../button";
 
 /**
- * PersonMenu — lista flotante de personas/roles para elegir, con una acción
- * al pie. AymurAI UI Library nodo 40002701:44844 ("single select").
+ * PersonMenu — floating list of people/roles to choose from, with an
+ * optional footer action. AymurAI UI Library node 40002701:44844
+ * ("single select").
  *
- * Es sólo la superficie: no monta un Popover ni maneja apertura o anclaje.
- * El consumidor la posiciona — SidePanel la ancla con Popover al botón
- * "Nuevo"; el SpeakerPicker de desktop-app la mete en su barra flotante.
+ * It's just the surface: it doesn't mount a Popover or handle opening or
+ * anchoring. The consumer positions it — SidePanel anchors it with a Popover
+ * on the "Nuevo" button; desktop-app's SpeakerPicker places it inside its
+ * own floating bar.
  *
- * Cada fila va envuelta en un <button> porque AvatarPill renderiza un <span>
- * y no es focusable: en un menú eso dejaría las opciones fuera del alcance
- * del teclado.
+ * Each row is wrapped in a <button> because AvatarPill renders a <span> and
+ * isn't focusable: in a menu that would leave the options out of keyboard
+ * reach.
  */
 export type PersonMenuOption = {
-  /** Identidad estable del consumidor; se usa como React key cuando está. */
+  /** Stable consumer identity; used as the React key when available. */
   id?: string;
-  /** Iniciales del avatar, p. ej. "FI" */
+  /** Avatar initials, e.g. "FI" */
   initials: string;
-  /** Nombre mostrado, p. ej. "Fiscal" */
+  /** Displayed name, e.g. "Fiscal" */
   name: string;
   color?: AvatarColor;
 };
 
 export type PersonMenuProps = {
-  /** Filas del menú, en orden de renderizado. Puede venir vacío. */
+  /** Menu rows, in render order. May be empty. */
   options: PersonMenuOption[];
-  /** Recibe el índice en `options` de la fila elegida. */
+  /** Receives the index in `options` of the chosen row. */
   onSelectOption: (index: number) => void;
-  /** Índice marcado como seleccionado. */
+  /** Index marked as selected. */
   selectedIndex?: number;
-  /** Texto de la acción al pie; omitir para no renderizarla. */
+  /** Footer action label; omit to skip rendering it. */
   footerLabel?: string;
   onFooterAction?: () => void;
   /**
-   * Contenido bajo las filas en lugar del botón, cuando el consumidor
-   * necesita otra cosa (p. ej. un input de nombre libre). Gana sobre
+   * Content under the rows instead of the button, when the consumer needs
+   * something else (e.g. a free-text name input). Takes priority over
    * `footerLabel`/`onFooterAction`.
    */
   footerSlot?: ReactNode;
-  /** Etiqueta accesible del contenedor. */
+  /** Accessible label for the container. */
   "aria-label"?: string;
   className?: string;
 };
@@ -56,8 +58,8 @@ const surface = css({
   p: "2", // 8px
   bg: "bg.secondary",
   rounded: "md", // 8px
-  // Figma usa el estilo `shadow` (0 0 10px rgba(0,0,0,.1)); `menu` es el
-  // token de superficie flotante que ya existe y la diferencia no se ve.
+  // Figma uses the shared `shadow` style (0 0 10px rgba(0,0,0,.1)); `menu`
+  // is the existing floating-surface token and the difference is imperceptible.
   boxShadow: "menu",
 });
 
@@ -69,7 +71,7 @@ const optionButton = css({
   bg: "[transparent]",
   p: "0",
   cursor: "pointer",
-  rounded: "xl", // 24px — el foco sigue la forma de la pill
+  rounded: "xl", // 24px — focus ring follows the pill shape
   "&:focus-visible": {
     outline: "primary-alt",
     outlineWidth: "[2px]",
@@ -77,8 +79,8 @@ const optionButton = css({
   },
 });
 
-// Button no tiene un tamaño de 40px (sm=32, md=48) y centra su contenido;
-// Figma pide 40px de alto y contenido a la izquierda.
+// Button has no 40px size (sm=32, md=48) and centers its content; Figma
+// calls for 40px height and left-aligned content.
 const footerButton = css({
   w: "full",
   h: "10", // 40px
