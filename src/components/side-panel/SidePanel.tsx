@@ -14,6 +14,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../dialog";
+import { PersonMenu } from "../person-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
 
@@ -78,7 +80,19 @@ export type SidePanelProps = {
   /** Index of the selected pill in `people` */
   selectedIndex?: number;
   onSelectPerson?: (index: number) => void;
+  /**
+   * With `newPersonOptions`, this is the handler for the "Nueva persona"
+   * action in the menu's footer. Without options, it's the "Nuevo" button's
+   * direct click handler, as before.
+   */
   onNewPerson?: () => void;
+  /**
+   * Opciones del desplegable de "Nuevo" (p. ej. roles sugeridos). Vacío u
+   * omitido → "Nuevo" llama a `onNewPerson` directo, como antes.
+   */
+  newPersonOptions?: SidePanelPerson[];
+  /** Recibe el índice en `newPersonOptions` de la opción elegida. */
+  onSelectNewPersonOption?: (index: number) => void;
   /** Persists a non-conflicting speaker rename. Set with `onMergePeople` to enable editing. */
   onRenamePerson?: (index: number, nextName: string) => void;
   /** Merges the edited source identity into the existing target identity. Set with `onRenamePerson`. */
@@ -167,6 +181,9 @@ const peopleGroup = css({
   ...stack.raw({ gap: "2" }), // 8px
   w: "full",
 });
+// Figma nodo 40002701:45247 muestra el botón en 40px; Button no tiene ese
+// tamaño (sm=32, md=48).
+const newButton = css({ h: "10" });
 const actions = css({ ...stack.raw({ gap: "4" }), w: "full" }); // 16px
 const fullWidthButton = css({ w: "full" });
 const divider = css({
@@ -283,6 +300,8 @@ export function SidePanel({
   selectedIndex,
   onSelectPerson,
   onNewPerson,
+  newPersonOptions,
+  onSelectNewPersonOption,
   onRenamePerson,
   onMergePeople,
   timestamp,
@@ -297,6 +316,7 @@ export function SidePanel({
   className,
 }: SidePanelProps) {
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [renameConflict, setRenameConflict] =
@@ -444,10 +464,47 @@ export function SidePanel({
             })}
           </div>
           <div>
-            <Button variant="tertiary" size="sm" onClick={onNewPerson}>
-              <PlusIcon size={16} />
-              Nuevo
-            </Button>
+            {newPersonOptions && newPersonOptions.length > 0 ? (
+              <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="tertiary" size="sm" className={newButton}>
+                    <PlusIcon size={16} />
+                    Nuevo
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  side="bottom"
+                  sideOffset={8}
+                  surface={false}
+                  showArrow={false}
+                >
+                  <PersonMenu
+                    options={newPersonOptions}
+                    aria-label="Elegir persona o rol"
+                    onSelectOption={(index) => {
+                      setMenuOpen(false);
+                      onSelectNewPersonOption?.(index);
+                    }}
+                    footerLabel="Nueva persona"
+                    onFooterAction={() => {
+                      setMenuOpen(false);
+                      onNewPerson?.();
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <Button
+                variant="tertiary"
+                size="sm"
+                className={newButton}
+                onClick={onNewPerson}
+              >
+                <PlusIcon size={16} />
+                Nuevo
+              </Button>
+            )}
           </div>
         </div>
         <ConfirmDialog
