@@ -33,7 +33,7 @@ export const Default: Story = {
   args: {
     icon: <FileIcon size={24} />,
     title: "Archivonombrelargolarguisimo.doc",
-    description: "11 pag. - 21.5 mb",
+    description: "11 pag. · 21.5 mb",
     trailingAction: <TrashButton />,
   },
   render: (args) => (
@@ -73,7 +73,7 @@ export const LongTitle: Story = {
   args: {
     icon: <FileIcon size={24} />,
     title: "Un-nombre-de-archivo-extremadamente-largo-que-no-entra.docx",
-    description: "34 pag. - 8.1 mb",
+    description: "34 pag. · 8.1 mb",
     trailingAction: <TrashButton />,
   },
   render: (args) => (
@@ -102,7 +102,7 @@ export const DocumentPreviewComposition: Story = {
       <ArchiveRow
         icon={<FileIcon size={24} />}
         title="Archivonombrelargolarguisimo.doc"
-        description="11 pag. - 21.5 mb"
+        description="11 pag. · 21.5 mb"
         trailingAction={<TrashButton />}
       />
     </div>
