@@ -38,6 +38,7 @@ export * from "./components/logo";
 // Voz a texto (speech-to-text)
 export * from "./components/option";
 export * from "./components/page-title";
+export * from "./components/person-menu";
 export * from "./components/player";
 export * from "./components/popover";
 export * from "./components/radio";

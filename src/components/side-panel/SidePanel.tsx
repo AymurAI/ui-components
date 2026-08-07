@@ -14,6 +14,8 @@ import {
   DialogDescription,
   DialogTitle,
 } from "../dialog";
+import { PersonMenu } from "../person-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "../popover";
 import { TextField } from "../text-field";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
 
@@ -30,7 +32,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../tooltip";
  *
  * Composite assembled from {@link AvatarPill}, {@link TextField},
  * {@link Button}, {@link Dialog} and {@link Tooltip}. Sections: selected
- * turn card, suggested people, timestamp, and turn actions (merge
+ * turn card, identified people, timestamp, and turn actions (merge
  * previous/next, add below, delete).
  *
  * Merge actions use the Phosphor "ArrowsMergeIcon" glyph: base points down
@@ -78,7 +80,19 @@ export type SidePanelProps = {
   /** Index of the selected pill in `people` */
   selectedIndex?: number;
   onSelectPerson?: (index: number) => void;
+  /**
+   * With `newPersonOptions`, this is the handler for the "Nueva persona"
+   * action in the menu's footer. Without options, it's the "Nuevo" button's
+   * direct click handler, as before.
+   */
   onNewPerson?: () => void;
+  /**
+   * Options for the "Nuevo" dropdown (e.g. suggested roles). Empty or
+   * omitted → "Nuevo" calls `onNewPerson` directly, as before.
+   */
+  newPersonOptions?: SidePanelPerson[];
+  /** Receives the index in `newPersonOptions` of the chosen option. */
+  onSelectNewPersonOption?: (index: number) => void;
   /** Persists a non-conflicting speaker rename. Set with `onMergePeople` to enable editing. */
   onRenamePerson?: (index: number, nextName: string) => void;
   /** Merges the edited source identity into the existing target identity. Set with `onRenamePerson`. */
@@ -160,6 +174,16 @@ const pills = css({
   gap: "2", // 8px
   w: "full",
 });
+// Figma node 40002701:44839 ("Pills"): two 40px rows with 8px gap — pills
+// on top (wrapping if needed), the "Nuevo" button always below, never
+// stuck to the end of the last pill row.
+const peopleGroup = css({
+  ...stack.raw({ gap: "2" }), // 8px
+  w: "full",
+});
+// Figma node 40002701:45247 shows the button at 40px; Button has no such
+// size (sm=32, md=48).
+const newButton = css({ h: "10" });
 const actions = css({ ...stack.raw({ gap: "4" }), w: "full" }); // 16px
 const fullWidthButton = css({ w: "full" });
 const divider = css({
@@ -276,6 +300,8 @@ export function SidePanel({
   selectedIndex,
   onSelectPerson,
   onNewPerson,
+  newPersonOptions,
+  onSelectNewPersonOption,
   onRenamePerson,
   onMergePeople,
   timestamp,
@@ -290,6 +316,7 @@ export function SidePanel({
   className,
 }: SidePanelProps) {
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [renameConflict, setRenameConflict] =
@@ -393,49 +420,92 @@ export function SidePanel({
         </div>
       </div>
 
-      {/* Suggested people */}
-      <Section heading="Personas sugeridas">
-        <div className={pills}>
-          {people.map((person, index) => {
-            const isEditing = editingIndex === index;
-            const canRename =
-              person.renamable && onRenamePerson && onMergePeople;
+      {/* Identified people */}
+      <Section heading="Personas identificadas">
+        <div className={peopleGroup}>
+          <div className={pills}>
+            {people.map((person, index) => {
+              const isEditing = editingIndex === index;
+              const canRename =
+                person.renamable && onRenamePerson && onMergePeople;
 
-            return (
-              <span
-                key={person.id ?? `${person.initials}-${person.name}-${index}`}
-                className={css({ display: "inline-flex" })}
+              return (
+                <span
+                  key={
+                    person.id ?? `${person.initials}-${person.name}-${index}`
+                  }
+                  className={css({ display: "inline-flex" })}
+                >
+                  <AvatarPill
+                    initials={person.initials}
+                    name={person.name}
+                    color={person.color}
+                    state={
+                      isEditing
+                        ? "typing"
+                        : index === selectedIndex
+                          ? "selected"
+                          : "default"
+                    }
+                    onClick={() => onSelectPerson?.(index)}
+                    onRename={canRename ? () => startEditing(index) : undefined}
+                    editValue={isEditing ? editValue : undefined}
+                    onEditValueChange={isEditing ? setEditValue : undefined}
+                    onEditCommit={
+                      isEditing
+                        ? (value) => handleRenameCommit(index, value)
+                        : undefined
+                    }
+                    onEditCancel={isEditing ? finishEditing : undefined}
+                    renameInputLabel={`Editar nombre de ${person.name}`}
+                  />
+                </span>
+              );
+            })}
+          </div>
+          <div>
+            {newPersonOptions && newPersonOptions.length > 0 ? (
+              <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="tertiary" size="sm" className={newButton}>
+                    <PlusIcon size={16} />
+                    Nuevo
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  side="bottom"
+                  sideOffset={8}
+                  surface={false}
+                  showArrow={false}
+                >
+                  <PersonMenu
+                    options={newPersonOptions}
+                    aria-label="Elegir persona o rol"
+                    onSelectOption={(index) => {
+                      setMenuOpen(false);
+                      onSelectNewPersonOption?.(index);
+                    }}
+                    footerLabel="Nueva persona"
+                    onFooterAction={() => {
+                      setMenuOpen(false);
+                      onNewPerson?.();
+                    }}
+                  />
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <Button
+                variant="tertiary"
+                size="sm"
+                className={newButton}
+                onClick={onNewPerson}
               >
-                <AvatarPill
-                  initials={person.initials}
-                  name={person.name}
-                  color={person.color}
-                  state={
-                    isEditing
-                      ? "typing"
-                      : index === selectedIndex
-                        ? "selected"
-                        : "default"
-                  }
-                  onClick={() => onSelectPerson?.(index)}
-                  onRename={canRename ? () => startEditing(index) : undefined}
-                  editValue={isEditing ? editValue : undefined}
-                  onEditValueChange={isEditing ? setEditValue : undefined}
-                  onEditCommit={
-                    isEditing
-                      ? (value) => handleRenameCommit(index, value)
-                      : undefined
-                  }
-                  onEditCancel={isEditing ? finishEditing : undefined}
-                  renameInputLabel={`Editar nombre de ${person.name}`}
-                />
-              </span>
-            );
-          })}
-          <Button variant="tertiary" size="sm" onClick={onNewPerson}>
-            <PlusIcon size={16} />
-            Nuevo
-          </Button>
+                <PlusIcon size={16} />
+                Nuevo
+              </Button>
+            )}
+          </div>
         </div>
         <ConfirmDialog
           open={renameConflict !== null}

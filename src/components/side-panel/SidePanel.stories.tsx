@@ -1,7 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
 import { TooltipProvider } from "../tooltip";
-import { SidePanel } from "./SidePanel";
+import { SidePanel, type SidePanelPerson } from "./SidePanel";
+
+const ROLE_OPTIONS: SidePanelPerson[] = [
+  { id: "r1", initials: "JU", name: "Juez/a", color: "violet" },
+  { id: "r2", initials: "FI", name: "Fiscal", color: "yellow" },
+  { id: "r3", initials: "DE", name: "Defensor/a", color: "green-light" },
+  { id: "r4", initials: "DN", name: "Denunciante", color: "blue" },
+  { id: "r5", initials: "AC", name: "Acusado/a", color: "orange" },
+];
 
 const meta = {
   title: "Components/SidePanel",
@@ -27,11 +35,7 @@ type Story = StoryObj<typeof meta>;
 const PEOPLE = [
   { initials: "AB", name: "Persona 1", color: "violet" as const },
   { initials: "AB", name: "Persona 2", color: "green" as const },
-  { initials: "JU", name: "Jueza", color: "red" as const },
-  { initials: "FI", name: "Fiscal", color: "yellow" as const },
-  { initials: "DE", name: "Defensor", color: "pink" as const },
-  { initials: "AB", name: "Imputado", color: "orange" as const },
-  { initials: "DE", name: "Defensor 2", color: "green-light" as const },
+  { initials: "AB", name: "Persona 3", color: "orange" as const },
 ];
 
 const RENAMEABLE_PEOPLE = [
@@ -75,6 +79,8 @@ export const Default: Story = {
         onSelectPerson={setSelected}
         timestamp={time}
         onTimestampChange={setTime}
+        newPersonOptions={ROLE_OPTIONS}
+        onSelectNewPersonOption={() => {}}
       />
     );
   },
@@ -100,6 +106,8 @@ export const Sizes: Story = {
             selectedIndex={selected}
             onSelectPerson={setSelected}
             timestamp="01:15"
+            newPersonOptions={ROLE_OPTIONS}
+            onSelectNewPersonOption={() => {}}
           />
         ))}
       </div>
@@ -125,6 +133,8 @@ export const NarrowContainer: Story = {
         }}
         people={PEOPLE}
         timestamp="01:15"
+        newPersonOptions={ROLE_OPTIONS}
+        onSelectNewPersonOption={() => {}}
       />
     </div>
   ),
@@ -150,10 +160,12 @@ export const MergeConfirmation: Story = {
         selectedIndex={selected}
         onSelectPerson={setSelected}
         timestamp="01:15"
-        previousTurnName="Fiscal"
-        nextTurnName="Defensor"
-        onMergePrevious={() => window.alert("Unido con Fiscal")}
-        onMergeNext={() => window.alert("Unido con Defensor")}
+        previousTurnName="Persona 2"
+        nextTurnName="Persona 3"
+        onMergePrevious={() => window.alert("Unido con Persona 2")}
+        onMergeNext={() => window.alert("Unido con Persona 3")}
+        newPersonOptions={ROLE_OPTIONS}
+        onSelectNewPersonOption={() => {}}
       />
     );
   },
@@ -174,6 +186,8 @@ export const InvalidTimestamp: Story = {
         people={PEOPLE}
         timestamp={time}
         onTimestampChange={setTime}
+        newPersonOptions={ROLE_OPTIONS}
+        onSelectNewPersonOption={() => {}}
       />
     );
   },
@@ -225,5 +239,32 @@ export const RenameAndCollision: Story = {
         <p style={{ padding: 16 }}>{lastAction}</p>
       </div>
     );
+  },
+};
+
+/** Replica of node 40002701:44829, with the "Nuevo" dropdown available. */
+export const WithNewPersonMenu: Story = {
+  args: {
+    people: [
+      { id: "s1", initials: "P1", name: "Persona 1", renamable: true },
+      { id: "s2", initials: "P2", name: "Persona 2", renamable: true },
+      { id: "s3", initials: "P3", name: "Persona 3", renamable: true },
+    ],
+    selectedIndex: 0,
+    timestamp: "01:15",
+    turn: { initials: "P1", name: "Persona 1", time: "01:15", color: "violet" },
+    newPersonOptions: ROLE_OPTIONS,
+    onSelectNewPersonOption: () => {},
+  },
+};
+
+/** Without `newPersonOptions`: "Nuevo" calls onNewPerson directly (backwards-compatible). */
+export const WithoutNewPersonMenu: Story = {
+  args: {
+    people: [{ id: "s1", initials: "P1", name: "Persona 1", renamable: true }],
+    timestamp: "01:15",
+    turn: { initials: "P1", name: "Persona 1", time: "01:15", color: "violet" },
+    newPersonOptions: undefined,
+    onNewPerson: () => window.alert("onNewPerson"),
   },
 };
